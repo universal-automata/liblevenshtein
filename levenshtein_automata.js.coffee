@@ -34,8 +34,6 @@ levenshtein = {}
 do (levenshtein) ->
   'use strict'
 
-  log = (params...) -> console.log(params)
-
   class Set extends Array
     constructor: (collection=null) ->
       @_elements = {}
@@ -324,8 +322,8 @@ matcher = (l) ->
   m
 
 words = ['cat', 'dog', 'horse', 'human', 'product_name']
-words.sort()
-term = 'product'
+#words.sort()
+term = 'produtc_name'
 m = matcher(words)
-log levenshtein.find_all_matches(term, 5, m)
-log 'm.probes', m.probes
+console.log levenshtein.find_all_matches(term, 5, m)
+console.log ['m.probes', m.probes]
