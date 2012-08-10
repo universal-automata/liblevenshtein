@@ -253,7 +253,7 @@ levenshtein = do ->
 
   # term := term for the automaton of edit distances of k to construct
   # k := edit distance of automaton
-  construct_nfa = (term, k) ->
+  build_nfa = (term, k) ->
     nfa = new NFA([0,0])
     for c, i in term
       for e in [0...k+1]
@@ -281,18 +281,7 @@ levenshtein = do ->
   #   database that is greater than or equal to the input argument.
   # Yields:
   #   Every matching term within levenshtein distance k from the database.
-  find_all_matches = (term, k, lookup) ->
-    start = new Date()
-
-    nfa_start = new Date()
-    automaton = construct_nfa(term, k)
-    nfa_stop = new Date()
-
-    dfa_start = new Date()
-    automaton = automaton.to_dfa()
-    dfa_stop = new Date()
-
-    match_start = new Date()
+  find_all_matches = (automaton, lookup) ->
     match = automaton.next_valid_string('\0')
     matches = []
     while match isnt null
@@ -302,35 +291,26 @@ levenshtein = do ->
         matches.push(match)
         next = next + '\0'
       match = automaton.next_valid_string(next)
-    match_stop = new Date()
-
-    stop = new Date()
-
-    console.log "Construction of NFA := #{nfa_stop - nfa_start} milliseconds"
-    console.log "Conversion from NFA to DFA := #{dfa_stop - dfa_start} milliseconds"
-    console.log "Time to Find All Matches := #{match_stop - match_start} milliseconds"
-    console.log "Total Time := #{stop - start} milliseconds"
-
     matches
 
   return {
     bisect_left: bisect_left
-    construct_nfa: construct_nfa
+    build_nfa: build_nfa
     find_all_matches: find_all_matches
   }
 
-matcher = (list) ->
+matcher = (corpus) ->
   lookup = (term) ->
     lookup.probes += 1
-    pos = levenshtein.bisect_left(list, term)
-    if pos < list.length
-      list[pos]
+    position = levenshtein.bisect_left(corpus, term)
+    if position < corpus.length
+      corpus[position]
     else
       null
   lookup.probes = 0
   lookup
 
-terms = '''
+corpus = '''
   id
   name
   avatar_uri
@@ -343,9 +323,37 @@ terms = '''
   boats
 '''.split(/\s+/)
 
-terms.sort()
+corpus.sort()
 
+lookup = matcher(corpus)
 term = 'naem'
-lookup = matcher(terms)
-console.log levenshtein.find_all_matches(term, 2, lookup)
-console.log ['probes', lookup.probes]
+k = 2
+
+start = new Date()
+
+nfa_start = new Date()
+automaton = levenshtein.build_nfa(term, k)
+nfa_stop = new Date()
+
+dfa_start = new Date()
+automaton = automaton.to_dfa()
+dfa_stop = new Date()
+
+match_start = new Date()
+matches = levenshtein.find_all_matches(automaton, lookup)
+match_stop = new Date()
+
+stop = new Date()
+
+console.log '--------------------------------------------------------------------------------'
+console.log "Corpus := #{JSON.stringify(corpus)}"
+console.log "Term := \"#{term}\""
+console.log "Maximum Edit Distance := #{k}"
+console.log "Matches := #{JSON.stringify(matches)}"
+console.log '--------------------------------------------------------------------------------'
+console.log "NFA Construction := #{nfa_stop - nfa_start} milliseconds"
+console.log "Conversion of NFA to DFA := #{dfa_stop - dfa_start} milliseconds"
+console.log "Time to Find All Matches := #{match_stop - match_start} milliseconds"
+console.log "Total Time := #{stop - start} milliseconds"
+console.log '--------------------------------------------------------------------------------'
+
