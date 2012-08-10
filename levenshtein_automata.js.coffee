@@ -1,11 +1,11 @@
 # Copyright (c) 2012 Dylon Edwards
 #
-# Permission is hereby granted, free of charge, to any person obtaining a copy of
-# this software and associated documentation files (the "Software"), to deal in
-# the Software without restriction, including without limitation the rights to
-# use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-# of the Software, and to permit persons to whom the Software is furnished to do
-# so, subject to the following conditions:
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 #
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
@@ -16,7 +16,7 @@
 # AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE. 
+# SOFTWARE.
 
 ################################################################################
 # Initial porting of the Levenshtein Automata algorithm given in the following
@@ -30,96 +30,61 @@
 # them myself.  Please do not attribute me to Levenshtein Automata or binary
 # searchng.
 
-levenshtein = {}
-do (levenshtein) ->
+levenshtein = do ->
   'use strict'
 
-  class Set extends Array
+  EPSILON = 'ε'
+  ANY = '∃'
+
+  class Set
     constructor: (collection=null) ->
-      @_elements = {}
+      @elements = {}
       @update(collection) if collection?
 
-    toString: ->
-      strbuf = []
-      for i in [0...@length]
-        strbuf.push(JSON.stringify(@[i]))
-      'Set([' + strbuf.join(', ') + '])'
-
     update: (collection) ->
-      if collection instanceof Array
+      if collection instanceof Set
+        for value of collection.elements
+          @elements[value] = true
+      else if collection instanceof Array
         for value in collection
-          @add(value)
-      else if collection instanceof Object
-        for own value of collection
-          @add(value)
-      else
-        throw new Error("Unsupported collection type: \"#{collection}\":\"#{typeof collection}\"")
+          @elements[value] = true
+      else #if collection instanceof Object
+        for value of collection
+          @elements[value] = true
       this
 
-    cardinality: (value) ->
-      @_elements[value] || 0
+    contains: (value) -> value of @elements
 
-    contains: (value) ->
-      value of @_elements
-
-    intersection: (set) ->
-      intersection = new Set()
-      for own value of @_elements
-        if value of set._elements
-          intersection.add(value)
-      intersection
+    has_intersection: (set) ->
+      elements = set.elements
+      for value of @elements
+        return true if value of elements
+      false
 
     difference: (set) ->
       difference = new Set()
-      for own value of @_elements
-        if value not of set._elements
+      elements = set.elements
+      for value of @elements
+        unless value of elements
           difference.add(value)
       difference
 
-    union: (set) ->
-      union = new Set()
-      for own value of @_elements
-        union.add(value)
-      for own value of set._elements
-        union.add(value)
-      union
-
     add: (value) ->
-      unless value of @_elements
-        @push(value.toString())
-        @_elements[value] = 0
-      @_elements[value] += 1
-
-    remove: (value) ->
-      if value of @_elements
-        i = 0
-        j = @length - 1
-        while i <= j
-          if @[i] is value
-            @splice(i, 1)
-            break
-          if @[j] is value
-            @splice(j, 1)
-            break
-          i += 1
-          j -= 1
-        delete @_elements[value]
-        true
-      else
-        false
+      @elements[value] = true
 
     pop: ->
-      if @length
-        value = super()
-        delete @_elements[value]
-        value
-      else
-        null
+      for value of @elements
+        delete @elements[value]
+        return value
+      null
+
+    toString: ->
+      strbuf = []
+      for value of @elements
+        strbuf.push(value)
+      strbuf.join(',')
 
   class NFA
-    @EPSILON = 'ε'
-    @ANY = '∃'
-
     constructor: (start_state) ->
       @transitions = {}
       @final_states = new Set()
@@ -136,58 +101,65 @@ do (levenshtein) ->
 
     add_final_state: (state) ->
       @final_states.add(state)
+      this
 
     is_final: (states) ->
-      @final_states.intersection(states)
+      @final_states.has_intersection(states)
 
     _expand: (states) ->
       frontier = new Set(states)
+      transitions = @transitions
       while frontier.length > 0
         state = frontier.pop()
-        @transitions[state] ||= {}
-        @transitions[state][NFA.EPSILON] ||= new Set()
-        new_states = @transitions[state][NFA.EPSILON].difference(states)
-        frontier.update(new_states)
-        states.update(new_states)
+        if state of transitions
+          state_transitions = transitions[state]
+          if EPSILON of state_transitions
+            new_states = state_transitions[EPSILON].difference(states)
+            frontier.update(new_states)
+            states.update(new_states)
       states
 
     next_state: (states, input) ->
       dest_states = new Set()
-      for state in states
-        state_transitions = @transitions[state] || {}
-        dest_states.update(state_transitions[input] || [])
-        dest_states.update(state_transitions[NFA.ANY] || [])
+      transitions = @transitions
+      for state of states.elements
+        if state of transitions
+          state_transitions = transitions[state]
+          if input of state_transitions
+            dest_states.update(state_transitions[input])
+          if ANY of state_transitions
+            dest_states.update(state_transitions[ANY])
       @_expand(dest_states)
 
     get_inputs: (states) ->
       inputs = new Set()
-      for state in states
+      for state of states.elements
         inputs.update(@transitions[state]) if state of @transitions
       inputs
 
     to_dfa: ->
-      dfa = new DFA(@start_state())
-      frontier = [@start_state()]
-      seen = new Set()
+      start_state = @start_state()
+      dfa = new DFA(start_state)
+      frontier = [start_state]
+      visited = {}
       while frontier.length > 0
         current = frontier.pop()
         inputs = @get_inputs(current)
-        for input in inputs
-          if input is NFA.EPSILON then continue
+        for input of inputs.elements
+          if input is EPSILON then continue
           new_state = @next_state(current, input)
-          unless seen.contains(new_state)
+          unless new_state of visited
             frontier.push(new_state)
-            seen.add(new_state)
-            if @is_final(new_state).length > 0
+            visited[new_state] = true
+            if @is_final(new_state)
               dfa.add_final_state(new_state)
-          if input is NFA.ANY
+          if input is ANY
             dfa.set_default_transition(current, new_state)
           else
             dfa.add_transition(current, input, new_state)
       dfa
 
   class DFA
-
     constructor: (start_state) ->
       @start_state = start_state
       @transitions = {}
@@ -197,19 +169,27 @@ do (levenshtein) ->
     add_transition: (src, input, dest) ->
       @transitions[src] ||= {}
       @transitions[src][input] = dest
+      this
 
     set_default_transition: (src, dest) ->
       @defaults[src] = dest
+      this
 
     add_final_state: (state) ->
       @final_states.add(state)
+      this
 
     is_final: (state) ->
       @final_states.contains(state)
 
     next_state: (src, input) ->
-      state_transitions = @transitions[src] || {}
-      state_transitions[input] || @defaults[src] || null
+      transitions = @transitions
+      if src of transitions and input of transitions[src]
+        transitions[src][input]
+      else if src of @defaults
+        @defaults[src]
+      else
+        null
 
     next_valid_string: (input) ->
       state = @start_state
@@ -217,9 +197,9 @@ do (levenshtein) ->
 
       # Evaluate the DFA as far as possible
       broke = false
-      for x, i in input
-        stack.push([input[0...i], state, x])
-        state = @next_state(state, x)
+      for edge, i in input
+        stack.push([input[0...i], state, edge])
+        state = @next_state(state, edge)
         if state is null
           broke = true
           break
@@ -227,41 +207,45 @@ do (levenshtein) ->
         stack.push([input[0...i+1], state, null])
 
       if @is_final(state)
-        # Input word is already valid
+        # Input term is already valid
         return input
 
       # Perform a 'wall following' search for the lexicographically smallest
       # accepting state.
       while stack.length > 0
-        [path, state, x] = stack.pop()
-        x = @find_next_edge(state, x)
-        if x
-          path += x
-          state = @next_state(state, x)
+        [path, state, edge] = stack.pop()
+        edge = @find_next_edge(state, edge)
+        if edge
+          path += edge
+          state = @next_state(state, edge)
           if @is_final(state)
             return path
           stack.push([path, state, null])
       return null
 
-    find_next_edge: (s, x) ->
-      if x is null
-        x = '\0'
+    find_next_edge: (state, edge) ->
+      if edge is null
+        edge = '\0'
       else
-        x = String.fromCharCode(x.charCodeAt(0) + 1)
-      state_transitions = @transitions[s] || {}
-      if x of state_transitions or s of @defaults
-        return x
-      labels = (key for own key of state_transitions)
-      labels.sort()
-      pos = bisect_left(labels, x)
-      if pos < labels.length
-        return labels[pos]
+        edge = String.fromCharCode(edge.charCodeAt(0) + 1)
+      if state of @transitions
+        state_transitions = @transitions[state]
+        if edge of state_transitions
+          return edge
+        labels = []
+        for label of state_transitions
+          labels.splice(bisect_left(labels, label), 0, label)
+        index = bisect_left(labels, edge)
+        if index < labels.length
+          return labels[index]
+      if state of @defaults
+        return edge
       return null
 
-  levenshtein.bisect_left = bisect_left = (a, x, lo=0, hi=a.length) ->
+  bisect_left = (array, edge, lo=0, hi=array.length) ->
     while lo < hi
       i = (lo + hi) >> 1
-      if a[i] < x
+      if array[i] < edge
         lo = i + 1
       else
         hi = i
@@ -269,7 +253,7 @@ do (levenshtein) ->
 
   # term := term for the automaton of edit distances of k to construct
   # k := edit distance of automaton
-  levenshtein.automata = automata = (term, k) ->
+  construct_nfa = (term, k) ->
     nfa = new NFA([0,0])
     for c, i in term
       for e in [0...k+1]
@@ -277,53 +261,91 @@ do (levenshtein) ->
         nfa.add_transition([i,e], c, [i + 1, e])
         if e < k
           # Deletion
-          nfa.add_transition([i,e], NFA.ANY, [i, e+1])
+          nfa.add_transition([i,e], ANY, [i, e+1])
           # Insertion
-          nfa.add_transition([i,e], NFA.EPSILON, [i+1, e+1])
+          nfa.add_transition([i,e], EPSILON, [i+1, e+1])
           # Substitution
-          nfa.add_transition([i,e], NFA.ANY, [i+1,e+1])
+          nfa.add_transition([i,e], ANY, [i+1,e+1])
     for e in [0...k+1]
       if e < k
-        nfa.add_transition([term.length, e], NFA.ANY, [term.length, e+1])
+        nfa.add_transition([term.length, e], ANY, [term.length, e+1])
       nfa.add_final_state([term.length, e])
     nfa
 
-  # Uses lookup_func to find all words within levenshtein distance k of word.
+  # Uses lookup to find all terms within levenshtein distance k of term.
   #
   # Args:
-  #   word: The word to look up
+  #   term: The term to look up
   #   k: Maximum edit distance
-  #   lookup_func: A single argument function that returns the first word in the
+  #   lookup: A single argument function that returns the first term in the
   #   database that is greater than or equal to the input argument.
   # Yields:
-  #   Every matching word within levenshtein distance k from the database.
-  levenshtein.find_all_matches = find_all_matches = (word, k, lookup_func) ->
-    lev = automata(word, k).to_dfa()
-    match = lev.next_valid_string('\0')
+  #   Every matching term within levenshtein distance k from the database.
+  find_all_matches = (term, k, lookup) ->
+    start = new Date()
+
+    nfa_start = new Date()
+    automaton = construct_nfa(term, k)
+    nfa_stop = new Date()
+
+    dfa_start = new Date()
+    automaton = automaton.to_dfa()
+    dfa_stop = new Date()
+
+    match_start = new Date()
+    match = automaton.next_valid_string('\0')
     matches = []
     while match isnt null
-      next = lookup_func(match)
+      next = lookup(match)
       break if next is null
       if match is next
         matches.push(match)
         next = next + '\0'
-      match = lev.next_valid_string(next)
+      match = automaton.next_valid_string(next)
+    match_stop = new Date()
+
+    stop = new Date()
+
+    console.log "Construction of NFA := #{nfa_stop - nfa_start} milliseconds"
+    console.log "Conversion from NFA to DFA := #{dfa_stop - dfa_start} milliseconds"
+    console.log "Time to Find All Matches := #{match_stop - match_start} milliseconds"
+    console.log "Total Time := #{stop - start} milliseconds"
+
     matches
 
-matcher = (l) ->
-  m = (w) ->
-    m.probes += 1
-    pos = levenshtein.bisect_left(l, w)
-    if pos < l.length
-      l[pos]
+  return {
+    bisect_left: bisect_left
+    construct_nfa: construct_nfa
+    find_all_matches: find_all_matches
+  }
+
+matcher = (list) ->
+  lookup = (term) ->
+    lookup.probes += 1
+    pos = levenshtein.bisect_left(list, term)
+    if pos < list.length
+      list[pos]
     else
       null
-  m.probes = 0
-  m
+  lookup.probes = 0
+  lookup
 
-words = ['cat', 'dog', 'horse', 'human', 'product_name']
-#words.sort()
-term = 'produtc_name'
-m = matcher(words)
-console.log levenshtein.find_all_matches(term, 5, m)
-console.log ['m.probes', m.probes]
+terms = '''
+  id
+  name
+  avatar_uri
+  children
+  friends
+  family
+  pets
+  cars
+  houses
+  boats
+'''.split(/\s+/)
+
+terms.sort()
+
+term = 'naem'
+lookup = matcher(terms)
+console.log levenshtein.find_all_matches(term, 2, lookup)
+console.log ['probes', lookup.probes]
