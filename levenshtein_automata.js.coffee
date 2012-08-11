@@ -42,10 +42,13 @@ levenshtein = do ->
       @update_set(collection) if collection
 
     toString: ->
-      strbuf = []
-      for value of @elements
-        strbuf.push(value)
-      strbuf.join(',')
+      if @_string
+        @_string
+      else
+        strbuf = []
+        for value of @elements
+          strbuf.push(value)
+        @_string = strbuf.join(',')
 
     update_set: (set) -> @update_object(set.elements)
 
@@ -338,8 +341,8 @@ main = ->
   corpus.sort()
 
   lookup = matcher(corpus)
-  term = 'naem'
-  k = 4 # WARNING: Don't set this too high (it increases the work exponentially)
+  term = 'atavar_url'
+  k = 5 # WARNING: Don't set this too high (it increases the work exponentially)
 
   start = new Date()
 
