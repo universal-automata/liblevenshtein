@@ -39,18 +39,20 @@ levenshtein = do ->
   class Set
     constructor: (collection=null) ->
       @elements = {}
-      @update(collection) if collection?
+      @update_set(collection) if collection
 
-    update: (collection) ->
-      if collection instanceof Set
-        for value of collection.elements
-          @elements[value] = true
-      else if collection instanceof Array
-        for value in collection
-          @elements[value] = true
-      else #if collection instanceof Object
-        for value of collection
-          @elements[value] = true
+    toString: ->
+      strbuf = []
+      for value of @elements
+        strbuf.push(value)
+      strbuf.join(',')
+
+    update_set: (set) -> @update_object(set.elements)
+
+    update_object: (object) ->
+      elements = @elements
+      for value of object
+        elements[value] = true
       this
 
     contains: (value) -> value of @elements
@@ -78,12 +80,6 @@ levenshtein = do ->
         return value
       null
 
-    toString: ->
-      strbuf = []
-      for value of @elements
-        strbuf.push(value)
-      strbuf.join(',')
-
   class NFA
     constructor: (start_state) ->
       @transitions = {}
@@ -91,12 +87,18 @@ levenshtein = do ->
       @_start_state = start_state
 
     start_state: ->
-      @_expand(new Set([@_start_state]))
+      set = new Set()
+      set.add(@_start_state)
+      @_expand(set)
 
     add_transition: (src, input, dest) ->
-      @transitions[src] ||= {}
-      @transitions[src][input] ||= new Set()
-      @transitions[src][input].add(dest)
+      transition = @transitions[src]
+      unless transition
+        transition = @transitions[src] = {}
+      set = transition[input]
+      unless set
+        set = transition[input] = new Set()
+      set.add(dest)
       this
 
     add_final_state: (state) ->
@@ -109,32 +111,36 @@ levenshtein = do ->
     _expand: (states) ->
       frontier = new Set(states)
       transitions = @transitions
-      while frontier.length > 0
-        state = frontier.pop()
-        if state of transitions
-          state_transitions = transitions[state]
-          if EPSILON of state_transitions
-            new_states = state_transitions[EPSILON].difference(states)
-            frontier.update(new_states)
-            states.update(new_states)
+      while state_transitions = transitions[frontier.pop()]
+        if state_transitions
+          epsilon_transition = state_transitions[EPSILON]
+          if epsilon_transition
+            new_states = epsilon_transition.difference(states)
+            frontier.update_object(new_states)
+            states.update_object(new_states)
       states
 
     next_state: (states, input) ->
       dest_states = new Set()
       transitions = @transitions
       for state of states.elements
-        if state of transitions
-          state_transitions = transitions[state]
-          if input of state_transitions
-            dest_states.update(state_transitions[input])
-          if ANY of state_transitions
-            dest_states.update(state_transitions[ANY])
+        state_transitions = transitions[state]
+        if state_transitions
+          state_transition = state_transitions[input]
+          if state_transition
+            dest_states.update_set(state_transition)
+          state_transition = state_transitions[ANY]
+          if state_transition
+            dest_states.update_set(state_transition)
       @_expand(dest_states)
 
     get_inputs: (states) ->
       inputs = new Set()
+      transitions = @transitions
       for state of states.elements
-        inputs.update(@transitions[state]) if state of @transitions
+        transition = transitions[state]
+        if transition
+          inputs.update_object(transition)
       inputs
 
     to_dfa: ->
@@ -167,8 +173,10 @@ levenshtein = do ->
       @final_states = new Set()
 
     add_transition: (src, input, dest) ->
-      @transitions[src] ||= {}
-      @transitions[src][input] = dest
+      transition = @transitions[src]
+      unless transition
+        transition = @transitions[src] = {}
+      transition[input] = dest
       this
 
     set_default_transition: (src, dest) ->
@@ -183,13 +191,13 @@ levenshtein = do ->
       @final_states.contains(state)
 
     next_state: (src, input) ->
-      transitions = @transitions
-      if src of transitions and input of transitions[src]
-        transitions[src][input]
-      else if src of @defaults
-        @defaults[src]
-      else
-        null
+      transition = @transitions[src]
+      if transition
+        state = transition[input]
+        return state if state
+      state = @defaults[src]
+      return state if state
+      null
 
     next_valid_string: (input) ->
       state = @start_state
@@ -199,8 +207,7 @@ levenshtein = do ->
       broke = false
       for edge, i in input
         stack.push([input[0...i], state, edge])
-        state = @next_state(state, edge)
-        if state is null
+        unless state = @next_state(state, edge)
           broke = true
           break
       unless broke
@@ -228,8 +235,8 @@ levenshtein = do ->
         edge = '\0'
       else
         edge = String.fromCharCode(edge.charCodeAt(0) + 1)
-      if state of @transitions
-        state_transitions = @transitions[state]
+      state_transitions = @transitions[state]
+      if state_transitions
         if edge of state_transitions
           return edge
         labels = []
@@ -266,10 +273,11 @@ levenshtein = do ->
           nfa.add_transition([i,e], EPSILON, [i+1, e+1])
           # Substitution
           nfa.add_transition([i,e], ANY, [i+1,e+1])
+    term_length = term.length
     for e in [0...k+1]
       if e < k
-        nfa.add_transition([term.length, e], ANY, [term.length, e+1])
-      nfa.add_final_state([term.length, e])
+        nfa.add_transition([term_length, e], ANY, [term_length, e+1])
+      nfa.add_final_state([term_length, e])
     nfa
 
   # Uses lookup to find all terms within levenshtein distance k of term.
@@ -294,66 +302,70 @@ levenshtein = do ->
     matches
 
   return {
+    Set: Set
+    NFA: NFA
+    DFA: DFA
     bisect_left: bisect_left
     build_nfa: build_nfa
     find_all_matches: find_all_matches
   }
 
-matcher = (corpus) ->
-  lookup = (term) ->
-    lookup.probes += 1
-    position = levenshtein.bisect_left(corpus, term)
-    if position < corpus.length
-      corpus[position]
-    else
-      null
-  lookup.probes = 0
-  lookup
+main = ->
+  matcher = (corpus) ->
+    lookup = (term) ->
+      lookup.probes += 1
+      position = levenshtein.bisect_left(corpus, term)
+      if position < corpus.length
+        corpus[position]
+      else
+        null
+    lookup.probes = 0
+    lookup
 
-corpus = '''
-  id
-  name
-  avatar_uri
-  children
-  friends
-  family
-  pets
-  cars
-  houses
-  boats
-'''.split(/\s+/)
+  corpus = '''
+    id
+    name
+    avatar_uri
+    children
+    friends
+    family
+    pets
+    cars
+    houses
+    boats
+  '''.split(/\s+/)
 
-corpus.sort()
+  corpus.sort()
 
-lookup = matcher(corpus)
-term = 'naem'
-k = 2
+  lookup = matcher(corpus)
+  term = 'naem'
+  k = 4 # WARNING: Don't set this too high (it increases the work exponentially)
 
-start = new Date()
+  start = new Date()
 
-nfa_start = new Date()
-automaton = levenshtein.build_nfa(term, k)
-nfa_stop = new Date()
+  nfa_start = new Date()
+  automaton = levenshtein.build_nfa(term, k)
+  nfa_stop = new Date()
 
-dfa_start = new Date()
-automaton = automaton.to_dfa()
-dfa_stop = new Date()
+  dfa_start = new Date()
+  automaton = automaton.to_dfa()
+  dfa_stop = new Date()
 
-match_start = new Date()
-matches = levenshtein.find_all_matches(automaton, lookup)
-match_stop = new Date()
+  match_start = new Date()
+  matches = levenshtein.find_all_matches(automaton, lookup)
+  match_stop = new Date()
 
-stop = new Date()
+  stop = new Date()
 
-console.log '--------------------------------------------------------------------------------'
-console.log "Corpus := #{JSON.stringify(corpus)}"
-console.log "Term := \"#{term}\""
-console.log "Maximum Edit Distance := #{k}"
-console.log "Matches := #{JSON.stringify(matches)}"
-console.log '--------------------------------------------------------------------------------'
-console.log "NFA Construction := #{nfa_stop - nfa_start} milliseconds"
-console.log "Conversion of NFA to DFA := #{dfa_stop - dfa_start} milliseconds"
-console.log "Time to Find All Matches := #{match_stop - match_start} milliseconds"
-console.log "Total Time := #{stop - start} milliseconds"
-console.log '--------------------------------------------------------------------------------'
-
+  console.log '--------------------------------------------------------------------------------'
+  console.log "Corpus := #{JSON.stringify(corpus)}"
+  console.log "Term := \"#{term}\""
+  console.log "Maximum Edit Distance := #{k}"
+  console.log "Matches := #{JSON.stringify(matches)}"
+  console.log '--------------------------------------------------------------------------------'
+  console.log "NFA Construction := #{nfa_stop - nfa_start} milliseconds"
+  console.log "Conversion of NFA to DFA := #{dfa_stop - dfa_start} milliseconds"
+  console.log "Time to Find All Matches := #{match_stop - match_start} milliseconds"
+  console.log "Total Time := #{stop - start} milliseconds"
+  console.log '--------------------------------------------------------------------------------'
+main()
