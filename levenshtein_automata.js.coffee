@@ -24,11 +24,6 @@
 #
 #   http://blog.notdot.net/2010/07/Damn-Cool-Algorithms-Levenshtein-Automata
 #
-# Note that although I've licensed this code under the MIT license, I claim only
-# ownership of the source code as described by the license; I do not claim
-# ownership of any of the corresponding algorithms, unless of course I derived
-# them myself.  Please do not attribute me to Levenshtein Automata or binary
-# searchng.
 
 levenshtein = do ->
   'use strict'
