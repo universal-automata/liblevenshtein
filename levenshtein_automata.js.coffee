@@ -39,7 +39,7 @@ levenshtein = do ->
   class Set
     constructor: (collection=null) ->
       @elements = {}
-      @update_set(collection) if collection
+      @update(collection) if collection
 
     toString: ->
       if @_string
@@ -50,15 +50,11 @@ levenshtein = do ->
           strbuf.push(value)
         @_string = strbuf.join(',')
 
-    update_set: (set) -> @update_object(set.elements)
-
-    update_object: (object) ->
+    update: (object) ->
       elements = @elements
       for value of object
         elements[value] = true
-      this
-
-    contains: (value) -> value of @elements
+      return
 
     has_intersection: (set) ->
       elements = set.elements
@@ -102,11 +98,11 @@ levenshtein = do ->
       unless set
         set = transition[input] = new Set()
       set.add(dest)
-      this
+      return
 
     add_final_state: (state) ->
       @final_states.add(state)
-      this
+      return
 
     is_final: (states) ->
       @final_states.has_intersection(states)
@@ -119,8 +115,8 @@ levenshtein = do ->
           epsilon_transition = state_transitions[EPSILON]
           if epsilon_transition
             new_states = epsilon_transition.difference(states)
-            frontier.update_object(new_states)
-            states.update_object(new_states)
+            frontier.update(new_states)
+            states.update(new_states)
       states
 
     next_state: (states, input) ->
@@ -131,10 +127,10 @@ levenshtein = do ->
         if state_transitions
           state_transition = state_transitions[input]
           if state_transition
-            dest_states.update_set(state_transition)
+            dest_states.update(state_transition.elements)
           state_transition = state_transitions[ANY]
           if state_transition
-            dest_states.update_set(state_transition)
+            dest_states.update(state_transition.elements)
       @_expand(dest_states)
 
     get_inputs: (states) ->
@@ -143,7 +139,7 @@ levenshtein = do ->
       for state of states.elements
         transition = transitions[state]
         if transition
-          inputs.update_object(transition)
+          inputs.update(transition)
       inputs
 
     to_dfa: ->
@@ -180,18 +176,17 @@ levenshtein = do ->
       unless transition
         transition = @transitions[src] = {}
       transition[input] = dest
-      this
+      return
 
     set_default_transition: (src, dest) ->
       @defaults[src] = dest
-      this
+      return
 
     add_final_state: (state) ->
       @final_states.add(state)
-      this
+      return
 
-    is_final: (state) ->
-      @final_states.contains(state)
+    is_final: (state) -> state of @final_states.elements
 
     next_state: (src, input) ->
       transition = @transitions[src]
@@ -207,18 +202,15 @@ levenshtein = do ->
       stack = []
 
       # Evaluate the DFA as far as possible
-      broke = false
       for edge, i in input
         stack.push([input[0...i], state, edge])
-        unless state = @next_state(state, edge)
-          broke = true
-          break
-      unless broke
-        stack.push([input[0...i+1], state, null])
+        break unless state = @next_state(state, edge)
 
-      if @is_final(state)
-        # Input term is already valid
-        return input
+      if state
+        stack.push([input[0...i+1], state, null])
+        if @is_final(state)
+          # Input term is already valid
+          return [input, state]
 
       # Perform a 'wall following' search for the lexicographically smallest
       # accepting state.
@@ -228,8 +220,7 @@ levenshtein = do ->
         if edge
           path += edge
           state = @next_state(state, edge)
-          if @is_final(state)
-            return path
+          return [path, state] if @is_final(state)
           stack.push([path, state, null])
       return null
 
@@ -264,23 +255,24 @@ levenshtein = do ->
   # term := term for the automaton of edit distances of k to construct
   # k := edit distance of automaton
   build_nfa = (term, k) ->
-    nfa = new NFA([0,0])
+    pair = (i, j) -> '(' + i + ',' + j + ')'
+    nfa = new NFA(pair(0,0))
     for c, i in term
       for e in [0...k+1]
         # Correct character
-        nfa.add_transition([i,e], c, [i + 1, e])
+        nfa.add_transition(pair(i,e), c, pair(i+1, e))
         if e < k
           # Deletion
-          nfa.add_transition([i,e], ANY, [i, e+1])
+          nfa.add_transition(pair(i,e), ANY, pair(i, e+1))
           # Insertion
-          nfa.add_transition([i,e], EPSILON, [i+1, e+1])
+          nfa.add_transition(pair(i,e), EPSILON, pair(i+1, e+1))
           # Substitution
-          nfa.add_transition([i,e], ANY, [i+1,e+1])
+          nfa.add_transition(pair(i,e), ANY, pair(i+1,e+1))
     term_length = term.length
     for e in [0...k+1]
       if e < k
-        nfa.add_transition([term_length, e], ANY, [term_length, e+1])
-      nfa.add_final_state([term_length, e])
+        nfa.add_transition(pair(term_length, e), ANY, pair(term_length, e+1))
+      nfa.add_final_state(pair(term_length, e))
     nfa
 
   # Uses lookup to find all terms within levenshtein distance k of term.
@@ -291,17 +283,22 @@ levenshtein = do ->
   #   lookup: A single argument function that returns the first term in the
   #   database that is greater than or equal to the input argument.
   # Yields:
-  #   Every matching term within levenshtein distance k from the database.
+  #   Every matching term within levenshtein distance k from the database, along
+  #   with its corresponding levenshtein distance.
   find_all_matches = (automaton, lookup) ->
-    match = automaton.next_valid_string('\0')
-    matches = []
-    while match isnt null
+    matches = []; next = '\0'
+    while successor = automaton.next_valid_string(next)
+      [match, state] = successor
       next = lookup(match)
       break if next is null
       if match is next
-        matches.push(match)
+        min_distance = Infinity
+        for pair of state.elements
+          distance = +/^\(\d+,(\d+)\)$/.exec(pair)[1]
+          if distance < min_distance
+            min_distance = distance
+        matches.push([match, min_distance])
         next = next + '\0'
-      match = automaton.next_valid_string(next)
     matches
 
   return {
