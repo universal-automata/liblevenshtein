@@ -37,7 +37,7 @@ levenshtein = do ->
   ANY = '∃'
 
   class Set
-    constructor: (collection=null) ->
+    constructor: (collection) ->
       @elements = {}
       @update(collection) if collection
 
