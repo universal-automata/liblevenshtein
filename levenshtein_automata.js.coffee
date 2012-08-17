@@ -347,7 +347,7 @@ main = ->
   corpus = '''
     id
     name
-    avatar_uri
+    avatar
     children
     friends
     family
@@ -360,7 +360,6 @@ main = ->
   corpus.sort()
 
   lookup = matcher(corpus)
-  #term = 'atavar_url'
   term = 'test'
   k = 5 # WARNING: Don't set this too high (it increases the work exponentially)
 
