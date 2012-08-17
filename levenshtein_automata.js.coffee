@@ -321,7 +321,7 @@ levenshtein = do ->
 
 main = ->
   # It is always suggested to run this, to ensure that the library can function
-  # correctly.  Not that it will throw an exception if it fails the check, so
+  # correctly.  Note that it will throw an exception if it fails the check, so
   # you should place it within a try-catch block.
   levenshtein.sanity_check()
 
