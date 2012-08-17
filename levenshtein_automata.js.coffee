@@ -300,10 +300,8 @@ levenshtein = do ->
     if v is '' or w is ''
       Math.max(v.length, w.length)
     else # v.length >= 1 and w.length >= 1
-      a = v[0]
-      s = v[1..]
-      b = w[0]
-      t = w[1..]
+      a = v[0]; s = v[1..]
+      b = w[0]; t = w[1..]
       Math.min(
         (if a is b then distance(s,t) else Infinity),
         1 + distance(s,w),
