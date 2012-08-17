@@ -301,6 +301,14 @@ levenshtein = do ->
         next = next + '\0'
     matches
 
+  sanity_check = ->
+    keys = []
+    for own key of Object.prototype
+      keys.push(key)
+    if keys.length
+      throw new Error("Expected Object.prototype to have no custom properties, but found these: #{JSON.stringify(keys)}")
+    return
+
   return {
     Set: Set
     NFA: NFA
@@ -308,9 +316,15 @@ levenshtein = do ->
     bisect_left: bisect_left
     build_nfa: build_nfa
     find_all_matches: find_all_matches
+    sanity_check: sanity_check
   }
 
 main = ->
+  # It is always suggested to run this, to ensure that the library can function
+  # correctly.  Not that it will throw an exception if it fails the check, so
+  # you should place it within a try-catch block.
+  levenshtein.sanity_check()
+
   matcher = (corpus) ->
     lookup = (term) ->
       lookup.probes += 1
