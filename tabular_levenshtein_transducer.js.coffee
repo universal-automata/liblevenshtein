@@ -320,7 +320,7 @@ main = ->
           while a is b and s.length > 0 and t.length > 0
             a = s[0]; v = s; s = s[1..]
             b = t[0]; w = t; t = t[1..]
-          if a is b # s.length = 0 = t.length
+          if a is b # s.length = 0 || t.length = 0
             if s.length is 0
               t.length
             else
