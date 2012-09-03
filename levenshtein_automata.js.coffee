@@ -297,16 +297,17 @@ levenshtein = do ->
   #
   # Source: http://www.fmi.uni-sofia.bg/fmi/logic/theses/mitankin-en.pdf
   distance = (v, w) ->
-    if v is '' or w is ''
-      Math.max(v.length, w.length)
+    if v is ''
+      w.length
+    else if w is ''
+      v.length
     else # v.length >= 1 and w.length >= 1
       a = v[0]; s = v[1..]
       b = w[0]; t = w[1..]
-      Math.min(
-        (if a is b then distance(s,t) else Infinity),
-        1 + distance(s,w),
-        1 + distance(v,t),
-        1 + distance(s,t))
+      if a is b
+        distance(s,t)
+      else
+        1 + Math.min(distance(s,w), distance(v,t), distance(s,t))
 
   sanity_check = ->
     keys = []
@@ -360,7 +361,7 @@ main = ->
   corpus.sort()
 
   lookup = matcher(corpus)
-  term = 'test'
+  term = 'testing, 1 2 3'
   k = 5 # WARNING: Don't set this too high (it increases the work exponentially)
 
   start = new Date()
@@ -383,19 +384,7 @@ main = ->
   distance_stop = new Date()
 
   sort_start = new Date()
-  matches.sort (v, w) ->
-    [a, x] = v
-    [b, y] = w
-    if x < y
-      -1
-    else if x > y
-      1
-    else if a < b
-      -1
-    else if a > b
-      1
-    else
-      0
+  matches.sort (v, w) -> v[1] - w[1] || v[0] - w[0]
   sort_stop = new Date()
 
   stop = new Date()
