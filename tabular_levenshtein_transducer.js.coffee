@@ -56,7 +56,7 @@ levenshtein = do ->
   TRANSPOSITION = 'transposition'
   MERGE_AND_SPLIT = 'merge_and_split'
     
-  transducer: ({dictionary, algorithm, sorted}; distance) ->
+  transducer: ({dictionary, algorithm, sorted}) ->
     algorithm = STANDARD unless algorithm in [STANDARD, TRANSPOSITION, MERGE_AND_SPLIT]
     sorted = false unless typeof sorted is 'boolean'
 
@@ -741,7 +741,7 @@ main = ->
     'phone'
   ]
 
-  word = 'clog'; n = 2
+  word = 'clog'; n = 1
 
   #algorithm = 'standard'
   #algorithm = 'transposition'
