@@ -715,7 +715,7 @@ levenshtein = do ->
                 else
                   1 + Math.min(p,q,r,s,t)
 
-main = (;distance) ->
+main = ->
   dictionary = [
     'levenshtein'
     'transducer'
