@@ -666,11 +666,9 @@ main = ->
     'snake'
     'lizard'
     'salamander'
-    'slithre'
-    'slitehr'
+    'slither'
     'cold'
     'child'
-    'pero'
     'pet'
     'computer'
     'cell'
@@ -692,7 +690,7 @@ main = ->
   distance_stop = new Date()
 
   dictionary_copy = (term for term in dictionary)
-  dictionary_copy.sort (a,b) -> distance(word, a) - distance(word, b) || if a < b then -1 else if a < b then 1 else 0
+  dictionary_copy.sort (a,b) -> distance(word, a) - distance(word, b) || if a < b then -1 else if a > b then 1 else 0
   console.log 'Distances to Every Dictionary Term:'
   console.log "  distance(\"#{word}\", \"#{term}\") = #{distance(word, term)}" for term in dictionary_copy
   console.log '----------------------------------------'
@@ -704,7 +702,7 @@ main = ->
 
   console.log '----------------------------------------'
 
-  transduced.sort (a,b) -> distance(word, a) - distance(word, b) || if a < b then -1 else if a < b then 1 else 0
+  transduced.sort (a,b) -> distance(word, a) - distance(word, b) || if a < b then -1 else if a > b then 1 else 0
   console.log 'Distances to Every Transduced Term:'
   for term in transduced
     console.log "  distance(\"#{word}\", \"#{term}\") = #{distance(word, term)}"
