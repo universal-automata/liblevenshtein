@@ -60,37 +60,6 @@ levenshtein = do ->
     algorithm = STANDARD unless algorithm in [STANDARD, TRANSPOSITION, MERGE_AND_SPLIT]
     sorted = false unless typeof sorted is 'boolean'
 
-    #subsumes = switch algorithm
-      #when STANDARD then (i,e, j,f) ->
-        #(e < f) and Math.abs(j - i) <= (f - e)
-
-      #when TRANSPOSITION then (i,e,x, j,f,y, w) ->
-        ## [i,e] is a t-position
-        #if x is true
-          ## [j,f] is a t-position
-          #if y is true
-            #(f > e) and (i is j)
-
-          ## [j,f] is a standard position
-          #else
-            #(n is f) and (f > e) and (i is j)
-
-        ## [i,e] is a standard position
-        #else
-          ## [j,f] is a t-position
-          #if y is true
-            #(f > e) and Math.abs(j - (i - 1)) <= (f - e)
-
-          ## [j,f] is a standard position
-          #else
-            #(e < f) and Math.abs(j - i) <= f - e
-
-      #when MERGE_AND_SPLIT then (i,e,x, j,f,y) ->
-        #if x isnt true and y isnt true
-          #(e < f) and Math.abs(j - i) <= f - e
-        #else
-          #(f > e) and Math.abs(j - i) <= f - e
-
     # ============================================================================
     # Taken and modified for my purposes from the following source:
     #  o http://stevehanov.ca/blog/index.php?id=115
@@ -188,7 +157,6 @@ levenshtein = do ->
         return
 
     index_of = (vector, k, i) ->
-      #console.log "x = #{x}, W = #{W}, k = #{k}, i = #{i}"
       j = 0
       while j < k
         return j if vector[i + j]
@@ -439,38 +407,6 @@ levenshtein = do ->
             else # i == w
               null
 
-    #unsubsume =
-      #if algorithm is STANDARD
-        #(state, w) ->
-          #state.sort (a,b) -> a[1] - b[1] || a[0] - b[0]
-          #m = 0
-          #while m < state.length - 1
-            #[i,e] = state[m]; n = m + 1
-            #while n < state.length
-              #[j,f] = state[n]
-              #if subsumes(i,e, j,f, w)
-                #state.splice(n,1)
-              #else
-                #n += 1
-            #m += 1
-          #state.sort (a,b) -> a[0] - b[0] || a[1] - b[1]
-          #return
-      #else
-        #(state, w) ->
-          #state.sort (a,b) -> a[1] - b[1] || a[0] - b[0]
-          #m = 0
-          #while m < state.length - 1
-            #[i,e,x] = state[m]; n = m + 1
-            #while n < state.length
-              #[j,f,y] = state[n]
-              #if subsumes(i,e,x, j,f,y, w)
-                #state.splice(n,1)
-              #else
-                #n += 1
-            #m += 1
-          #state.sort (a,b) -> a[0] - b[0] || a[1] - b[1]
-          #return
-
     copy =
       if algorithm is STANDARD
         (state) -> ([i,e] for [i,e] in state)
@@ -500,12 +436,10 @@ levenshtein = do ->
 
         for position in state_copy
           next_state = transition(position, vector)
-          #console.log " << 1 >> transition(#{JSON.stringify(position)}, #{JSON.stringify(vector)}) = #{JSON.stringify(next_state)}"
           continue unless next_state
           Array::push.apply(state_prime, next_state)
 
         if state_prime.length > 0
-          #unsubsume(state_prime)
           relabel(state_prime, offset)
           state_prime
         else
@@ -543,9 +477,7 @@ levenshtein = do ->
         [V, q_D, M] = stack.pop(); i = M[0][0]; k = Math.min(2 * n + 1, w - i)
         for x, next_q_D of q_D.edges
           vector = characteristic_vector(x, term, k, i)
-          #console.log " << 0 >> x = #{x}, term = #{term}, i = #{i}, w = #{w}, k = #{k}, n = #{n}, vector = #{JSON.stringify(vector)}"
           next_M = transition(M, vector)
-          #console.log "#{JSON.stringify(M)} -> #{JSON.stringify(next_M)}"
           if next_M
             next_V = V + x
             stack.push([next_V, next_q_D, next_M])
