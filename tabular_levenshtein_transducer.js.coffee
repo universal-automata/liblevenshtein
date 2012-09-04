@@ -741,10 +741,7 @@ main = (;distance) ->
     'phone'
   ]
 
-  #word = 'chold'; n = 2
   word = 'clog'; n = 2
-
-  # BUG: Merge-and-Split returns words with distances of 3 for word = "clog", when n = 2
 
   #algorithm = 'standard'
   #algorithm = 'transposition'
