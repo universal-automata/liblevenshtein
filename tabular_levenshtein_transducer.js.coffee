@@ -484,6 +484,7 @@ levenshtein = do ->
             if next_q_D.final and is_final(next_M, w, n)
               matches.push(next_V)
       matches
+
   distance: (algorithm) ->
     algorithm = STANDARD unless algorithm in [STANDARD, TRANSPOSITION, MERGE_AND_SPLIT]
 
@@ -594,6 +595,9 @@ levenshtein = do ->
                   else
                     1 + Math.min(p,q,r)
 
+      # Calculates the Levenshtein distance between words v and w, using the
+      # following primitive operations: deletion, insertion, substitution,
+      # merge, and split.
       when MERGE_AND_SPLIT then do ->
         f = (u, t) ->
           if t < u.length
