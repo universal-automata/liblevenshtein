@@ -655,7 +655,7 @@ levenshtein = do ->
                   a1 = x[0]  # prefix character of x
                   b1 = y[0]  # prefix character of y
                   if a is b1 and a1 is b
-                    if (s = distance(f(v,2), f(w,2))) is 0
+                    if (s = distance(f(v,1), f(w,1))) is 0
                       1
                     else
                       1 + Math.min(p,q,r,s)
@@ -706,10 +706,10 @@ levenshtein = do ->
                 else if (r = distance(x,y)) is 0
                   1  # 1 + min(p,q,r) = 1 + min(p > 0, q > 0, r = 0) = 1 + 0 = 1
 
-                else if (s = if w.length >= 2 then distance(y, f(w,2)) else Infinity) is 0
+                else if (s = if w.length > 1 then distance(y, f(v,1)) else Infinity) is 0
                   1
 
-                else if (t = if v.length >= 2 then distance(f(v,2), x) else Infinity) is 0
+                else if (t = if v.length > 1 then distance(f(w,1), x) else Infinity) is 0
                   1
 
                 else
@@ -717,38 +717,39 @@ levenshtein = do ->
 
 main = (;distance) ->
   dictionary = [
-    'levenshtein'
-    'transducer'
-    'automata'
-    'sold'
-    'cat'
+    #'levenshtein'
+    #'transducer'
+    #'automata'
+    #'sold'
+    #'cat'
     'dog'
-    'horse'
-    'man'
-    'ant'
-    'insect'
-    'snake'
-    'lizard'
-    'salamander'
-    'slithre'
-    'slitehr'
-    'cold'
-    'child'
-    'pero'
-    'pet'
-    'computer'
-    'cell'
-    'phone'
+    #'horse'
+    #'man'
+    #'ant'
+    #'insect'
+    #'snake'
+    #'lizard'
+    #'salamander'
+    #'slithre'
+    #'slitehr'
+    #'cold'
+    #'child'
+    #'pero'
+    #'pet'
+    #'computer'
+    #'cell'
+    #'phone'
   ]
 
-  word = 'chold'; n = 2
+  #word = 'chold'; n = 2
+  word = 'clog'; n = 1
 
   # BUG: This fails to return 'cat' for n=4 and algorithm=transposition
   # BUG: This returns 'dog' for n=2 and algorithm=merge_and_split
 
   #algorithm = 'standard'
-  algorithm = 'transposition'
-  #algorithm = 'merge_and_split'
+  #algorithm = 'transposition'
+  algorithm = 'merge_and_split'
 
   transduce_start = new Date()
   transduce = levenshtein.transducer(dictionary: dictionary, algorithm: algorithm)
