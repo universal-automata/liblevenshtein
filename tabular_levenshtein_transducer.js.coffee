@@ -741,7 +741,7 @@ main = ->
     'phone'
   ]
 
-  word = 'clog'; n = 1
+  word = 'clog'; n = 2
 
   #algorithm = 'standard'
   #algorithm = 'transposition'
