@@ -706,10 +706,10 @@ levenshtein = do ->
                 else if (r = distance(x,y)) is 0
                   1  # 1 + min(p,q,r) = 1 + min(p > 0, q > 0, r = 0) = 1 + 0 = 1
 
-                else if (s = if w.length > 1 then distance(y, f(v,1)) else Infinity) is 0
+                else if (s = if w.length > 1 then distance(x, f(w,1)) else Infinity) is 0
                   1
 
-                else if (t = if v.length > 1 then distance(f(w,1), x) else Infinity) is 0
+                else if (t = if v.length > 1 then distance(f(v,1), y) else Infinity) is 0
                   1
 
                 else
@@ -717,35 +717,34 @@ levenshtein = do ->
 
 main = (;distance) ->
   dictionary = [
-    #'levenshtein'
-    #'transducer'
-    #'automata'
-    #'sold'
-    #'cat'
+    'levenshtein'
+    'transducer'
+    'automata'
+    'sold'
+    'cat'
     'dog'
-    #'horse'
-    #'man'
-    #'ant'
-    #'insect'
-    #'snake'
-    #'lizard'
-    #'salamander'
-    #'slithre'
-    #'slitehr'
-    #'cold'
-    #'child'
-    #'pero'
-    #'pet'
-    #'computer'
-    #'cell'
-    #'phone'
+    'horse'
+    'man'
+    'ant'
+    'insect'
+    'snake'
+    'lizard'
+    'salamander'
+    'slithre'
+    'slitehr'
+    'cold'
+    'child'
+    'pero'
+    'pet'
+    'computer'
+    'cell'
+    'phone'
   ]
 
   #word = 'chold'; n = 2
-  word = 'clog'; n = 1
+  word = 'clog'; n = 2
 
-  # BUG: This fails to return 'cat' for n=4 and algorithm=transposition
-  # BUG: This returns 'dog' for n=2 and algorithm=merge_and_split
+  # BUG: Merge-and-Split returns words with distances of 3 for word = "clog", when n = 2
 
   #algorithm = 'standard'
   #algorithm = 'transposition'
