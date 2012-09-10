@@ -22,11 +22,11 @@ do ->
   'use strict'
 
   if typeof exports isnt 'undefined'
-    {dawg} = require('./dawg')
+    {Dawg} = require('./dawg')
     {transducer} = require('./levenshtein.transducer')
     {distance} = require('./levenshtein.distance')
 
-    exports.dawg = dawg
+    exports.Dawg = Dawg
     exports.transducer = transducer
     exports.distance = distance
   else

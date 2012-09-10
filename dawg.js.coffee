@@ -53,7 +53,7 @@ do ->
       for label, node of @edges # insertion sort
         edge = label + node.id.toString()
         edges.splice(@bisect_left(edges, edge, 0, edges.length), 0, edge)
-      (if @final then '1' else '0') + edges.join()
+      (if @final then '1' else '0') + edges.join('')
 
   class Dawg
     constructor: (dictionary) ->
@@ -70,15 +70,15 @@ do ->
       @finish()
 
     insert: (word) ->
-      # Find common prefix between word and previous word
-      common_prefix = 0; previous_word = @previous_word
+      # Find longest common prefix between word and previous word
+      i = 0; previous_word = @previous_word
+
       upper_bound = Math.min(word.length, previous_word.length)
-      while common_prefix < upper_bound and word[common_prefix] is previous_word[common_prefix]
-        common_prefix += 1
+      i += 1 while i < upper_bound and word[i] is previous_word[i]
 
       # Check the unchecked_nodes for redundant nodes, proceeding from last one
       # down to the common prefix size.  Then truncate the list at that point.
-      @minimize(common_prefix)
+      @minimize(i)
       unchecked_nodes = @unchecked_nodes
 
       # Add the suffix, starting from the correct node mid-way through the graph.
@@ -87,9 +87,7 @@ do ->
       else
         node = unchecked_nodes[unchecked_nodes.length - 1][2]
 
-      i = common_prefix; n = word.length
-      while i < n
-        character = word[i]
+      while character = word[i]
         next_node = new DawgNode()
         node.edges[character] = next_node
         unchecked_nodes.push([node, character, next_node])
@@ -110,7 +108,8 @@ do ->
       minimized_nodes = @minimized_nodes
       unchecked_nodes = @unchecked_nodes
 
-      while unchecked_nodes.length > lower_bound
+      j = unchecked_nodes.length
+      while j > lower_bound
         [parent, character, child] = unchecked_nodes.pop()
         child_key = child.toString()
         if child_key of minimized_nodes
@@ -119,9 +118,10 @@ do ->
         else
           # add the state to the minimized nodes
           minimized_nodes[child_key] = child
+        j -= 1
       return
 
-    lookup: (word) ->
+    accepts: (word) ->
       node = @root
       for edge in word
         node = node.edges[edge]

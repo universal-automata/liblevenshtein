@@ -45,6 +45,19 @@ main = ->
   dictionary = []; sorted = true
   read_dictionary(dictionary, '/usr/share/dict/cracklib-small', 'ascii')
 
+  dawg_start = new Date()
+  dawg = new levenshtein.Dawg(dictionary); dictionary_type = 'dawg'
+  dawg_stop = new Date()
+
+  # Sanity check: Make sure that every word in the dictionary is indexed.
+  errors = []
+  for term in dictionary
+    unless dawg.accepts(term)
+      errors.push(term)
+  if errors.length > 0
+    for term in errors
+      console.log "    {!} \"#{term}\" ::= failed to encode in dawg"
+
   word = 'lcog'; n = 3
 
   #algorithm = 'standard'
@@ -52,7 +65,7 @@ main = ->
   #algorithm = 'merge_and_split'
 
   transduce_start = new Date()
-  transduce = levenshtein.transducer(dictionary: dictionary, algorithm: algorithm, sorted: sorted)
+  transduce = levenshtein.transducer(dictionary: dawg, sorted: sorted, dictionary_type: dictionary_type, algorithm: algorithm)
   transduce_stop = new Date()
 
   distance_start = new Date()
@@ -104,6 +117,7 @@ main = ->
   console.log "    word=\"#{word}\", n=#{n}, algorithm=\"#{algorithm}\""
   console.log '----------------------------------------'
   console.log 'Benchmarks:'
+  console.log "    Time to construct dawg: #{dawg_stop - dawg_start} ms"
   console.log "    Time to construct transducer: #{transduce_stop - transduce_start} ms"
   console.log "    Time to construct distance metric: #{distance_stop - distance_start} ms"
   console.log "    Time to transduce the dictionary: #{transduced_stop - transduced_start} ms"
