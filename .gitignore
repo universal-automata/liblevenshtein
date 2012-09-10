@@ -1,2 +1,5 @@
+/node_modules/*
+/linux-tick-processor.py
+/tabular_levenshtein_transducer.js
 *.swp
 *.swo

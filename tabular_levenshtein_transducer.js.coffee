@@ -78,17 +78,21 @@ levenshtein = do ->
         @final = false
         @edges = {}
 
-      toString: ->
-        unless @signature
-          buffer = []
-          if @final
-            buffer.push('1')
+      bisect_left: (edges, edge, lower, upper) ->
+        while lower < upper
+          i = (lower + upper) >> 1
+          if edges[i] < edge
+            lower = i + 1
           else
-            buffer.push('0')
-          for label, node of @edges
-            buffer.push(label, node.id)
-          @signature = buffer.join('_')
-        @signature
+            upper = i
+        return lower
+
+      toString: ->
+        edges = []
+        for label, node of @edges # insertion sort
+          edge = label + node.id.toString()
+          edges.splice(@bisect_left(edges, edge, 0, edges.length), 0, edge)
+        (if @final then '1' else '0') + edges.join()
 
     class Dawg
       constructor: (dictionary) ->
@@ -108,8 +112,7 @@ levenshtein = do ->
         # Find common prefix between word and previous word
         common_prefix = 0; previous_word = @previous_word
         upper_bound = Math.min(word.length, previous_word.length)
-        while common_prefix < upper_bound
-          break if word[common_prefix] isnt previous_word[common_prefix]
+        while common_prefix < upper_bound and word[common_prefix] is previous_word[common_prefix]
           common_prefix += 1
 
         # Check the unchecked_nodes for redundant nodes, proceeding from last one
@@ -148,13 +151,21 @@ levenshtein = do ->
 
         while unchecked_nodes.length > lower_bound
           [parent, character, child] = unchecked_nodes.pop()
-          if child of minimized_nodes
+          child_key = child.toString()
+          if child_key of minimized_nodes
             # replace the child with the previously encountered one
-            parent.edges[character] = minimized_nodes[child]
+            parent.edges[character] = minimized_nodes[child_key]
           else
             # add the state to the minimized nodes
-            minimized_nodes[child] = child
+            minimized_nodes[child_key] = child
         return
+
+      lookup: (word) ->
+        node = @root
+        for edge in word
+          node = node.edges[edge]
+          return false unless node
+        node.final
 
     index_of = (vector, k, i) ->
       j = 0
@@ -165,8 +176,8 @@ levenshtein = do ->
 
     transition_for_position = switch algorithm
       when STANDARD then (n) ->
-        ([i,e], vector) ->
-          w = vector.length
+        ([i,e], vector, offset) ->
+          i -= offset; w = vector.length
           if e < n
             if i <= w - 2
               k = Math.min(n - e + 1, w - i)
@@ -214,8 +225,8 @@ levenshtein = do ->
             null
 
       when TRANSPOSITION then (n) ->
-        ([i,e,t], vector) ->
-          w = vector.length
+        ([i,e,t], vector, offset) ->
+          i -= offset; w = vector.length
           if e == 0 < n
             if i <= w - 2
               k = Math.min(n - e + 1, w - i)
@@ -323,8 +334,8 @@ levenshtein = do ->
               null
 
       when MERGE_AND_SPLIT then (n) ->
-        ([i,e,s], vector) ->
-          w = vector.length
+        ([i,e,s], vector, offset) ->
+          i -= offset; w = vector.length
           if e == 0 < n
             if i <= w - 2
               if vector[i]
@@ -407,35 +418,19 @@ levenshtein = do ->
             else # i == w
               null
 
-    copy =
-      if algorithm is STANDARD
-        (state) -> ([i,e] for [i,e] in state)
-      else
-        (state) -> ([i,e,x is true] for [i,e,x] in state)
+    relabel = (state, offset) ->
+      position[0] += offset for position in state
+      return
 
     transition_for_state = (n) ->
-      stringify_state = (state) ->
-        positions = []
-        positions.push(i, e) for [i,e] in state
-        positions.join(',')
-
       transition = transition_for_position(n)
 
-      relabel = (state, offset) ->
-        for position in state
-          position[0] += offset
-        return
-
       (state, vector) ->
-        state_copy = copy(state)
-
         offset = state[0][0]
-        relabel(state_copy, -offset)
-
         state_prime = []
 
-        for position in state_copy
-          next_state = transition(position, vector)
+        for position in state
+          next_state = transition(position, vector, offset)
           continue unless next_state
           Array::push.apply(state_prime, next_state)
 
@@ -455,19 +450,17 @@ levenshtein = do ->
         j += 1
       vector
 
-    is_final = switch algorithm
-      when STANDARD then (state, w, n) ->
-        for [i,e] in state
-          return true if w - i <= n - e
-        return false
-      when TRANSPOSITION then (state, w, n) ->
-        for [i,e,t] in state
-          return true if t isnt true and (w - i) <= (n - e)
-        return false
-      when MERGE_AND_SPLIT then (state, w, n) ->
-        for [i,e,s] in state
-          return true if s isnt true and (w - i) <= (n - e)
-        return false
+    is_final =
+      if algorithm is STANDARD
+        (state, w, n) ->
+          for [i,e] in state
+            return true if w - i <= n - e
+          return false
+      else
+        (state, w, n) ->
+          for [i,e,x] in state
+            return true if x isnt true and (w - i) <= (n - e)
+          return false
 
     (term, n) ->
       w = term.length
@@ -488,6 +481,12 @@ levenshtein = do ->
   distance: (algorithm) ->
     algorithm = STANDARD unless algorithm in [STANDARD, TRANSPOSITION, MERGE_AND_SPLIT]
 
+    f = (u, t) ->
+      if t < u.length
+        u[t+1..]
+      else
+        ''
+
     # Source: http://www.fmi.uni-sofia.bg/fmi/logic/theses/mitankin-en.pdf
     switch algorithm
 
@@ -497,220 +496,220 @@ levenshtein = do ->
         memoized_distance = {}
         distance = (v, w) ->
           key = v + '|' + w
-          if value = memoized_distance[key]
+          if (value = memoized_distance[key]) isnt `undefined`
             value
           else
-            memoized_distance[key] =
-              if v is ''
-                w.length
-              else if w is ''
-                v.length
-              else # v.length > 0 and w.length > 0
-                a = v[0]; s = v[1..]
-                b = w[0]; t = w[1..]
+            if v is ''
+              memoized_distance[key] = w.length
+            else if w is ''
+              memoized_distance[key] = v.length
+            else # v.length > 0 and w.length > 0
+              a = v[0]; s = v[1..]
+              b = w[0]; t = w[1..]
 
-                # Discard identical characters
-                while a is b and s.length > 0 and t.length > 0
-                  a = s[0]; v = s; s = s[1..]
-                  b = t[0]; w = t; t = t[1..]
+              # Discard identical characters
+              while a is b and s.length > 0 and t.length > 0
+                a = s[0]; v = s; s = s[1..]
+                b = t[0]; w = t; t = t[1..]
 
-                if a is b # s is '' or t is ''
-                  if s is ''
-                    t.length # t.length >= 0
-                  else # t is ''
-                    s.length # s.length > 0
+              if a is b # s is '' or t is ''
+                if s is ''
+                  memoized_distance[key] = t.length # t.length >= 0
+                else # t is ''
+                  memoized_distance[key] = s.length # s.length > 0
 
-                # p = 0 => (p <= q and p <= r) => min(p,q,r) = p
-                else if (p = distance(s,w)) is 0
-                  1  # 1 + min(p,q,r) = 1 + min(p = 0, q >= 0, r >= 0) = 1 + 0 = 1
+              # p = 0 => (p <= q and p <= r) => min(p,q,r) = p
+              else if (p = distance(s,w)) is 0
+                memoized_distance[key] = 1  # 1 + min(p,q,r) = 1 + min(p = 0, q >= 0, r >= 0) = 1 + 0 = 1
 
-                # (p > 0 and q = 0) => (q < p and q <= r) => min(p,q,r) = q
-                else if (q = distance(v,t)) is 0
-                  1  # 1 + min(p,q,r) = 1 + min(p > 0, q = 0, r >= 0) = 1 + 0 = 1
+              # (p > 0 and q = 0) => (q < p and q <= r) => min(p,q,r) = q
+              else if (q = distance(v,t)) is 0
+                memoized_distance[key] = 1  # 1 + min(p,q,r) = 1 + min(p > 0, q = 0, r >= 0) = 1 + 0 = 1
 
-                # (p > 0 and q > 0 and r = 0) => (r < p and r < q) => min(p,q,r) = r
-                else if (r = distance(s,t)) is 0
-                  1  # 1 + min(p,q,r) = 1 + min(p > 0, q > 0, r = 0) = 1 + 0 = 1
+              # (p > 0 and q > 0 and r = 0) => (r < p and r < q) => min(p,q,r) = r
+              else if (r = distance(s,t)) is 0
+                memoized_distance[key] = 1  # 1 + min(p,q,r) = 1 + min(p > 0, q > 0, r = 0) = 1 + 0 = 1
 
-                # p > 0, q > 0, and r > 0
-                else
-                  1 + Math.min(p,q,r)
+              # p > 0, q > 0, and r > 0
+              else
+                memoized_distance[key] = 1 + Math.min(p,q,r)
 
       # Calculates the Levenshtein distance between words v and w, using the
       # following primitive operations: deletion, insertion, substitution, and
       # transposition.
       when TRANSPOSITION then do ->
-        f = (u, t) ->
-          if t < u.length
-            u[t+1..]
-          else
-            ''
         memoized_distance = {}
         distance = (v, w) ->
           key = v + '|' + w
-          if value = memoized_distance[key]
+          if (value = memoized_distance[key]) isnt `undefined`
             value
           else
-            memoized_distance[key] =
-              if v is ''
-                w.length
-              else if w is ''
-                v.length
-              else # v.length > 0 and w.length > 0
-                a = v[0]; x = v[1..]
-                b = w[0]; y = w[1..]
+            if v is ''
+              memoized_distance[key] = w.length
+            else if w is ''
+              memoized_distance[key] = v.length
+            else # v.length > 0 and w.length > 0
+              a = v[0]; x = v[1..]
+              b = w[0]; y = w[1..]
 
-                # Discard identical characters
-                while a is b and x.length > 0 and y.length > 0
-                  a = x[0]; v = x; x = x[1..]
-                  b = y[0]; w = y; y = y[1..]
+              # Discard identical characters
+              while a is b and x.length > 0 and y.length > 0
+                a = x[0]; v = x; x = x[1..]
+                b = y[0]; w = y; y = y[1..]
 
-                if a is b # x is '' or y is ''
-                  if x is ''
-                    y.length # y.length >= 0
-                  else # y is ''
-                    x.length # x.length > 0
+              if a is b # x is '' or y is ''
+                memoized_distance[key] = x.length || y.length
 
-                # p = 0 => (p <= q and p <= r) => min(p,q,r) = p
-                else if (p = distance(x,w)) is 0
-                  1  # 1 + min(p,q,r) = 1 + min(p = 0, q >= 0, r >= 0) = 1 + 0 = 1
+              # p = 0 => (p <= q and p <= r) => min(p,q,r) = p
+              else if (p = distance(x,w)) is 0
+                memoized_distance[key] = 1  # 1 + min(p,q,r) = 1 + min(p = 0, q >= 0, r >= 0) = 1 + 0 = 1
 
-                # (p > 0 and q = 0) => (q < p and q <= r) => min(p,q,r) = q
-                else if (q = distance(v,y)) is 0
-                  1  # 1 + min(p,q,r) = 1 + min(p > 0, q = 0, r >= 0) = 1 + 0 = 1
+              # (p > 0 and q = 0) => (q < p and q <= r) => min(p,q,r) = q
+              else if (q = distance(v,y)) is 0
+                memoized_distance[key] = 1  # 1 + min(p,q,r) = 1 + min(p > 0, q = 0, r >= 0) = 1 + 0 = 1
 
-                # (p > 0 and q > 0 and r = 0) => (r < p and r < q) => min(p,q,r) = r
-                else if (r = distance(x,y)) is 0
-                  1  # 1 + min(p,q,r) = 1 + min(p > 0, q > 0, r = 0) = 1 + 0 = 1
+              # (p > 0 and q > 0 and r = 0) => (r < p and r < q) => min(p,q,r) = r
+              else if (r = distance(x,y)) is 0
+                memoized_distance[key] = 1  # 1 + min(p,q,r) = 1 + min(p > 0, q > 0, r = 0) = 1 + 0 = 1
 
-                # p > 0, q > 0, and r > 0
-                else
-                  a1 = x[0]  # prefix character of x
-                  b1 = y[0]  # prefix character of y
-                  if a is b1 and a1 is b
-                    if (s = distance(f(v,1), f(w,1))) is 0
-                      1
-                    else
-                      1 + Math.min(p,q,r,s)
+              # p > 0, q > 0, and r > 0
+              else
+                a1 = x[0]  # prefix character of x
+                b1 = y[0]  # prefix character of y
+                if a is b1 and a1 is b
+                  if (s = distance(f(v,1), f(w,1))) is 0
+                    memoized_distance[key] = 1
                   else
-                    1 + Math.min(p,q,r)
+                    memoized_distance[key] = 1 + Math.min(p,q,r,s)
+                else
+                  memoized_distance[key] = 1 + Math.min(p,q,r)
 
       # Calculates the Levenshtein distance between words v and w, using the
       # following primitive operations: deletion, insertion, substitution,
       # merge, and split.
       when MERGE_AND_SPLIT then do ->
-        f = (u, t) ->
-          if t < u.length
-            u[t+1..]
-          else
-            ''
         memoized_distance = {}
         distance = (v, w) ->
           key = v + '|' + w
-          if value = memoized_distance[key]
+          if (value = memoized_distance[key]) isnt `undefined`
             value
           else
-            memoized_distance[key] =
-              if v is ''
-                w.length
-              else if w is ''
-                v.length
-              else # v.length > 0 and w.length > 0
-                a = v[0]; x = v[1..]
-                b = w[0]; y = w[1..]
+            if v is ''
+              memoized_distance[key] = w.length
+            else if w is ''
+              memoized_distance[key] = v.length
+            else # v.length > 0 and w.length > 0
+              a = v[0]; x = v[1..]
+              b = w[0]; y = w[1..]
 
-                # Discard identical characters
-                while a is b and x.length > 0 and y.length > 0
-                  a = x[0]; v = x; x = x[1..]
-                  b = y[0]; w = y; y = y[1..]
+              # Discard identical characters
+              while a is b and x.length > 0 and y.length > 0
+                a = x[0]; v = x; x = x[1..]
+                b = y[0]; w = y; y = y[1..]
 
-                if a is b # x is '' or y is ''
-                  if x is ''
-                    y.length # y.length >= 0
-                  else # y is ''
-                    x.length # x.length > 0
-
-                # p = 0 => (p <= q and p <= r) => min(p,q,r) = p
-                else if (p = distance(x,w)) is 0
-                  1  # 1 + min(p,q,r) = 1 + min(p = 0, q >= 0, r >= 0) = 1 + 0 = 1
-
-                # (p > 0 and q = 0) => (q < p and q <= r) => min(p,q,r) = q
-                else if (q = distance(v,y)) is 0
-                  1  # 1 + min(p,q,r) = 1 + min(p > 0, q = 0, r >= 0) = 1 + 0 = 1
-
-                # (p > 0 and q > 0 and r = 0) => (r < p and r < q) => min(p,q,r) = r
-                else if (r = distance(x,y)) is 0
-                  1  # 1 + min(p,q,r) = 1 + min(p > 0, q > 0, r = 0) = 1 + 0 = 1
-
-                else if (s = if w.length > 1 then distance(x, f(w,1)) else Infinity) is 0
-                  1
-
-                else if (t = if v.length > 1 then distance(f(v,1), y) else Infinity) is 0
-                  1
-
-                else
-                  1 + Math.min(p,q,r,s,t)
+              if a is b
+                memoized_distance[key] = x.length || y.length
+              else if (p = distance(x,w)) is 0
+                memoized_distance[key] = 1
+              else if (q = distance(v,y)) is 0
+                memoized_distance[key] = 1
+              else if (r = distance(x,y)) is 0
+                memoized_distance[key] = 1
+              else if (s = if w.length > 1 then distance(x, f(w,1)) else Infinity) is 0
+                memoized_distance[key] = 1
+              else if (t = if v.length > 1 then distance(f(v,1), y) else Infinity) is 0
+                memoized_distance[key] = 1
+              else
+                memoized_distance[key] = 1 + Math.min(p,q,r,s,t)
 
 main = ->
-  dictionary = [
-    'levenshtein'
-    'transducer'
-    'automata'
-    'sold'
-    'cat'
-    'dog'
-    'horse'
-    'man'
-    'ant'
-    'insect'
-    'snake'
-    'lizard'
-    'salamander'
-    'slither'
-    'cold'
-    'child'
-    'pet'
-    'computer'
-    'cell'
-    'phone'
-  ]
+  fs = require('fs')
+  profiler = require('profiler')
 
-  word = 'clog'; n = 2
+  read_dictionary = (dictionary, path, encoding) ->
+    bisect_left = (dictionary, term, lower, upper) ->
+      while lower < upper
+        i = (lower + upper) >> 1
+        if dictionary[i] < term
+          lower = i + 1
+        else
+          upper = i
+      return lower
+
+    term = ''
+    for c in fs.readFileSync(path, encoding)
+      if c isnt '\n'
+        term += c
+      else
+        dictionary.splice(bisect_left(dictionary, term, 0, dictionary.length), 0 ,term)
+        term = ''
+    if term isnt ''
+      dictionary.splice(bisect_left(dictionary, term, 0, dictionary.length), 0 ,term)
+    return
+
+  dictionary = []; sorted = true
+  read_dictionary(dictionary, '/usr/share/dict/cracklib-small', 'ascii')
+
+  word = 'lcog'; n = 2
 
   #algorithm = 'standard'
-  #algorithm = 'transposition'
-  algorithm = 'merge_and_split'
+  algorithm = 'transposition'
+  #algorithm = 'merge_and_split'
 
-  transduce_start = new Date()
-  transduce = levenshtein.transducer(dictionary: dictionary, algorithm: algorithm)
-  transduce_stop = new Date()
+  transduce_start = new Date(); profiler.resume()
+  transduce = levenshtein.transducer(dictionary: dictionary, algorithm: algorithm, sorted: sorted)
+  profiler.pause(); transduce_stop = new Date()
 
-  distance_start = new Date()
+  distance_start = new Date(); profiler.resume()
   distance = levenshtein.distance(algorithm)
-  distance_stop = new Date()
+  profiler.pause(); distance_stop = new Date()
 
-  dictionary_copy = (term for term in dictionary)
-  dictionary_copy.sort (a,b) -> distance(word, a) - distance(word, b) || if a < b then -1 else if a > b then 1 else 0
-  console.log 'Distances to Every Dictionary Term:'
-  console.log "  distance(\"#{word}\", \"#{term}\") = #{distance(word, term)}" for term in dictionary_copy
-  console.log '----------------------------------------'
-  console.log 'State Transitions:'
+  target_terms = {}
+  target_terms[term] = true for term in dictionary when distance(word, term) <= n
+  dictionary = null
 
-  transduced_start = new Date()
+  transduced_start = new Date(); profiler.resume()
   transduced = transduce(word, n)
-  transduced_stop = new Date()
-
-  console.log '----------------------------------------'
+  profiler.pause(); transduced_stop = new Date()
 
   transduced.sort (a,b) -> distance(word, a) - distance(word, b) || if a < b then -1 else if a > b then 1 else 0
   console.log 'Distances to Every Transduced Term:'
   for term in transduced
-    console.log "  distance(\"#{word}\", \"#{term}\") = #{distance(word, term)}"
+    console.log "    distance(\"#{word}\", \"#{term}\") = #{distance(word, term)}"
+  console.log "Total Transduced: #{transduced.length}"
   console.log '----------------------------------------'
-  console.log "word=\"#{word}\", n=#{n}, algorithm=\"#{algorithm}\""
+
+  false_positives = []
+  for term in transduced
+    if term of target_terms
+      delete target_terms[term]
+    else
+      false_positives.push(term)
+
+  if false_positives.length > 0
+    console.log 'Distances to Every False Positive:'
+    false_positives.sort (a,b) -> distance(word, a) - distance(word, b) || if a < b then -1 else if a > b then 1 else 0
+    for term in false_positives
+      console.log "    distance(\"#{word}\", \"#{term}\") = #{distance(word, term)}"
+    console.log "Total False Positives: #{false_positives.length}"
+    console.log '----------------------------------------'
+
+  false_negatives = []
+  false_negatives.push(term) for term of target_terms
+
+  if false_negatives.length > 0
+    console.log 'Distances to Every False Negative:'
+    false_negatives.sort (a,b) -> distance(word, a) - distance(word, b) || if a < b then -1 else if a > b then 1 else 0
+    for term in false_negatives
+      console.log "    distance(\"#{word}\", \"#{term}\") = #{distance(word, term)}"
+    console.log "Total False Negatives: #{false_negatives.length}"
+    console.log '----------------------------------------'
+
+  console.log 'Calibrations:'
+  console.log "    word=\"#{word}\", n=#{n}, algorithm=\"#{algorithm}\""
   console.log '----------------------------------------'
   console.log 'Benchmarks:'
-  console.log "  Time to construct transducer: #{transduce_stop - transduce_start} ms"
-  console.log "  Time to construct distance metric: #{distance_stop - distance_start} ms"
-  console.log "  Time to transduce the dictionary: #{transduced_stop - transduced_start} ms"
+  console.log "    Time to construct transducer: #{transduce_stop - transduce_start} ms"
+  console.log "    Time to construct distance metric: #{distance_stop - distance_start} ms"
+  console.log "    Time to transduce the dictionary: #{transduced_stop - transduced_start} ms"
 main()
