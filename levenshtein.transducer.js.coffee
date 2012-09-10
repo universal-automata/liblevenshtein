@@ -51,12 +51,15 @@
 #   title = {Incremental Construction of Minimal Acyclic Finite-State Automata},
 #   year = {2000}
 # }
-levenshtein = do ->
+
+do ->
+  'use strict'
+
   STANDARD = 'standard'
   TRANSPOSITION = 'transposition'
   MERGE_AND_SPLIT = 'merge_and_split'
     
-  transducer: ({dictionary, algorithm, sorted}) ->
+  transducer = ({dictionary, algorithm, sorted}) ->
     algorithm = STANDARD unless algorithm in [STANDARD, TRANSPOSITION, MERGE_AND_SPLIT]
     sorted = false unless typeof sorted is 'boolean'
 
@@ -478,235 +481,10 @@ levenshtein = do ->
               matches.push(next_V)
       matches
 
-  distance: (algorithm) ->
-    algorithm = STANDARD unless algorithm in [STANDARD, TRANSPOSITION, MERGE_AND_SPLIT]
+  if typeof exports isnt 'undefined'
+    exports.transducer = transducer
+  else if typeof levenshtein isnt 'undefined'
+    levenshtein.transducer = transducer
+  else
+    throw new Error('Cannot find either the "levenshtein" or "exports" variable')
 
-    f = (u, t) ->
-      if t < u.length
-        u[t+1..]
-      else
-        ''
-
-    # Source: http://www.fmi.uni-sofia.bg/fmi/logic/theses/mitankin-en.pdf
-    switch algorithm
-
-      # Calculates the Levenshtein distance between words v and w, using the
-      # following primitive operations: deletion, insertion, and substitution.
-      when STANDARD then do ->
-        memoized_distance = {}
-        distance = (v, w) ->
-          key = v + '|' + w
-          if (value = memoized_distance[key]) isnt `undefined`
-            value
-          else
-            if v is ''
-              memoized_distance[key] = w.length
-            else if w is ''
-              memoized_distance[key] = v.length
-            else # v.length > 0 and w.length > 0
-              a = v[0]; s = v[1..]
-              b = w[0]; t = w[1..]
-
-              # Discard identical characters
-              while a is b and s.length > 0 and t.length > 0
-                a = s[0]; v = s; s = s[1..]
-                b = t[0]; w = t; t = t[1..]
-
-              if a is b # s is '' or t is ''
-                if s is ''
-                  memoized_distance[key] = t.length # t.length >= 0
-                else # t is ''
-                  memoized_distance[key] = s.length # s.length > 0
-
-              # p = 0 => (p <= q and p <= r) => min(p,q,r) = p
-              else if (p = distance(s,w)) is 0
-                memoized_distance[key] = 1  # 1 + min(p,q,r) = 1 + min(p = 0, q >= 0, r >= 0) = 1 + 0 = 1
-
-              # (p > 0 and q = 0) => (q < p and q <= r) => min(p,q,r) = q
-              else if (q = distance(v,t)) is 0
-                memoized_distance[key] = 1  # 1 + min(p,q,r) = 1 + min(p > 0, q = 0, r >= 0) = 1 + 0 = 1
-
-              # (p > 0 and q > 0 and r = 0) => (r < p and r < q) => min(p,q,r) = r
-              else if (r = distance(s,t)) is 0
-                memoized_distance[key] = 1  # 1 + min(p,q,r) = 1 + min(p > 0, q > 0, r = 0) = 1 + 0 = 1
-
-              # p > 0, q > 0, and r > 0
-              else
-                memoized_distance[key] = 1 + Math.min(p,q,r)
-
-      # Calculates the Levenshtein distance between words v and w, using the
-      # following primitive operations: deletion, insertion, substitution, and
-      # transposition.
-      when TRANSPOSITION then do ->
-        memoized_distance = {}
-        distance = (v, w) ->
-          key = v + '|' + w
-          if (value = memoized_distance[key]) isnt `undefined`
-            value
-          else
-            if v is ''
-              memoized_distance[key] = w.length
-            else if w is ''
-              memoized_distance[key] = v.length
-            else # v.length > 0 and w.length > 0
-              a = v[0]; x = v[1..]
-              b = w[0]; y = w[1..]
-
-              # Discard identical characters
-              while a is b and x.length > 0 and y.length > 0
-                a = x[0]; v = x; x = x[1..]
-                b = y[0]; w = y; y = y[1..]
-
-              if a is b # x is '' or y is ''
-                memoized_distance[key] = x.length || y.length
-
-              # p = 0 => (p <= q and p <= r) => min(p,q,r) = p
-              else if (p = distance(x,w)) is 0
-                memoized_distance[key] = 1  # 1 + min(p,q,r) = 1 + min(p = 0, q >= 0, r >= 0) = 1 + 0 = 1
-
-              # (p > 0 and q = 0) => (q < p and q <= r) => min(p,q,r) = q
-              else if (q = distance(v,y)) is 0
-                memoized_distance[key] = 1  # 1 + min(p,q,r) = 1 + min(p > 0, q = 0, r >= 0) = 1 + 0 = 1
-
-              # (p > 0 and q > 0 and r = 0) => (r < p and r < q) => min(p,q,r) = r
-              else if (r = distance(x,y)) is 0
-                memoized_distance[key] = 1  # 1 + min(p,q,r) = 1 + min(p > 0, q > 0, r = 0) = 1 + 0 = 1
-
-              # p > 0, q > 0, and r > 0
-              else
-                a1 = x[0]  # prefix character of x
-                b1 = y[0]  # prefix character of y
-                if a is b1 and a1 is b
-                  if (s = distance(f(v,1), f(w,1))) is 0
-                    memoized_distance[key] = 1
-                  else
-                    memoized_distance[key] = 1 + Math.min(p,q,r,s)
-                else
-                  memoized_distance[key] = 1 + Math.min(p,q,r)
-
-      # Calculates the Levenshtein distance between words v and w, using the
-      # following primitive operations: deletion, insertion, substitution,
-      # merge, and split.
-      when MERGE_AND_SPLIT then do ->
-        memoized_distance = {}
-        distance = (v, w) ->
-          key = v + '|' + w
-          if (value = memoized_distance[key]) isnt `undefined`
-            value
-          else
-            if v is ''
-              memoized_distance[key] = w.length
-            else if w is ''
-              memoized_distance[key] = v.length
-            else # v.length > 0 and w.length > 0
-              a = v[0]; x = v[1..]
-              b = w[0]; y = w[1..]
-
-              # Discard identical characters
-              while a is b and x.length > 0 and y.length > 0
-                a = x[0]; v = x; x = x[1..]
-                b = y[0]; w = y; y = y[1..]
-
-              if a is b
-                memoized_distance[key] = x.length || y.length
-              else if (p = distance(x,w)) is 0
-                memoized_distance[key] = 1
-              else if (q = distance(v,y)) is 0
-                memoized_distance[key] = 1
-              else if (r = distance(x,y)) is 0
-                memoized_distance[key] = 1
-              else if (s = if w.length > 1 then distance(x, f(w,1)) else Infinity) is 0
-                memoized_distance[key] = 1
-              else if (t = if v.length > 1 then distance(f(v,1), y) else Infinity) is 0
-                memoized_distance[key] = 1
-              else
-                memoized_distance[key] = 1 + Math.min(p,q,r,s,t)
-
-main = ->
-  read_dictionary = (dictionary, path, encoding) ->
-    bisect_left = (dictionary, term, lower, upper) ->
-      while lower < upper
-        i = (lower + upper) >> 1
-        if dictionary[i] < term
-          lower = i + 1
-        else
-          upper = i
-      return lower
-
-    term = ''; fs = require('fs')
-    for c in fs.readFileSync(path, encoding)
-      if c isnt '\n'
-        term += c
-      else
-        dictionary.splice(bisect_left(dictionary, term, 0, dictionary.length), 0 ,term)
-        term = ''
-    if term isnt ''
-      dictionary.splice(bisect_left(dictionary, term, 0, dictionary.length), 0 ,term)
-    return
-
-  dictionary = []; sorted = true
-  read_dictionary(dictionary, '/usr/share/dict/cracklib-small', 'ascii')
-
-  word = 'lcog'; n = 2
-
-  #algorithm = 'standard'
-  algorithm = 'transposition'
-  #algorithm = 'merge_and_split'
-
-  transduce_start = new Date()
-  transduce = levenshtein.transducer(dictionary: dictionary, algorithm: algorithm, sorted: sorted)
-  transduce_stop = new Date()
-
-  distance_start = new Date()
-  distance = levenshtein.distance(algorithm)
-  distance_stop = new Date()
-
-  target_terms = {}
-  target_terms[term] = true for term in dictionary when distance(word, term) <= n
-  dictionary = null
-
-  transduced_start = new Date()
-  transduced = transduce(word, n)
-  transduced_stop = new Date()
-
-  transduced.sort (a,b) -> distance(word, a) - distance(word, b) || if a < b then -1 else if a > b then 1 else 0
-  console.log 'Distances to Every Transduced Term:'
-  for term in transduced
-    console.log "    distance(\"#{word}\", \"#{term}\") = #{distance(word, term)}"
-  console.log "Total Transduced: #{transduced.length}"
-  console.log '----------------------------------------'
-
-  false_positives = []
-  for term in transduced
-    if term of target_terms
-      delete target_terms[term]
-    else
-      false_positives.push(term)
-
-  if false_positives.length > 0
-    console.log 'Distances to Every False Positive:'
-    false_positives.sort (a,b) -> distance(word, a) - distance(word, b) || if a < b then -1 else if a > b then 1 else 0
-    for term in false_positives
-      console.log "    distance(\"#{word}\", \"#{term}\") = #{distance(word, term)}"
-    console.log "Total False Positives: #{false_positives.length}"
-    console.log '----------------------------------------'
-
-  false_negatives = []
-  false_negatives.push(term) for term of target_terms
-
-  if false_negatives.length > 0
-    console.log 'Distances to Every False Negative:'
-    false_negatives.sort (a,b) -> distance(word, a) - distance(word, b) || if a < b then -1 else if a > b then 1 else 0
-    for term in false_negatives
-      console.log "    distance(\"#{word}\", \"#{term}\") = #{distance(word, term)}"
-    console.log "Total False Negatives: #{false_negatives.length}"
-    console.log '----------------------------------------'
-
-  console.log 'Calibrations:'
-  console.log "    word=\"#{word}\", n=#{n}, algorithm=\"#{algorithm}\""
-  console.log '----------------------------------------'
-  console.log 'Benchmarks:'
-  console.log "    Time to construct transducer: #{transduce_stop - transduce_start} ms"
-  console.log "    Time to construct distance metric: #{distance_stop - distance_start} ms"
-  console.log "    Time to transduce the dictionary: #{transduced_stop - transduced_start} ms"
-main()
