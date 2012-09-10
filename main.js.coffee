@@ -45,7 +45,7 @@ main = ->
   dictionary = []; sorted = true
   read_dictionary(dictionary, '/usr/share/dict/cracklib-small', 'ascii')
 
-  word = 'lcog'; n = 2
+  word = 'lcog'; n = 3
 
   #algorithm = 'standard'
   algorithm = 'transposition'
