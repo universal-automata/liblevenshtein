@@ -623,8 +623,6 @@ levenshtein = do ->
                 memoized_distance[key] = 1 + Math.min(p,q,r,s,t)
 
 main = ->
-  fs = require('fs')
-
   read_dictionary = (dictionary, path, encoding) ->
     bisect_left = (dictionary, term, lower, upper) ->
       while lower < upper
@@ -635,7 +633,7 @@ main = ->
           upper = i
       return lower
 
-    term = ''
+    term = ''; fs = require('fs')
     for c in fs.readFileSync(path, encoding)
       if c isnt '\n'
         term += c
