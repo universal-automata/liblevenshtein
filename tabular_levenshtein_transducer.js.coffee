@@ -624,7 +624,6 @@ levenshtein = do ->
 
 main = ->
   fs = require('fs')
-  profiler = require('profiler')
 
   read_dictionary = (dictionary, path, encoding) ->
     bisect_left = (dictionary, term, lower, upper) ->
@@ -656,21 +655,21 @@ main = ->
   algorithm = 'transposition'
   #algorithm = 'merge_and_split'
 
-  transduce_start = new Date(); profiler.resume()
+  transduce_start = new Date()
   transduce = levenshtein.transducer(dictionary: dictionary, algorithm: algorithm, sorted: sorted)
-  profiler.pause(); transduce_stop = new Date()
+  transduce_stop = new Date()
 
-  distance_start = new Date(); profiler.resume()
+  distance_start = new Date()
   distance = levenshtein.distance(algorithm)
-  profiler.pause(); distance_stop = new Date()
+  distance_stop = new Date()
 
   target_terms = {}
   target_terms[term] = true for term in dictionary when distance(word, term) <= n
   dictionary = null
 
-  transduced_start = new Date(); profiler.resume()
+  transduced_start = new Date()
   transduced = transduce(word, n)
-  profiler.pause(); transduced_stop = new Date()
+  transduced_stop = new Date()
 
   transduced.sort (a,b) -> distance(word, a) - distance(word, b) || if a < b then -1 else if a > b then 1 else 0
   console.log 'Distances to Every Transduced Term:'
