@@ -18,40 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# The algorithm for imitating Levenshtein automata was taken from the following
-# journal article:
-#
-# @ARTICLE{Schulz02faststring,
-#   author = {Klaus Schulz and Stoyan Mihov},
-#   title = {Fast String Correction with Levenshtein-Automata},
-#   journal = {INTERNATIONAL JOURNAL OF DOCUMENT ANALYSIS AND RECOGNITION},
-#   year = {2002},
-#   volume = {5},
-#   pages = {67--85}
-# }
-#
-# As well, this Master Thesis helped me understand its concepts:
-#
-#   www.fmi.uni-sofia.bg/fmi/logic/theses/mitankin-en.pdf
-#
-# The supervisor of the student who submitted the thesis was one of the authors
-# of the journal article, above.
-#
-# The algorithm for constructing a DAWG (Direct Acyclic Word Graph) from the
-# input dictionary of words (DAWGs are otherwise known as an MA-FSA, or Minimal
-# Acyclic Finite-State Automata), was taken and modified from the following blog
-# from Steve Hanov:
-#
-#   http://stevehanov.ca/blog/index.php?id=115
-#
-# The algorithm therein was taken from the following paper:
-#
-# @MISC{Daciuk00incrementalconstruction,
-#   author = {Jan Daciuk and Bruce W. Watson and Richard E. Watson and Stoyan Mihov},
-#   title = {Incremental Construction of Minimal Acyclic Finite-State Automata},
-#   year = {2000}
-# }
-
 do ->
   'use strict'
 
@@ -59,6 +25,39 @@ do ->
   TRANSPOSITION = 'transposition'
   MERGE_AND_SPLIT = 'merge_and_split'
     
+  # The algorithm for imitating Levenshtein automata was taken from the
+  # following journal article:
+  #
+  # @ARTICLE{Schulz02faststring,
+  #   author = {Klaus Schulz and Stoyan Mihov},
+  #   title = {Fast String Correction with Levenshtein-Automata},
+  #   journal = {INTERNATIONAL JOURNAL OF DOCUMENT ANALYSIS AND RECOGNITION},
+  #   year = {2002},
+  #   volume = {5},
+  #   pages = {67--85}
+  # }
+  #
+  # As well, this Master Thesis helped me understand its concepts:
+  #
+  #   www.fmi.uni-sofia.bg/fmi/logic/theses/mitankin-en.pdf
+  #
+  # The supervisor of the student who submitted the thesis was one of the
+  # authors of the journal article, above.
+  #
+  # The algorithm for constructing a DAWG (Direct Acyclic Word Graph) from the
+  # input dictionary of words (DAWGs are otherwise known as an MA-FSA, or
+  # Minimal Acyclic Finite-State Automata), was taken and modified from the
+  # following blog from Steve Hanov:
+  #
+  #   http://stevehanov.ca/blog/index.php?id=115
+  #
+  # The algorithm therein was taken from the following paper:
+  #
+  # @MISC{Daciuk00incrementalconstruction,
+  #   author = {Jan Daciuk and Bruce W. Watson and Richard E. Watson and Stoyan Mihov},
+  #   title = {Incremental Construction of Minimal Acyclic Finite-State Automata},
+  #   year = {2000}
+  # }
   transducer = ({dictionary, algorithm, sorted}) ->
     algorithm = STANDARD unless algorithm in [STANDARD, TRANSPOSITION, MERGE_AND_SPLIT]
     sorted = false unless typeof sorted is 'boolean'
