@@ -2,8 +2,7 @@
 
 ### Basic Usage:
 
-Add the following script tag to the <code>&lt;head /&gt;</code> section of your
-document:
+Add the following `<script>` tag to the `<head>` section of your document:
 
 ```html
 <script type="text/javascript"
