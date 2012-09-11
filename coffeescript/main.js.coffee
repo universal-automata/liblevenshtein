@@ -21,7 +21,7 @@
 do ->
   'use strict'
 
-  {levenshtein} = require('../javascript/v1.0/liblevenshtein.min')
+  {levenshtein} = require('../javascripts/v1.0/liblevenshtein.min')
 
   read_dictionary = (dictionary, path, encoding) ->
     bisect_left = (dictionary, term, lower, upper) ->
