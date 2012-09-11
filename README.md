@@ -2,17 +2,16 @@
 
 ### Basic Usage:
 
-Add the following script tag to the <code>&lt;head&gt;</code> section of your
+Add the following script tag to the <code>&lt;head /&gt;</code> section of your
 document:
 
 ```html
-<script
+<script type="text/javascript"
 	src="http://dylon.github.com/levenshtein_automata/javascripts/v1.0/liblevenshtein.min.js">
 </script>
 ```
 
-Then, somewhere within your JavaScript logic, you may use the library as
-follows:
+Then, within your JavaScript logic, you may use the library as follows:
 
 ```javascript
 var dictionary = [ /* some list of words */ ];
