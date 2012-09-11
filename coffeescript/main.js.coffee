@@ -1,15 +1,15 @@
 # Copyright (c) 2012 Dylon Edwards
-#
+# 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-#
+# 
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-#
+# 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
 do ->
   'use strict'
 
-  levenshtein = require('./levenshtein')
+  {levenshtein} = require('../javascript/v1.0/liblevenshtein.min')
 
   read_dictionary = (dictionary, path, encoding) ->
     bisect_left = (dictionary, term, lower, upper) ->
@@ -60,7 +60,7 @@ do ->
     for term in errors
       console.log "    {!} \"#{term}\" ::= failed to encode in dawg"
 
-  word = 'sillywilly'; n = 3
+  word = 'sillywilly'; n = 50
 
   #algorithm = 'standard'
   algorithm = 'transposition'
@@ -129,4 +129,5 @@ do ->
   console.log "    Time to construct transducer: #{transduce_stop - transduce_start} ms"
   console.log "    Time to construct distance metric: #{distance_stop - distance_start} ms"
   console.log "    Time to transduce the dictionary: #{transduced_stop - transduced_start} ms"
+  return
 

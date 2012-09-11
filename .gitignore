@@ -1,5 +1,2 @@
-/node_modules/*
-/linux-tick-processor.py
-/*.js
 *.swp
 *.swo
