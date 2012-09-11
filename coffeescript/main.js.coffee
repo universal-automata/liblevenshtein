@@ -45,7 +45,7 @@ do ->
     return
 
   dictionary = []; sorted = true
-  read_dictionary(dictionary, '/usr/share/dict/cracklib-small', 'ascii')
+  read_dictionary(dictionary, '/usr/share/dict/american-english', 'ascii')
 
   dawg_start = new Date()
   dawg = new levenshtein.Dawg(dictionary); dictionary_type = 'dawg'
