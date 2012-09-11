@@ -60,7 +60,7 @@ do ->
     for term in errors
       console.log "    {!} \"#{term}\" ::= failed to encode in dawg"
 
-  word = 'sillywilly'; n = 50
+  word = 'sillywilly'; n = 3
 
   #algorithm = 'standard'
   algorithm = 'transposition'
@@ -86,7 +86,7 @@ do ->
   transduced = transduce(word, n)
   transduced_stop = new Date()
 
-  transduced.sort (a,b) -> distance(word, a) - distance(word, b) || if a < b then -1 else if a > b then 1 else 0
+  transduced.sort (a,b) -> distance(word, a) - distance(word, b) || a.localeCompare(b)
   if transduced.length < 100
     console.log 'Distances to Every Transduced Term:'
     for term in transduced
@@ -103,7 +103,7 @@ do ->
 
   if false_positives.length > 0
     console.log 'Distances to Every False Positive:'
-    false_positives.sort (a,b) -> distance(word, a) - distance(word, b) || if a < b then -1 else if a > b then 1 else 0
+    false_positives.sort (a,b) -> distance(word, a) - distance(word, b) || a.localeCompare(b)
     for term in false_positives
       console.log "    distance(\"#{word}\", \"#{term}\") = #{distance(word, term)}"
     console.log "Total False Positives: #{false_positives.length}"
@@ -114,7 +114,7 @@ do ->
 
   if false_negatives.length > 0
     console.log 'Distances to Every False Negative:'
-    false_negatives.sort (a,b) -> distance(word, a) - distance(word, b) || if a < b then -1 else if a > b then 1 else 0
+    false_negatives.sort (a,b) -> distance(word, a) - distance(word, b) || a.localeCompare(b)
     for term in false_negatives
       console.log "    distance(\"#{word}\", \"#{term}\") = #{distance(word, term)}"
     console.log "Total False Negatives: #{false_negatives.length}"
