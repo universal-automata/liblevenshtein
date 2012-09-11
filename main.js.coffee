@@ -18,7 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-main = ->
+do ->
+  'use strict'
+
   levenshtein = require('./levenshtein')
 
   read_dictionary = (dictionary, path, encoding) ->
@@ -127,5 +129,4 @@ main = ->
   console.log "    Time to construct transducer: #{transduce_stop - transduce_start} ms"
   console.log "    Time to construct distance metric: #{distance_stop - distance_start} ms"
   console.log "    Time to transduce the dictionary: #{transduced_stop - transduced_start} ms"
-main()
 

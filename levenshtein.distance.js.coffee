@@ -19,6 +19,8 @@
 # SOFTWARE.
 
 do ->
+  'use strict'
+
   STANDARD = 'standard'
   TRANSPOSITION = 'transposition'
   MERGE_AND_SPLIT = 'merge_and_split'
