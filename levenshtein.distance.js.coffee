@@ -57,27 +57,19 @@ do ->
                 a = s[0]; v = s; s = s[1..]
                 b = t[0]; w = t; t = t[1..]
 
-              if a is b # s is '' or t is ''
-                if s is ''
-                  memoized_distance[key] = t.length # t.length >= 0
-                else # t is ''
-                  memoized_distance[key] = s.length # s.length > 0
+              # s.length is 0 or t.length is 0
+              return memoized_distance[key] = s.length || t.length if a is b
 
-              # p = 0 => (p <= q and p <= r) => min(p,q,r) = p
-              else if (p = distance(s,w)) is 0
-                memoized_distance[key] = 1  # 1 + min(p,q,r) = 1 + min(p = 0, q >= 0, r >= 0) = 1 + 0 = 1
+              return memoized_distance[key] = 1 if (p = distance(s,w)) is 0
+              min = p
 
-              # (p > 0 and q = 0) => (q < p and q <= r) => min(p,q,r) = q
-              else if (q = distance(v,t)) is 0
-                memoized_distance[key] = 1  # 1 + min(p,q,r) = 1 + min(p > 0, q = 0, r >= 0) = 1 + 0 = 1
+              return memoized_distance[key] = 1 if (p = distance(v,t)) is 0
+              min = p if p < min
 
-              # (p > 0 and q > 0 and r = 0) => (r < p and r < q) => min(p,q,r) = r
-              else if (r = distance(s,t)) is 0
-                memoized_distance[key] = 1  # 1 + min(p,q,r) = 1 + min(p > 0, q > 0, r = 0) = 1 + 0 = 1
+              return memoized_distance[key] = 1 if (p = distance(s,t)) is 0
+              min = p if p < min
 
-              # p > 0, q > 0, and r > 0
-              else
-                memoized_distance[key] = 1 + Math.min(p,q,r)
+              return memoized_distance[key] = 1 + min
 
       # Calculates the Levenshtein distance between words v and w, using the
       # following primitive operations: deletion, insertion, substitution, and
@@ -102,32 +94,25 @@ do ->
                 a = x[0]; v = x; x = x[1..]
                 b = y[0]; w = y; y = y[1..]
 
-              if a is b # x is '' or y is ''
-                memoized_distance[key] = x.length || y.length
+              # x.length is 0 or y.length is 0
+              return memoized_distance[key] = x.length || y.length if a is b
 
-              # p = 0 => (p <= q and p <= r) => min(p,q,r) = p
-              else if (p = distance(x,w)) is 0
-                memoized_distance[key] = 1  # 1 + min(p,q,r) = 1 + min(p = 0, q >= 0, r >= 0) = 1 + 0 = 1
+              return memoized_distance[key] = 1 if (p = distance(x,w)) is 0
+              min = p
 
-              # (p > 0 and q = 0) => (q < p and q <= r) => min(p,q,r) = q
-              else if (q = distance(v,y)) is 0
-                memoized_distance[key] = 1  # 1 + min(p,q,r) = 1 + min(p > 0, q = 0, r >= 0) = 1 + 0 = 1
+              return memoized_distance[key] = 1 if (p = distance(v,y)) is 0
+              min = p if p < min
 
-              # (p > 0 and q > 0 and r = 0) => (r < p and r < q) => min(p,q,r) = r
-              else if (r = distance(x,y)) is 0
-                memoized_distance[key] = 1  # 1 + min(p,q,r) = 1 + min(p > 0, q > 0, r = 0) = 1 + 0 = 1
+              return memoized_distance[key] = 1 if (p = distance(x,y)) is 0
+              min = p if p < min
 
-              # p > 0, q > 0, and r > 0
-              else
-                a1 = x[0]  # prefix character of x
-                b1 = y[0]  # prefix character of y
-                if a is b1 and a1 is b
-                  if (s = distance(f(v,1), f(w,1))) is 0
-                    memoized_distance[key] = 1
-                  else
-                    memoized_distance[key] = 1 + Math.min(p,q,r,s)
-                else
-                  memoized_distance[key] = 1 + Math.min(p,q,r)
+              a1 = x[0]  # prefix character of x
+              b1 = y[0]  # prefix character of y
+              if a is b1 and a1 is b
+                return memoized_distance[key] = 1 if (p = distance(f(v,1), f(w,1))) is 0
+                min = p if p < min
+
+              return memoized_distance[key] = 1 + min
 
       # Calculates the Levenshtein distance between words v and w, using the
       # following primitive operations: deletion, insertion, substitution,
@@ -152,20 +137,25 @@ do ->
                 a = x[0]; v = x; x = x[1..]
                 b = y[0]; w = y; y = y[1..]
 
-              if a is b
-                memoized_distance[key] = x.length || y.length
-              else if (p = distance(x,w)) is 0
-                memoized_distance[key] = 1
-              else if (q = distance(v,y)) is 0
-                memoized_distance[key] = 1
-              else if (r = distance(x,y)) is 0
-                memoized_distance[key] = 1
-              else if (s = if w.length > 1 then distance(x, f(w,1)) else Infinity) is 0
-                memoized_distance[key] = 1
-              else if (t = if v.length > 1 then distance(f(v,1), y) else Infinity) is 0
-                memoized_distance[key] = 1
-              else
-                memoized_distance[key] = 1 + Math.min(p,q,r,s,t)
+              # x.length is 0 or y.length is 0
+              return memoized_distance[key] = x.length || y.length if a is b
+
+              return memoized_distance[key] = 1 if (p = distance(x,w)) is 0
+              min = p
+
+              return memoized_distance[key] = 1 if (p = distance(v,y)) is 0
+              min = p if p < min
+
+              return memoized_distance[key] = 1 if (p = distance(x,y)) is 0
+              min = p if p < min
+
+              return memoized_distance[key] = 1 if (p = if w.length > 1 then distance(x, f(w,1)) else Infinity) is 0
+              min = p if p < min
+
+              return memoized_distance[key] = 1 if (p = if v.length > 1 then distance(f(v,1), y) else Infinity) is 0
+              min = p if p < min
+
+              return memoized_distance[key] = 1 + min
 
   if typeof exports isnt 'undefined'
     exports.distance = distance

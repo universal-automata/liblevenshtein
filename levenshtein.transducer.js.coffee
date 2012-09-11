@@ -79,7 +79,8 @@ do ->
           h = i - offset; w = vector.length
           if e < n
             if h <= w - 2
-              k = Math.min(n - e + 1, w - h)
+              a = n - e + 1; b = w - h
+              k = if a < b then a else b
               j = index_of(vector, k, h)
               if j == 0
                 [
@@ -128,104 +129,106 @@ do ->
           h = i - offset; w = vector.length
           if e == 0 < n
             if h <= w - 2
-              k = Math.min(n - e + 1, w - h)
+              a = n - e + 1; b = w - h
+              k = if a < b then a else b
               j = index_of(vector, k, h)
               if j == 0
                 [
-                  [(i + 1), 0]
+                  [(i + 1), 0, 0]
                 ]
               else if j == 1
                 [
-                  [i, 1]
-                  [i, 1, true] # t-position
-                  [(i + 1), 1]
-                  [(i + 2), 1]
+                  [i, 1, 0]
+                  [i, 1, 1] # t-position
+                  [(i + 1), 1, 0]
+                  [(i + 2), 1, 0]
                 ]
               else if j > 1
                 [
-                  [i, 1]
-                  [(i + 1), 1]
-                  [(i + j + 1), j]
+                  [i, 1, 0]
+                  [(i + 1), 1, 0]
+                  [(i + j + 1), j, 0]
                 ]
               else
                 [
-                  [i, 1]
-                  [(i + 1), 1]
+                  [i, 1, 0]
+                  [(i + 1), 1, 0]
                 ]
             else if h == w - 1
               if vector[h]
                 [
-                  [(i + 1), 0]
+                  [(i + 1), 0, 0]
                 ]
               else
                 [
-                  [i, 1]
-                  [(i + 1), 1]
+                  [i, 1, 0]
+                  [(i + 1), 1, 0]
                 ]
             else # h == w
               [
-                [i, 1]
+                [i, 1, 0]
               ]
           else if 1 <= e < n
             if h <= w - 2
-              if t isnt true # [i,e] is not a t-position
-                k = Math.min(n - e + 1, w - h)
+              if t is 0 # [i,e] is not a t-position
+                a = n - e + 1; b = w - h
+                k = if a < b then a else b
                 j = index_of(vector, k, h)
                 if j == 0
                   [
-                    [(i + 1), e]
+                    [(i + 1), e, 0]
                   ]
                 else if j == 1
                   [
-                    [i, (e + 1)]
-                    [i, (e + 1), true] # t-position
-                    [(i + 1), (e + 1)]
-                    [(i + 2), (e + 1)]
+                    [i, (e + 1), 0]
+                    [i, (e + 1), 1] # t-position
+                    [(i + 1), (e + 1), 0]
+                    [(i + 2), (e + 1), 0]
                   ]
                 else if j > 1
                   [
-                    [i, (e + 1)]
-                    [(i + 1), (e + 1)]
-                    [(i + j + 1), (e + j)]
+                    [i, (e + 1), 0]
+                    [(i + 1), (e + 1), 0]
+                    [(i + j + 1), (e + j), 0]
                   ]
                 else
                   [
-                    [i, (e + 1)]
-                    [(i + 1), (e + 1)]
+                    [i, (e + 1), 0]
+                    [(i + 1), (e + 1), 0]
                   ]
               else
                 if vector[h]
                   [
-                    [(i + 2), e]
+                    [(i + 2), e, 0]
                   ]
                 else
                   null
             else if h == w - 1
               if vector[h]
                 [
-                  [(i + 1), e]
+                  [(i + 1), e, 0]
                 ]
               else
                 [
-                  [i, (e + 1)]
-                  [(i + 1), (e + 1)]
+                  [i, (e + 1), 0]
+                  [(i + 1), (e + 1), 0]
                 ]
             else # h == w
               [
-                [i, (e + 1)]
+                [i, (e + 1), 0]
               ]
           else
-            if h <= w - 1 and t isnt true
+            if h <= w - 1 and t is 0
               if vector[h]
                 [
-                  [(i + 1), n]
+                  [(i + 1), n, 0]
                 ]
               else
                 null
-            else if h <= w - 2 and t is true # [i,e] is a t-position
+            else if h <= w - 2 and t is 1 # [i,e] is a t-position
               if vector[h]
                 [
-                  [(i + 2), n]
+                  [(i + 2), n, 0]
                 ]
               else
                 null
@@ -239,80 +242,80 @@ do ->
             if h <= w - 2
               if vector[h]
                 [
-                  [(i + 1), e]
+                  [(i + 1), e, 0]
                 ]
               else
                 [
-                  [i, (e + 1)]
-                  [i, (e + 1), true] # s-position
-                  [(i + 1), (e + 1)]
-                  [(i + 2), (e + 1)]
+                  [i, (e + 1), 0]
+                  [i, (e + 1), 1] # s-position
+                  [(i + 1), (e + 1), 0]
+                  [(i + 2), (e + 1), 0]
                 ]
             else if h == w - 1
               if vector[h]
                 [
-                  [(i + 1), e]
+                  [(i + 1), e, 0]
                 ]
               else
                 [
-                  [i, (e + 1)]
-                  [i, (e + 1), true] # s-position
-                  [(i + 1), (e + 1)]
+                  [i, (e + 1), 0]
+                  [i, (e + 1), 1] # s-position
+                  [(i + 1), (e + 1), 0]
                 ]
             else # h == w
               [
-                [i, (e + 1)]
+                [i, (e + 1), 0]
               ]
           else if e < n
             if h <= w - 2
-              if s isnt true
+              if s is 0
                 if vector[h]
                   [
-                    [(i + 1), e]
+                    [(i + 1), e, 0]
                   ]
                 else
                   [
-                    [i, (e + 1)]
-                    [i, (e + 1), true] # s-position
-                    [(i + 1), (e + 1)]
-                    [(i + 2), (e + 1)]
+                    [i, (e + 1), 0]
+                    [i, (e + 1), 1] # s-position
+                    [(i + 1), (e + 1), 0]
+                    [(i + 2), (e + 1), 0]
                   ]
               else # [i,e] is an s-position
                 [
-                  [(i + 1), e]
+                  [(i + 1), e, 0]
                 ]
             else if h == w - 1
-              if s isnt true
+              if s is 0
                 if vector[h]
                   [
-                    [(i + 1), e]
+                    [(i + 1), e, 0]
                   ]
                 else
                   [
-                    [i, (e + 1)]
-                    [i, (e + 1), true] # s-position
-                    [(i + 1), (e + 1)]
+                    [i, (e + 1), 0]
+                    [i, (e + 1), 1] # s-position
+                    [(i + 1), (e + 1), 0]
                   ]
               else # [i,e] is an s-position
                 [
-                  [(i + 1), e]
+                  [(i + 1), e, 0]
                 ]
             else # h == w
               [
-                [i, (e + 1)]
+                [i, (e + 1), 0]
               ]
           else
             if h <= w - 1
-              if s isnt true
+              if s is 0
                 if vector[h]
                   [
-                    [(i + 1), n]
+                    [(i + 1), n, 0]
                   ]
                 else
                   null
               else # [i,e] is an s-position
                 [
-                  [(i + 1), e]
+                  [(i + 1), e, 0]
                 ]
             else # h == w
               null
@@ -349,34 +352,55 @@ do ->
       if algorithm is STANDARD
         (state) -> ([i,e] for [i,e] in state)
       else
-        (state) -> ([i,e,x is true] for [i,e,x] in state)
+        (state) -> ([i,e,x] for [i,e,x] in state)
 
     subsumes = switch algorithm
       when STANDARD then (i,e, j,f) ->
-        (e < f) && Math.abs(j - i) <= (f - e)
+        #(e < f) && Math.abs(j - i) <= (f - e)
+        Math.abs(j - i) <= (f - e)
       when TRANSPOSITION then (i,e,s, j,f,t, n) ->
-        if s
-          if t
-            (f > e) && (i == j)
+        if s is 1
+          if t is 1
+            #(e < f) && (i == j)
+            (i == j)
           else
-            (n == f > e) && (i == j)
+            #(e < f == n) && (i == j)
+            (f == n) && (i == j)
         else
-          if t
-            (f > e) && Math.abs(j - (i - 1)) <= (f - e)
+          if t is 1
+            #(e < f) && Math.abs(j - (i - 1)) <= (f - e)
+            Math.abs(j - (i - 1)) <= (f - e)
           else
-            (e < f) && Math.abs(j - i) <= (f - e)
+            #(e < f) && Math.abs(j - i) <= (f - e)
+            Math.abs(j - i) <= (f - e)
       when MERGE_AND_SPLIT then(i,e,s, j,f,t) ->
-        if s and not t
+        if s is 1 and t is 0
           false
         else
-          (f > e) && Math.abs(j - i) <= (f - e)
+          #(e < f) && Math.abs(j - i) <= (f - e)
+          Math.abs(j - i) <= (f - e)
+
+    # Given two positions [i,e] and [j,f], for [i,e] to subsume [j,f], it must
+    # be the case that e < f.  Therefore, I can remove a redundant check for
+    # (e < f) within the subsumes method by finding the first index that
+    # contains a position having an error greater than the current one (assuming
+    # that the positions are sorted in ascending order, according to error).
+    bisect_error_right = (state, e, l) ->
+      u = state.length
+      while l < u
+        i = (l + u) >> 1
+        if e < state[i][1]
+          u = i
+        else
+          l = i + 1
+      return l
 
     unsubsume_for = switch algorithm
       when STANDARD then (n) ->
         (state) ->
           m = 0
           while x = state[m]
-            [i,e] = x; n = m + 1
+            [i,e] = x; n = bisect_error_right(state, e, m)
             while y = state[n]
               [j,f] = y
               if subsumes(i,e, j,f)
@@ -388,7 +412,7 @@ do ->
         (state) ->
           m = 0
           while x = state[m]
-            [i,e,s] = x; n = m + 1
+            [i,e,s] = x; n = bisect_error_right(state, e, m)
             while y = state[n]
               [j,f,t] = y
               if subsumes(i,e,s, j,f,t, n)
@@ -400,7 +424,7 @@ do ->
         (state) ->
           m = 0
           while x = state[m]
-            [i,e,s] = x; n = m + 1
+            [i,e,s] = x; n = bisect_error_right(state, e, m)
             while y = state[n]
               [j,f,t] = y
               if subsumes(i,e,s, j,f,t, n)
@@ -420,7 +444,7 @@ do ->
         (state) ->
           signature = ''
           for [i,e,x] in state
-            signature += i.toString() + ',' + e.toString() + ',' + (x is true).toString()
+            signature += i.toString() + ',' + e.toString() + ',' + x.toString()
           signature
 
     insert_for_subsumption =
@@ -449,34 +473,30 @@ do ->
               state_prime.push(position)
           return
 
+    sort_for_transition =
+      if algorithm is STANDARD
+        (state) -> state.sort (a,b) -> a[0] - b[0] || a[1] - b[1]
+      else
+        (state) -> state.sort (a,b) -> a[0] - b[0] || a[1] - b[1] || a[2] - b[2]
+
     transition_for_state = (n) ->
       transition = transition_for_position(n)
       unsubsume = unsubsume_for(n)
-      memoized_states = {}
 
       (state, vector) ->
-        state_key = stringify_state(state); vector_key = vector.join('')
+        offset = state[0][0]; state_prime = []
 
-        unless memoized_vectors = memoized_states[state_key]
-          memoized_vectors = memoized_states[state_key] = {}
+        for position in state
+          next_state = transition(position, vector, offset)
+          continue unless next_state
+          insert_for_subsumption(state_prime, next_state)
+        unsubsume(state_prime)
 
-        if (state_prime = memoized_vectors[vector_key]) isnt `undefined`
+        if state_prime.length > 0
+          sort_for_transition(state_prime)
           state_prime
         else
-          offset = state[0][0]; state_prime = []
-
-          for position in state
-            next_state = transition(position, vector, offset)
-            continue unless next_state
-            insert_for_subsumption(state_prime, next_state)
-          unsubsume(state_prime)
-
-          if state_prime.length > 0
-            state_prime.sort (a,b) -> a[0] - b[0] || a[1] - b[1]
-            #relabel(state_prime, offset)
-            memoized_vectors[vector_key] = state_prime
-          else
-            memoized_vectors[vector_key] = null
+          null
 
     if dictionary_type is LIST
       if typeof exports isnt 'undefined'
@@ -505,15 +525,23 @@ do ->
       else
         (state, w, n) ->
           for [i,e,x] in state
-            return true if x isnt true and (w - i) <= (n - e)
+            return true if x isnt 1 and (w - i) <= (n - e)
           return false
+
+    initial_state =
+      if algorithm is STANDARD
+        [[0,0]]
+      else
+        [[0,0,0]]
 
     (term, n) ->
       w = term.length
       transition = transition_for_state(n)
-      matches = []; stack = [['', dawg.root, [[0,0]]]]
+      matches = []; stack = [['', dawg.root, initial_state]]
       while stack.length > 0
-        [V, q_D, M] = stack.pop(); i = M[0][0]; k = Math.min(2 * n + 1, w - i)
+        [V, q_D, M] = stack.pop(); i = M[0][0]
+        a = 2 * n + 1; b = w - i
+        k = if a < b then a else b
         for x, next_q_D of q_D.edges
           vector = characteristic_vector(x, term, k, i)
           next_M = transition(M, vector)

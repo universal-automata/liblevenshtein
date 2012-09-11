@@ -73,7 +73,7 @@ do ->
       # Find longest common prefix between word and previous word
       i = 0; previous_word = @previous_word
 
-      upper_bound = Math.min(word.length, previous_word.length)
+      upper_bound = if word.length < previous_word.length then word.length else previous_word.length
       i += 1 while i < upper_bound and word[i] is previous_word[i]
 
       # Check the unchecked_nodes for redundant nodes, proceeding from last one
