@@ -354,6 +354,8 @@ do ->
       else
         (state) -> ([i,e,x] for [i,e,x] in state)
 
+    # NOTE: See my comment above bisect_error_right(state,e,l) and how I am
+    # using it in unsubsume_for(n) for why I am not checking (e < f) below.
     subsumes = switch algorithm
       when STANDARD then (i,e, j,f) ->
         #(e < f) && Math.abs(j - i) <= (f - e)
