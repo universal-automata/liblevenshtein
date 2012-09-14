@@ -542,22 +542,36 @@ transducer = (args) ->
           return true if x isnt 1 and (w - i) <= (n - e)
         return false
 
+  # The distance of each position in a state can be defined as follows:
+  #
+  #   distance = w - i + e
+  #
+  # For every accepting position, it must be the case that w - i <= n - e.  It
+  # follows directly that the distance of every accepted position must be no
+  # more than n:
+  #
+  # (w - i <= n - e) <=> (w - i + e <= n) <=> (distance <= n)
+  #
+  # The Levenshtein distance between any two terms is defined as the minimum
+  # edit distance between the two terms.  Therefore, iterate over each position
+  # in an accepting state, and take the minimum distance among all its accepting
+  # positions as the corresponding Levenshtein distance.
   minimum_distance =
     if algorithm is STANDARD
       (state, w, n) ->
         minimum = Infinity
         for [i,e] in state
-          if (w - i) <= (n - e)
-            distance = w - i + e
-            minimum = distance if distance < minimum
+          distance = w - i + e
+          if distance <= n and distance < minimum
+            minimum = distance
         minimum
     else
       (state, w, n) ->
         minimum = Infinity
         for [i,e,x] in state
-          if x isnt 1 and (w - i) <= (n - e)
-            distance = w - i + e
-            minimum = distance if distance < minimum
+          distance = w - i + e
+          if x isnt 1 and distance <= n and distance < minimum
+            minimum = distance
         minimum
 
   insert_match =
