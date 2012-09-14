@@ -53,7 +53,7 @@ var transduce = levenshtein.transducer({
 });
 ```
 
-The sorting options are as following:
+The sorting options are as follows:
 
 1. sort_matches := Whether to sort the transduced terms.
 2. include_distance := Whether to include the Levenshtein distances with the transduced terms.
