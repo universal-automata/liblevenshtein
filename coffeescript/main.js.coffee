@@ -21,113 +21,111 @@
 do ->
   'use strict'
 
-  {levenshtein} = require('../javascripts/v1.0/liblevenshtein.min')
+  fs = require('fs'); lazy = require('lazy')
+  new lazy(fs.createReadStream('/usr/share/dict/american-english', encoding: 'utf8')).lines.map((line) ->
+    line && line.toString()
+  ).join (dictionary) ->
+    dictionary.splice(0,1) # discard the empty string ...
 
-  read_dictionary = (dictionary, path, encoding) ->
-    bisect_left = (dictionary, term, lower, upper) ->
-      while lower < upper
-        i = (lower + upper) >> 1
-        if dictionary[i] < term
-          lower = i + 1
-        else
-          upper = i
-      return lower
+    {levenshtein} = require('../javascripts/v1.1/liblevenshtein.min')
 
-    term = ''; fs = require('fs')
-    for c in fs.readFileSync(path, encoding)
-      if c isnt '\n'
-        term += c
+    dawg_start = new Date()
+    dawg = new levenshtein.Dawg(dictionary)
+    dawg_stop = new Date()
+
+    dictionary_type = 'dawg'; sorted = true
+
+    # Sanity check: Make sure that every word in the dictionary is indexed.
+    errors = []
+    for term in dictionary
+      unless dawg.accepts(term)
+        errors.push(term)
+    if errors.length > 0
+      for term in errors
+        console.log "    {!} \"#{term}\" ::= failed to encode in dawg"
+
+    #word = 'sillywilly'; n = 5
+    word = 'dayf'; n = 2
+    #word = 'parasaurolophus'; n = 20
+
+    #algorithm = 'standard'
+    algorithm = 'transposition'
+    #algorithm = 'merge_and_split'
+
+    transduce_start = new Date()
+    transduce = levenshtein.transducer(dictionary: dawg, sorted: sorted, dictionary_type: dictionary_type, algorithm: algorithm)
+    transduce_stop = new Date()
+
+    distance_start = new Date()
+    distance = levenshtein.distance(algorithm)
+    distance_stop = new Date()
+
+    distances_start = new Date()
+    distance(word, term) for term in dictionary
+    distances_stop = new Date()
+
+    target_terms = {}
+    target_terms[term] = true for term in dictionary when distance(word, term) <= n
+    dictionary = null
+
+    transduced_start = new Date()
+    transduced = transduce(word, n)
+    transduced_stop = new Date()
+
+    console.log "Distances to Transduced Term(s):"
+    i = 0; k = transduced.length; j = if 100 < k then 100 else k
+    while i < j
+      [term, d] = transduced[i]
+      message = "    distance(\"#{word}\", \"#{term}\") = #{distance(word, term)} <=> #{d}"
+      console.log(message)
+      if distance(word, term) != d
+        console.log '    ' + Array(message.length - 3).join('^')
+      i += 1
+    while i < k
+      [term, d] = transduced[i]
+      if distance(word, term) != d
+        message = "    distance(\"#{word}\", \"#{term}\") = #{distance(word, term)} <=> #{d}"
+        console.log(message)
+        console.log '    ' + Array(message.length - 3).join('^')
+      i += 1
+    console.log "Total Transduced: #{transduced.length}"
+    console.log '----------------------------------------'
+
+    false_positives = []
+    for [term] in transduced
+      if term of target_terms
+        delete target_terms[term]
       else
-        dictionary.splice(bisect_left(dictionary, term, 0, dictionary.length), 0 ,term)
-        term = ''
-    if term isnt ''
-      dictionary.splice(bisect_left(dictionary, term, 0, dictionary.length), 0 ,term)
+        false_positives.push(term)
+
+    if false_positives.length > 0
+      console.log 'Distances to Every False Positive:'
+      false_positives.sort (a,b) -> distance(word, a[0]) - distance(word, b[0]) || a[0].localeCompare(b[0])
+      for term in false_positives
+        console.log "    distance(\"#{word}\", \"#{term}\") = #{distance(word, term)}"
+      console.log "Total False Positives: #{false_positives.length}"
+      console.log '----------------------------------------'
+
+    false_negatives = []
+    false_negatives.push(term) for term of target_terms
+
+    if false_negatives.length > 0
+      console.log 'Distances to Every False Negative:'
+      false_negatives.sort (a,b) -> distance(word, a[0]) - distance(word, b[0]) || a[0].localeCompare(b[0])
+      for term in false_negatives
+        console.log "    distance(\"#{word}\", \"#{term}\") = #{distance(word, term)}"
+      console.log "Total False Negatives: #{false_negatives.length}"
+      console.log '----------------------------------------'
+
+    console.log 'Calibrations:'
+    console.log "    word=\"#{word}\", n=#{n}, algorithm=\"#{algorithm}\""
+    console.log '----------------------------------------'
+    console.log 'Benchmarks:'
+    console.log "    Time to distance the dictionary: #{distances_stop - distances_start} ms"
+    console.log "    Time to construct dawg: #{dawg_stop - dawg_start} ms"
+    console.log "    Time to construct transducer: #{transduce_stop - transduce_start} ms"
+    console.log "    Time to construct distance metric: #{distance_stop - distance_start} ms"
+    console.log "    Time to transduce the dictionary: #{transduced_stop - transduced_start} ms"
     return
-
-  dictionary = []; sorted = true
-  read_dictionary(dictionary, '/usr/share/dict/american-english', 'ascii')
-
-  dawg_start = new Date()
-  dawg = new levenshtein.Dawg(dictionary); dictionary_type = 'dawg'
-  dawg_stop = new Date()
-
-  # Sanity check: Make sure that every word in the dictionary is indexed.
-  errors = []
-  for term in dictionary
-    unless dawg.accepts(term)
-      errors.push(term)
-  if errors.length > 0
-    for term in errors
-      console.log "    {!} \"#{term}\" ::= failed to encode in dawg"
-
-  word = 'sillywilly'; n = 3
-
-  #algorithm = 'standard'
-  algorithm = 'transposition'
-  #algorithm = 'merge_and_split'
-
-  transduce_start = new Date()
-  transduce = levenshtein.transducer(dictionary: dawg, sorted: sorted, dictionary_type: dictionary_type, algorithm: algorithm)
-  transduce_stop = new Date()
-
-  distance_start = new Date()
-  distance = levenshtein.distance(algorithm)
-  distance_stop = new Date()
-
-  distances_start = new Date()
-  distance(word, term) for term in dictionary
-  distances_stop = new Date()
-
-  target_terms = {}
-  target_terms[term] = true for term in dictionary when distance(word, term) <= n
-  dictionary = null
-
-  transduced_start = new Date()
-  transduced = transduce(word, n)
-  transduced_stop = new Date()
-
-  transduced.sort (a,b) -> distance(word, a) - distance(word, b) || a.localeCompare(b)
-  if transduced.length < 100
-    console.log 'Distances to Every Transduced Term:'
-    for term in transduced
-      console.log "    distance(\"#{word}\", \"#{term}\") = #{distance(word, term)}"
-  console.log "Total Transduced: #{transduced.length}"
-  console.log '----------------------------------------'
-
-  false_positives = []
-  for term in transduced
-    if term of target_terms
-      delete target_terms[term]
-    else
-      false_positives.push(term)
-
-  if false_positives.length > 0
-    console.log 'Distances to Every False Positive:'
-    false_positives.sort (a,b) -> distance(word, a) - distance(word, b) || a.localeCompare(b)
-    for term in false_positives
-      console.log "    distance(\"#{word}\", \"#{term}\") = #{distance(word, term)}"
-    console.log "Total False Positives: #{false_positives.length}"
-    console.log '----------------------------------------'
-
-  false_negatives = []
-  false_negatives.push(term) for term of target_terms
-
-  if false_negatives.length > 0
-    console.log 'Distances to Every False Negative:'
-    false_negatives.sort (a,b) -> distance(word, a) - distance(word, b) || a.localeCompare(b)
-    for term in false_negatives
-      console.log "    distance(\"#{word}\", \"#{term}\") = #{distance(word, term)}"
-    console.log "Total False Negatives: #{false_negatives.length}"
-    console.log '----------------------------------------'
-
-  console.log 'Calibrations:'
-  console.log "    word=\"#{word}\", n=#{n}, algorithm=\"#{algorithm}\""
-  console.log '----------------------------------------'
-  console.log 'Benchmarks:'
-  console.log "    Time to distance the dictionary: #{distances_stop - distances_start} ms"
-  console.log "    Time to construct dawg: #{dawg_stop - dawg_start} ms"
-  console.log "    Time to construct transducer: #{transduce_stop - transduce_start} ms"
-  console.log "    Time to construct distance metric: #{distance_stop - distance_start} ms"
-  console.log "    Time to transduce the dictionary: #{transduced_stop - transduced_start} ms"
   return
 

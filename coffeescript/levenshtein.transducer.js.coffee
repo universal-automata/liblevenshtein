@@ -57,14 +57,24 @@ DAWG = 'dawg'
 # }
 ###
 transducer = (args) ->
-  dictionary      = args['dictionary']
-  sorted          = args['sorted']
-  dictionary_type = args['dictionary_type']
-  algorithm       = args['algorithm']
+  dictionary       = args['dictionary']
+  sorted           = args['sorted']
+  dictionary_type  = args['dictionary_type']
+  algorithm        = args['algorithm']
+  sort_matches     = args['sort_matches']
+  include_distance = args['include_distance']
+  case_insensitive = args['case_insensitive']
+
+  throw new Error('No dictionary was specified') unless dictionary
+  unless dictionary instanceof Array or dictionary instanceof Dawg
+    throw new Error('dictionary must be either an Array or levenshtein.Dawg')
 
   sorted = false unless typeof sorted is 'boolean'
   dictionary_type = LIST unless dictionary_type in [LIST, DAWG]
   algorithm = STANDARD unless algorithm in [STANDARD, TRANSPOSITION, MERGE_AND_SPLIT]
+  sort_matches = true unless typeof sort_matches is 'boolean'
+  include_distance = true unless typeof include_distance is 'boolean'
+  case_insensitive = true unless typeof case_insensitive is 'boolean'
 
   index_of = (vector, k, i) ->
     j = 0
@@ -508,11 +518,6 @@ transducer = (args) ->
         null
 
   if dictionary_type is LIST
-    if typeof exports isnt 'undefined'
-      Dawg = require('./dawg')['Dawg']
-    else
-      Dawg = levenshtein['Dawg']
-
     dictionary.sort() unless sorted
     dawg = new Dawg(dictionary)
   else
@@ -529,7 +534,7 @@ transducer = (args) ->
     if algorithm is STANDARD
       (state, w, n) ->
         for [i,e] in state
-          return true if w - i <= n - e
+          return true if (w - i) <= (n - e)
         return false
     else
       (state, w, n) ->
@@ -537,29 +542,116 @@ transducer = (args) ->
           return true if x isnt 1 and (w - i) <= (n - e)
         return false
 
+  minimum_distance =
+    if algorithm is STANDARD
+      (state, w, n) ->
+        minimum = Infinity
+        for [i,e] in state
+          if (w - i) <= (n - e)
+            distance = w - i + e
+            minimum = distance if distance < minimum
+        minimum
+    else
+      (state, w, n) ->
+        minimum = Infinity
+        for [i,e,x] in state
+          if x isnt 1 and (w - i) <= (n - e)
+            distance = w - i + e
+            minimum = distance if distance < minimum
+        minimum
+
+  insert_match =
+    if sort_matches
+      if include_distance
+        if case_insensitive
+          (matches, match, distance) ->
+            l = 0; u = matches.length; downcased = match.toLowerCase()
+            while l < u
+              i = (l + u) >> 1; [w,d] = matches[i]
+              if (d - distance || w.toLowerCase().localeCompare(downcased)) < 0
+                l = i + 1
+              else
+                u = i
+            matches.splice(l, 0, [match, distance])
+        else
+          (matches, match, distance) ->
+            l = 0; u = matches.length
+            while l < u
+              i = (l + u) >> 1; [w,d] = matches[i]
+              if (d - distance || w.localeCompare(match)) < 0
+                l = i + 1
+              else
+                u = i
+            matches.splice(l, 0, [match, distance])
+      else
+        if case_insensitive
+          (matches, match) ->
+            l = 0; u = matches.length; downcased = match.toLowerCase()
+            while l < u
+              i = (l + u) >> 1; [w,d] = matches[i]
+              if w.toLowerCase().localeCompare(downcased) < 0
+                l = i + 1
+              else
+                u = i
+            matches.splice(l, 0, match)
+        else
+          (matches, match) ->
+            l = 0; u = matches.length
+            while l < u
+              i = (l + u) >> 1; [w,d] = matches[i]
+              if w.localeCompare(match) < 0
+                l = i + 1
+              else
+                u = i
+            matches.splice(l, 0, match)
+    else
+      if include_distance
+        (matches, match, distance) -> matches.push([match, distance])
+      else
+        (matches, match) -> matches.push(match)
+
   initial_state =
     if algorithm is STANDARD
       [[0,0]]
     else
       [[0,0,0]]
 
-  (term, n) ->
-    w = term.length
-    transition = transition_for_state(n)
-    matches = []; stack = [['', dawg['root'], initial_state]]
-    while stack.length > 0
-      [V, q_D, M] = stack.pop(); i = M[0][0]
-      a = 2 * n + 1; b = w - i
-      k = if a < b then a else b
-      for x, next_q_D of q_D['edges']
-        vector = characteristic_vector(x, term, k, i)
-        next_M = transition(M, vector)
-        if next_M
-          next_V = V + x
-          stack.push([next_V, next_q_D, next_M])
-          if next_q_D['is_final'] and is_final(next_M, w, n)
-            matches.push(next_V)
-    matches
+  if include_distance
+    (term, n) ->
+      w = term.length
+      transition = transition_for_state(n)
+      matches = []; stack = [['', dawg['root'], initial_state]]
+      while stack.length > 0
+        [V, q_D, M] = stack.pop(); i = M[0][0]
+        a = 2 * n + 1; b = w - i
+        k = if a < b then a else b
+        for x, next_q_D of q_D['edges']
+          vector = characteristic_vector(x, term, k, i)
+          next_M = transition(M, vector)
+          if next_M
+            next_V = V + x
+            stack.push([next_V, next_q_D, next_M])
+            if next_q_D['is_final'] and isFinite(distance = minimum_distance(next_M, w, n))
+              insert_match(matches, next_V, distance)
+      matches
+  else
+    (term, n) ->
+      w = term.length
+      transition = transition_for_state(n)
+      matches = []; stack = [['', dawg['root'], initial_state]]
+      while stack.length > 0
+        [V, q_D, M] = stack.pop(); i = M[0][0]
+        a = 2 * n + 1; b = w - i
+        k = if a < b then a else b
+        for x, next_q_D of q_D['edges']
+          vector = characteristic_vector(x, term, k, i)
+          next_M = transition(M, vector)
+          if next_M
+            next_V = V + x
+            stack.push([next_V, next_q_D, next_M])
+            if next_q_D['is_final'] and is_final(next_M, w, n)
+              insert_match(matches, next_V)
+      matches
 
 levenshtein['transducer'] = transducer
 

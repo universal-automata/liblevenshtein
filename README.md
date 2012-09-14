@@ -27,16 +27,27 @@ var other_term = "oter";
 var other_matches = transduce(other_term, max_edit_distance); // reuse the transducer
 ```
 
-If you would like to rank the transduced terms according to their distance from
-the query term, you may do the following (using the same variables as above):
+The default behavior of the transducer is to sort the results, ascendingly, in
+the following fashion: first according to the transduced terms' Levenshtein
+distances from the query term, then lexicographically, in a case insensitive
+manner.
+
+If you would prefer to sort the results yourself, or do not care about order,
+you may do the following:
 
 ```javascript
-var distance = levenshtein.distance(algorithm); // accepts the same algorithms as the transducer
-
-// Sort the matches in ascending order according to distance, first, then
-// lexicographically (for dictionary terms having the same distance from the
-// query term).
-matches.sort(function (lhs, rhs) {
-	return distance(query_term, lhs) - distance(query_term, rhs) || lhs.localeCompare(rhs);
+var transduce = levenshtein.transducer({
+  dictionary: dictionary,
+  algorithm: algorithm,
+  sort_results: false
 });
 ```
+
+The sorting options are as following:
+1. sort_matches := Whether to sort the transduced terms.
+2. include_distance := Whether to include the Levenshtein distances with the transduced terms.
+3. case_insensitive := Whether to sort the results in a case-insensitive manner.
+
+Each option defaults to `true`.  You can get the original behavior of the
+transducer by setting each option to false (where the original behavior was to
+return the terms unsorted and excluding their distances).
