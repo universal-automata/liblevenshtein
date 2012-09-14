@@ -558,20 +558,18 @@ transducer = (args) ->
   # positions as the corresponding Levenshtein distance.
   minimum_distance =
     if algorithm is STANDARD
-      (state, w, n) ->
+      (state, w) ->
         minimum = Infinity
         for [i,e] in state
           distance = w - i + e
-          if distance <= n and distance < minimum
-            minimum = distance
+          minimum = distance if distance < minimum
         minimum
     else
-      (state, w, n) ->
+      (state, w) ->
         minimum = Infinity
         for [i,e,x] in state
           distance = w - i + e
-          if x isnt 1 and distance <= n and distance < minimum
-            minimum = distance
+          minimum = distance if x isnt 1 and distance < minimum
         minimum
 
   insert_match =
@@ -645,7 +643,7 @@ transducer = (args) ->
           if next_M
             next_V = V + x
             stack.push([next_V, next_q_D, next_M])
-            if next_q_D['is_final'] and isFinite(distance = minimum_distance(next_M, w, n))
+            if next_q_D['is_final'] and (distance = minimum_distance(next_M, w)) <= n
               insert_match(matches, next_V, distance)
       matches
   else

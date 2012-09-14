@@ -905,24 +905,24 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       }
       return false;
     };
-    minimum_distance = algorithm === STANDARD ? function(state, w, n) {
+    minimum_distance = algorithm === STANDARD ? function(state, w) {
       var e, i, minimum, _i, _len, _ref;
       minimum = Infinity;
       for (_i = 0, _len = state.length; _i < _len; _i++) {
         _ref = state[_i], i = _ref[0], e = _ref[1];
         distance = w - i + e;
-        if (distance <= n && distance < minimum) {
+        if (distance < minimum) {
           minimum = distance;
         }
       }
       return minimum;
-    } : function(state, w, n) {
+    } : function(state, w) {
       var e, i, minimum, x, _i, _len, _ref;
       minimum = Infinity;
       for (_i = 0, _len = state.length; _i < _len; _i++) {
         _ref = state[_i], i = _ref[0], e = _ref[1], x = _ref[2];
         distance = w - i + e;
-        if (x !== 1 && distance <= n && distance < minimum) {
+        if (x !== 1 && distance < minimum) {
           minimum = distance;
         }
       }
@@ -1013,7 +1013,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             if (next_M) {
               next_V = V + x;
               stack.push([next_V, next_q_D, next_M]);
-              if (next_q_D['is_final'] && isFinite(distance = minimum_distance(next_M, w, n))) {
+              if (next_q_D['is_final'] && (distance = minimum_distance(next_M, w)) <= n) {
                 insert_match(matches, next_V, distance);
               }
             }
