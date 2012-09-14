@@ -30,8 +30,17 @@ var other_matches = transduce(other_term, max_edit_distance); // reuse the trans
 The default behavior of the transducer is to sort the results, ascendingly, in
 the following fashion: first according to the transduced terms' Levenshtein
 distances from the query term, then lexicographically, in a case insensitive
-manner.  Each result is a pair consisting of the transuced term and its
+manner.  Each result is a pair consisting of the transduced term and its
 Levenshtein distance from the query term, as follows: `[term, distance]`
+
+```javascript
+var pair, match, distance, i = 0;
+while ((pair = matches[i]) !== undefined) {
+	match = pair[0]; distance = pair[1];
+	// do something with match and pair
+	i += 1;
+}
+```
 
 If you would prefer to sort the results yourself, or do not care about order,
 you may do the following:
