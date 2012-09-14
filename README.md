@@ -34,10 +34,10 @@ manner.  Each result is a pair consisting of the transduced term and its
 Levenshtein distance from the query term, as follows: `[term, distance]`
 
 ```javascript
-var pair, match, distance, i = 0;
+var pair, term, distance, i = 0;
 while ((pair = matches[i]) !== undefined) {
-	match = pair[0]; distance = pair[1];
-	// do something with `match` and `distance`
+	term = pair[0]; distance = pair[1];
+	// do something with `term` and `distance`
 	i += 1;
 }
 ```
