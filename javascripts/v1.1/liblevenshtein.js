@@ -910,11 +910,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       minimum = Infinity;
       for (_i = 0, _len = state.length; _i < _len; _i++) {
         _ref = state[_i], i = _ref[0], e = _ref[1];
-        if ((w - i) <= (n - e)) {
-          distance = w - i + e;
-          if (distance < minimum) {
-            minimum = distance;
-          }
+        distance = w - i + e;
+        if (distance <= n && distance < minimum) {
+          minimum = distance;
         }
       }
       return minimum;
@@ -923,11 +921,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       minimum = Infinity;
       for (_i = 0, _len = state.length; _i < _len; _i++) {
         _ref = state[_i], i = _ref[0], e = _ref[1], x = _ref[2];
-        if (x !== 1 && (w - i) <= (n - e)) {
-          distance = w - i + e;
-          if (distance < minimum) {
-            minimum = distance;
-          }
+        distance = w - i + e;
+        if (x !== 1 && distance <= n && distance < minimum) {
+          minimum = distance;
         }
       }
       return minimum;
