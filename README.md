@@ -30,7 +30,8 @@ var other_matches = transduce(other_term, max_edit_distance); // reuse the trans
 The default behavior of the transducer is to sort the results, ascendingly, in
 the following fashion: first according to the transduced terms' Levenshtein
 distances from the query term, then lexicographically, in a case insensitive
-manner.
+manner.  Each result is a pair consisting of the transuced term and its
+Levenshtein distance from the query term, as follows: `[term, distance]`
 
 If you would prefer to sort the results yourself, or do not care about order,
 you may do the following:
