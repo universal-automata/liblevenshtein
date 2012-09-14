@@ -37,7 +37,7 @@ Levenshtein distance from the query term, as follows: `[term, distance]`
 var pair, match, distance, i = 0;
 while ((pair = matches[i]) !== undefined) {
 	match = pair[0]; distance = pair[1];
-	// do something with match and pair
+	// do something with `match` and `distance`
 	i += 1;
 }
 ```
