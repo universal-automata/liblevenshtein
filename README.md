@@ -54,6 +54,7 @@ var transduce = levenshtein.transducer({
 ```
 
 The sorting options are as following:
+
 1. sort_matches := Whether to sort the transduced terms.
 2. include_distance := Whether to include the Levenshtein distances with the transduced terms.
 3. case_insensitive := Whether to sort the results in a case-insensitive manner.
