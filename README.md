@@ -49,7 +49,7 @@ you may do the following:
 var transduce = levenshtein.transducer({
   dictionary: dictionary,
   algorithm: algorithm,
-  sort_results: false
+  sort_matches: false
 });
 ```
 
