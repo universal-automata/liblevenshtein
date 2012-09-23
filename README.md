@@ -1,4 +1,4 @@
-# Levshtein Automata
+# Levenshtein Automata
 
 ### Basic Usage:
 
