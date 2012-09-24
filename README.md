@@ -59,8 +59,8 @@ material within this library:
 3. [Natural Language Processing](https://class.coursera.org/nlp "Dan Jurafsky and Chris Manning (Coursera)")
 
 Finally, I must credit the course which first introduced me to the field of
-Information Retrieval, Mathematical Applications in Search Engine Design, taught
-by [Dr. Rao Li](http://www.usca.edu/math/~mathdept/rli/) at the
+Information Retrieval, "Mathematical Applications in Search Engine Design",
+taught by [Dr. Rao Li](http://www.usca.edu/math/~mathdept/rli/) at the
 [University of South Carolina Aiken](http://web.usca.edu/). I highly recommend
 that course if you are in the area.
 
