@@ -51,7 +51,7 @@ in his blog post entitled, "[Compressing dictionaries with a DAWG](http://steveh
 Another of Steve's blogs also made an impact on me, namely "[Fast and Easy Levenshtein distance using a Trie](http://stevehanov.ca/blog/index.php?id=114 "Steve Hanov (2011)")".
 
 I've become heavily involved with the online movement regarding MOOCs (Massive
-Open Online Classrooms), and the following classes taught me much about the
+Open Online Classrooms), and the following courses taught me much regarding the
 material within this library:
 
 1. [Automata](https://class.coursera.org/automata "Jeffrey Ullman (Coursera)")
