@@ -1,4 +1,4 @@
-# Lib-Levenshtein
+# libLevenshtein
 
 ## A library for generating Finite State Transducers based on Levenshtein Automata.
 
