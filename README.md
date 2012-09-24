@@ -48,7 +48,7 @@ which itself is based on the project by Jean-Philippe Barrette-LaPierre, [Moman]
 Steve Hanov pointed me to the paper, 
 "[Incremental Construction of Minimal Acyclic Finite-State Automata](http://dl.acm.org/citation.cfm?id=971842 "Jan Daciuk, Bruce W. Watson, Stoyan Mihov, and Richard E. Watson (2000)")",
 in his blog post entitled, "[Compressing dictionaries with a DAWG](http://stevehanov.ca/blog/index.php?id=115 "Steve Hanov (2011)")".
-Another of Steve's other blogs also made an impact on me, namely "[Fast and Easy Levenshtein distance using a Trie](http://stevehanov.ca/blog/index.php?id=114 "Steve Hanov (2011)")".
+Another of Steve's blogs also made an impact on me, namely "[Fast and Easy Levenshtein distance using a Trie](http://stevehanov.ca/blog/index.php?id=114 "Steve Hanov (2011)")".
 
 I've become heavily involved with the online movement regarding MOOCs (Massive
 Open Online Classrooms), and the following classes taught me much about the
