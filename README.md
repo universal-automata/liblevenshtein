@@ -1,4 +1,6 @@
-# LibLevenshtein: A library for generating Finite State Transducers based on Levenshtein Automata.
+# Lib-Levenshtein
+
+## A library for generating Finite State Transducers based on Levenshtein Automata.
 
 Based largely on the works of [Stoyan Mihov](http://www.lml.bas.bg/~stoyan/),
 [Klaus Schulz](http://www.klaus-schulze.com/), and Petar Nikolaev Mitankin, this
