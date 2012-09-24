@@ -8,7 +8,7 @@ library generates Levenshtein transducers using nothing more than an input list
 of dictionary terms. The referenced literature includes: 
 "[Fast String Correction with Levenshtein-Automata](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.16.652 "Klaus Schulz and Stoyan Mihov (2002)")",
 which defines the algorithm used to generate the Levenshtein automata,
-"[Universal Levenshtein Automata. Building and Properties](www.fmi.uni-sofia.bg/fmi/logic/theses/mitankin-en.pdf "Petar Nikolaev Mitankin (2005)")",
+"[Universal Levenshtein Automata. Building and Properties](http://www.fmi.uni-sofia.bg/fmi/logic/theses/mitankin-en.pdf "Petar Nikolaev Mitankin (2005)")",
 which provided many mathematical proofs that helped me understand the algorithm
 and supplied the recursive definitions upon which I based my distance functions,
 and
