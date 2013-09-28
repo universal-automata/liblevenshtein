@@ -8,7 +8,7 @@ Add the following `<script>` tag to the `<head>` section of your document:
 
 ```html
 <script type="text/javascript"
-	src="http://dylon.github.com/levenshtein_automata/javascripts/v1.1/liblevenshtein.min.js">
+	src="http://dylon.github.com/liblevenshtein/javascripts/v1.1/liblevenshtein.min.js">
 </script>
 ```
 
