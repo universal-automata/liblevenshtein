@@ -2,6 +2,8 @@
 
 ## A library for generating Finite State Transducers based on Levenshtein Automata.
 
+For a quick demonstration, please visit the [Github Page, here](http://dylon.github.io/liblevenshtein/).
+
 ### Basic Usage:
 
 Add the following `<script>` tag to the `<head>` section of your document:

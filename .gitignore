@@ -3,3 +3,4 @@
 coffeescript/node_modules/*
 java/build/*
 java/.gradle/*
+.sass-cache/*
