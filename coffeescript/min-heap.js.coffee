@@ -1,4 +1,4 @@
-class MaxHeap
+class MinHeap
   parent: (i) ->
     # Index of the parent of the element of A, having the index, i
     ((i + 1) >> 1) - 1
@@ -14,17 +14,17 @@ class MaxHeap
     l = @left_child(i)
     r = @right_child(i)
     heap = @heap
-    if l < @length and @f(heap[l], heap[i]) > 0
-      largest = l
+    if l < @length and @f(heap[l], heap[i]) < 0
+      smallest = l
     else
-      largest = i
-    if r < @length and @f(heap[r], heap[largest]) > 0
-      largest = r
-    if largest isnt i
+      smallest = i
+    if r < @length and @f(heap[r], heap[smallest]) < 0
+      smallest = r
+    if smallest isnt i
       tmp = heap[i]
-      heap[i] = heap[largest]
-      heap[largest] = tmp
-      @heapify(largest)
+      heap[i] = heap[smallest]
+      heap[smallest] = tmp
+      @heapify(smallest)
     null
   build: () ->
     i = @length >> 1
@@ -32,16 +32,16 @@ class MaxHeap
       @heapify(i)
       i -= 1
     null
-  increase_key: (i, key) ->
+  decrease_key: (i, key) ->
     f = @f
     heap = @heap
     c = f(key, heap[i])
-    if c < 0
-      throw new Error("Expected #{key} to be at least heap[#{i}] = #{heap[i]}")
+    if c > 0
+      throw new Error("Expected #{key} to be at no more than heap[#{i}] = #{heap[i]}")
     heap[i] = key
     parent = @parent
     p = parent(i)
-    while i and f(heap[p], heap[i]) < 0
+    while i and f(heap[p], heap[i]) > 0
       tmp = heap[i]
       heap[i] = heap[p]
       heap[p] = tmp
@@ -77,7 +77,7 @@ class MaxHeap
     p = parent(i)
     heap = @heap
     f = @f
-    while i > 0 and f(heap[p], key) < 0
+    while i > 0 and f(heap[p], key) > 0
       heap[i] = heap[p]
       i = p
       p = parent(i)
@@ -87,10 +87,10 @@ class MaxHeap
     @build()
 
 test = (A, f) ->
-  B = new MaxHeap(f, A.slice())
+  B = new MinHeap(f, A.slice())
   console.log((b while (b = B.pop()) isnt null))
 
-  B = new MaxHeap(f)
+  B = new MinHeap(f)
   i = 0
   while i < A.length
     B.push(A[i])
@@ -98,12 +98,12 @@ test = (A, f) ->
   console.log((b while (b = B.pop()) isnt null))
 
   # Should be the reverse of the queue
-  B = new MaxHeap(f, A.slice())
+  B = new MinHeap(f, A.slice())
   B.sort()
   console.log(B.heap)
 
-  B = new MaxHeap(f, A.slice())
-  B.increase_key(3, 5)
+  B = new MinHeap(f, A.slice())
+  B.decrease_key(3, 0)
   console.log((b while (b = B.pop()) isnt null))
 
   null
