@@ -35,7 +35,7 @@ distance = (algorithm) ->
     when STANDARD then do ->
       memoized_distance = {}
       distance = (v, w) ->
-        key = v + '|' + w
+        key = v + '\0' + w
         if (value = memoized_distance[key]) isnt `undefined`
           value
         else
@@ -72,7 +72,7 @@ distance = (algorithm) ->
     when TRANSPOSITION then do ->
       memoized_distance = {}
       distance = (v, w) ->
-        key = v + '|' + w
+        key = v + '\0' + w
         if (value = memoized_distance[key]) isnt `undefined`
           value
         else
@@ -115,7 +115,7 @@ distance = (algorithm) ->
     when MERGE_AND_SPLIT then do ->
       memoized_distance = {}
       distance = (v, w) ->
-        key = v + '|' + w
+        key = v + '\0' + w
         if (value = memoized_distance[key]) isnt `undefined`
           value
         else
