@@ -1,0 +1,18 @@
+table.query {
+  width: 100%;
+  border: none; }
+  table.query td {
+    border: none;
+    padding: 0.25em; }
+    table.query td.query-term {
+      width: 70%; }
+    table.query td.algorithm {
+      width: 25%;
+      padding-right: 0; }
+  table.query input[type=text] {
+    width: 100%; }
+  table.query textarea.programming-languages {
+    width: 100%;
+    height: 10em; }
+  table.query select.algorithm {
+    width: 100%; }

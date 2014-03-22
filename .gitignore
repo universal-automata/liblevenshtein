@@ -1,3 +1,5 @@
 *.swp
 *.swo
 coffeescript/node_modules/*
+java/build/*
+.sass-cache/*

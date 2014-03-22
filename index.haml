@@ -1,0 +1,58 @@
+!!!
+%html
+  %head
+    %meta{:charset => 'utf-8'}/
+    %meta{:content => 'chrome=1', 'http-equiv' => 'X-UA-Compatible'}/
+    %meta{:content => 'libLevenshtein : Various utilities regarding Levenshtein transducers.', :name => 'description'}/
+    %link{:href => 'stylesheets/stylesheet.css', :media => 'screen', :rel => 'stylesheet', :type => 'text/css'}/
+    %link{:href => 'index.css', :media => 'screen', :rel => 'stylesheet', :type => 'text/css'}/
+    %script{:type => 'text/javascript', :src => 'http://code.jquery.com/jquery-2.1.0.min.js'}
+    %script{:type => 'text/javascript', :src => 'javascripts/v1.1.1/liblevenshtein.min.js'}
+    %script{:type => 'text/javascript', :src => 'programming-languages.js'}
+    %script{:type => 'text/javascript', :src => 'index.js'}
+    %title libLevenshtein
+  %body
+    / HEADER
+    #header_wrap.outer
+      %header.inner
+        %a#forkme_banner{:href => 'https://github.com/dylon/liblevenshtein'} View on GitHub
+        %h1#project_title libLevenshtein
+        %h2#project_tagline Various utilities regarding Levenshtein transducers.
+        %section#downloads
+          %a.zip_download_link{:href => 'https://github.com/dylon/liblevenshtein/zipball/master'}
+            Download this project as a .zip file
+          %a.tar_download_link{:href => 'https://github.com/dylon/liblevenshtein/tarball/master'}
+            Download this project as a tar.gz file
+    / MAIN CONTENT
+    #main_content_wrap.outer
+      %section#main_content.inner
+        %h2 Demonstration
+        Enter a query term below, and (optionally) change the maximum edit
+        distance and search algorithm.  Note that the search is case-sensitive,
+        so c++ and C++ are different terms.
+        %table.query
+          %tr
+            %td.query-term
+              %input.query-term{:type => 'text', :title => 'Query term to search for'}
+            %td.edit-distance
+              %select.edit-distance{:title => 'Maximum edit distance'}
+                - (0..10).each do |distance|
+                  %option{:value => distance}
+                    = distance
+            %td.algorithm
+              %select.algorithm{:title => 'Which algorithm to use'}
+                %option{:value => 'standard'} Standard
+                %option{:value => 'transposition'} Transposition
+                %option{:value => 'merge_and_split'} Merge and Split
+          %tr
+            %td{:colspan => 3}
+              %textarea.programming-languages{:readonly => true, :title => 'List of prgramming languages'}
+    / FOOTER
+    #footer_wrap.outer
+      %footer.inner
+        %p.copyright
+          libLevenshtein is maintained by
+          %a{:href => 'https://github.com/dylon'} dylon
+        %p
+          Published with
+          %a{:href => 'http://pages.github.com'} GitHub Pages

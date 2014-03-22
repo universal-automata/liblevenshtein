@@ -1,74 +1,111 @@
 <!DOCTYPE html>
 <html>
-
   <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Levenshtein Automata : Various utilities regarding Levenshtein Automata and related." />
-
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Levenshtein Automata</title>
+    <meta charset='utf-8'>
+    <meta content='chrome=1' http-equiv='X-UA-Compatible'>
+    <meta content='libLevenshtein : Various utilities regarding Levenshtein transducers.' name='description'>
+    <link href='stylesheets/stylesheet.css' media='screen' rel='stylesheet' type='text/css'>
+    <link href='index.css' media='screen' rel='stylesheet' type='text/css'>
+    <script src='http://code.jquery.com/jquery-2.1.0.min.js' type='text/javascript'></script>
+    <script src='javascripts/v1.1.1/liblevenshtein.min.js' type='text/javascript'></script>
+    <script src='programming-languages.js' type='text/javascript'></script>
+    <script src='index.js' type='text/javascript'></script>
+    <title>libLevenshtein</title>
   </head>
-
   <body>
-
     <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/dylon/levenshtein_automata">View on GitHub</a>
-
-          <h1 id="project_title">Levenshtein Automata</h1>
-          <h2 id="project_tagline">Various utilities regarding Levenshtein Automata and related.</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/dylon/levenshtein_automata/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/dylon/levenshtein_automata/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
+    <div class='outer' id='header_wrap'>
+      <header class='inner'>
+        <a href='https://github.com/dylon/liblevenshtein' id='forkme_banner'>View on GitHub</a>
+        <h1 id='project_title'>libLevenshtein</h1>
+        <h2 id='project_tagline'>Various utilities regarding Levenshtein transducers.</h2>
+        <section id='downloads'>
+          <a class='zip_download_link' href='https://github.com/dylon/liblevenshtein/zipball/master'>
+            Download this project as a .zip file
+          </a>
+          <a class='tar_download_link' href='https://github.com/dylon/liblevenshtein/tarball/master'>
+            Download this project as a tar.gz file
+          </a>
+        </section>
+      </header>
     </div>
-
     <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h3>Welcome to GitHub Pages.</h3>
-
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
-
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
-
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
-
-<h3>Designer Templates</h3>
-
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
-
-<h3>Rather Drive Stick?</h3>
-
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
-
-<h3>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+    <div class='outer' id='main_content_wrap'>
+      <section class='inner' id='main_content'>
+        <h2>Demonstration</h2>
+        Enter a query term below, and (optionally) change the maximum edit
+        distance and search algorithm.  Note that the search is case-sensitive,
+        so c++ and C++ are different terms.
+        <table class='query'>
+          <tr>
+            <td class='query-term'>
+              <input class='query-term' title='Query term to search for' type='text'>
+            </td>
+            <td class='edit-distance'>
+              <select class='edit-distance' title='Maximum edit distance'>
+                <option value='0'>
+                  0
+                </option>
+                <option value='1'>
+                  1
+                </option>
+                <option value='2'>
+                  2
+                </option>
+                <option value='3'>
+                  3
+                </option>
+                <option value='4'>
+                  4
+                </option>
+                <option value='5'>
+                  5
+                </option>
+                <option value='6'>
+                  6
+                </option>
+                <option value='7'>
+                  7
+                </option>
+                <option value='8'>
+                  8
+                </option>
+                <option value='9'>
+                  9
+                </option>
+                <option value='10'>
+                  10
+                </option>
+              </select>
+            </td>
+            <td class='algorithm'>
+              <select class='algorithm' title='Which algorithm to use'>
+                <option value='standard'>Standard</option>
+                <option value='transposition'>Transposition</option>
+                <option value='merge_and_split'>Merge and Split</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td colspan='3'>
+              <textarea class='programming-languages' readonly title='List of prgramming languages'></textarea>
+            </td>
+          </tr>
+        </table>
       </section>
     </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Levenshtein Automata maintained by <a href="https://github.com/dylon">dylon</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+    <!-- FOOTER -->
+    <div class='outer' id='footer_wrap'>
+      <footer class='inner'>
+        <p class='copyright'>
+          libLevenshtein is maintained by
+          <a href='https://github.com/dylon'>dylon</a>
+        </p>
+        <p>
+          Published with
+          <a href='http://pages.github.com'>GitHub Pages</a>
+        </p>
       </footer>
     </div>
-
-    
-
   </body>
 </html>
