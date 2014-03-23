@@ -70,6 +70,7 @@ task 'test', 'Run the test suite', ->
     reporters.default.run do ->
       test_dirs = ['test']
       for file in wrench.readdirSyncRecursive('test')
-        test_dirs.push("test/#{file}") unless /\.\w+$/.test(file)
+        path = "test/#{file}"
+        test_dirs.push(path) if fs.lstatSync(path).isDirectory()
       test_dirs.sort()
 
