@@ -14,9 +14,21 @@ build = (watch, callback) ->
   coffee = spawn 'coffee', options
   coffee.stdout.on 'data', (data) -> print data.toString()
   coffee.stderr.on 'data', (data) -> print data.toString()
-  coffee.on 'exit', (status) ->
-    throw new Error('An unexpected error occurred') if status isnt 0
+  coffee.on 'exit', (status) -> callback?() if status is 0
 
+task 'docs', 'Generate annotated source code with Docco', ->
+  fs.readdir 'src', (err, contents) ->
+    files = ("src/#{file}" for file in contents when /\.coffee$/.test file)
+    docco = spawn 'docco', files
+    docco.stdout.on 'data', (data) -> print data.toString()
+    docco.stderr.on 'data', (data) -> print data.toString()
+    docco.on 'exit', (status) -> callback?() if status is 0
+
+task 'build', 'Compile CoffeeScript source files', ->
+  build()
+
+task 'minify', 'Builds and minifies liblevenshtein.js', ->
+  build ->
     fs.open 'lib/liblevenshtein.js', 'w', null, (error, fd) ->
       throw error if error
       fs.writeSync fd, [
@@ -31,21 +43,9 @@ build = (watch, callback) ->
       fs.writeSync fd, '\n'
       fs.close fd, (error) -> throw error if error
 
-    closure = spawn 'gradle', ['minify']
-    closure.stdout.on 'data', (data) -> print data.toString()
-    closure.stderr.on 'data', (data) -> print data.toString()
-    closure.on 'exit', (status) -> callback?() if status is 0
-
-task 'docs', 'Generate annotated source code with Docco', ->
-  fs.readdir 'src', (err, contents) ->
-    files = ("src/#{file}" for file in contents when /\.coffee$/.test file)
-    docco = spawn 'docco', files
-    docco.stdout.on 'data', (data) -> print data.toString()
-    docco.stderr.on 'data', (data) -> print data.toString()
-    docco.on 'exit', (status) -> callback?() if status is 0
-
-task 'build', 'Compile CoffeeScript source files', ->
-  build()
+      closure = spawn 'gradle', ['minify']
+      closure.stdout.on 'data', (data) -> print data.toString()
+      closure.stderr.on 'data', (data) -> print data.toString()
 
 task 'watch', 'Recompile CoffeeScript source files when modified', ->
   build true
