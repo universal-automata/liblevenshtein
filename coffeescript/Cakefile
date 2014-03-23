@@ -18,16 +18,24 @@ build = (watch, callback) ->
     throw new Error("An unexpected error occurred") if status isnt 0
     fs.open 'lib/liblevenshtein.js', 'w', null, (error, fd) ->
       throw error if error
-      fs.writeSync fd, [
-        '(function(){'
-          '"use strict";'
-          fs.readFileSync('lib/levenshtein.js', 'utf8')
-          fs.readFileSync('lib/levenshtein/distance.js', 'utf8')
-          fs.readFileSync('lib/collection/dawg.js', 'utf8')
-          fs.readFileSync('lib/levenshtein/transducer.js', 'utf8')
-        '}());'
-      ].join('\n')
+
+      fs.writeSync fd, '(function(){\n'
+      fs.writeSync fd, '"use strict";\n'
+
+      files = [
+        'lib/levenshtein.js'
+        'lib/levenshtein/distance.js'
+        'lib/collection/dawg.js'
+        'lib/levenshtein/transducer.js'
+      ]
+
+      for file in files
+        fs.writeSync fd, fs.readFileSync(file, 'utf8')
+        fs.writeSync fd, '\n'
+
+      fs.writeSync fd, '}());'
       fs.writeSync fd, '\n'
+
       fs.close fd, (error) ->
         if error
           throw error
@@ -57,5 +65,11 @@ task 'watch', 'Recompile CoffeeScript source files when modified', ->
 task 'test', 'Run the test suite', ->
   build ->
     {reporters} = require 'nodeunit'
+    wrench = require 'wrench'
     process.chdir __dirname
-    reporters.default.run ['test', 'test/util']
+    reporters.default.run do ->
+      test_dirs = ['test']
+      for file in wrench.readdirSyncRecursive('test')
+        test_dirs.push("test/#{file}") unless /\.\w+$/.test(file)
+      test_dirs.sort()
+

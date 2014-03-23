@@ -60,6 +60,11 @@ class MinHeap
       @heapify(0)
       i -= 1
     null
+  peek: () ->
+    if @length
+      @heap[0]
+    else
+      null
   pop: () ->
     if @length
       heap = @heap
@@ -83,56 +88,25 @@ class MinHeap
       p = parent(i)
     heap[i] = key
     null
-  constructor: (@f, @heap=[], @length=@heap.length) ->
+  constructor: (@f, @heap, @length) ->
+    unless heap
+      @heap = heap = []
+    unless typeof heap.length is 'number'
+      throw new Error("heap must be array-like")
+    unless typeof length is 'number'
+      @length = length = if heap then heap.length else 0
+    unless typeof f is 'function'
+      throw new Error("f must be a function")
+    unless 0 <= length <= heap.length
+      throw new Error("Expected 0 <= heap length = #{length} <= #{heap.length} = heap size")
     @build()
 
-test = (A, f) ->
-  B = new MinHeap(f, A.slice())
-  console.log((b while (b = B.pop()) isnt null))
+global =
+  if typeof window is 'object'
+    window
+  else if typeof exports is 'object'
+    exports
+  else
+    this
 
-  B = new MinHeap(f)
-  i = 0
-  while i < A.length
-    B.push(A[i])
-    i += 1
-  console.log((b while (b = B.pop()) isnt null))
-
-  # Should be the reverse of the queue
-  B = new MinHeap(f, A.slice())
-  B.sort()
-  console.log(B.heap)
-
-  B = new MinHeap(f, A.slice())
-  B.decrease_key(3, 0)
-  console.log((b while (b = B.pop()) isnt null))
-
-  null
-
-# comparator
-f = (a,b) -> a - b
-
-test([1,2,3,4], f)
-test([2,3,4,1], f)
-test([3,4,1,2], f)
-test([4,1,2,3], f)
-test([2,1,3,4], f)
-test([1,3,4,2], f)
-test([3,4,2,1], f)
-test([4,2,1,3], f)
-test([2,3,1,4], f)
-test([3,1,4,2], f)
-test([1,4,2,3], f)
-test([4,2,3,1], f)
-test([1,3,2,4], f)
-test([3,2,4,1], f)
-test([2,4,1,3], f)
-test([4,1,3,2], f)
-test([1,2,4,3], f)
-test([2,4,3,1], f)
-test([4,3,1,2], f)
-test([3,1,2,4], f)
-test([4,3,2,1], f)
-test([3,2,1,4], f)
-test([2,1,4,3], f)
-test([1,4,3,2], f)
-
+global.MinHeap = MinHeap

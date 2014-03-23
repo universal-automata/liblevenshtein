@@ -16,7 +16,8 @@
   "main": null,
   "devDependencies": {
     "nodeunit": "~0.8",
-    "coffee-script": "~1.7"
+    "coffee-script": "~1.7",
+    "wrench": "~1.5"
   },
   "engines":
   {
