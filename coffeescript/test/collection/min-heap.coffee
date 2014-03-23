@@ -1,5 +1,5 @@
-{MinHeap} = require '../../src/collection/min-heap'
-{permutations} = require '../../src/util/permutations'
+{levenshtein: {MinHeap}} = require '../../src/collection/min-heap'
+{levenshtein: {permutations}} = require '../../src/util/permutations'
 
 c_num = (a,b) -> a - b #-> comparator for numbers
 
@@ -27,7 +27,7 @@ module.exports =
     test.strictEqual(heap.pop(), null, 'expected heap.pop() to return null')
     test.done()
   'Every permutation of 0..6 should be dequeued in the same order': (test) ->
-    test_heap = (heap) ->
+    test_heap = (heap, order) ->
       test.strictEqual(heap.length, order.length)
       i = 0
       while heap.peek() isnt null
@@ -42,12 +42,12 @@ module.exports =
       # Test heapified elements
       p = permutation.slice()
       heap = new MinHeap(c_num, p)
-      test_heap(heap)
+      test_heap(heap, order)
       # Test adding elements, one-by-one
       p = permutation.slice()
       heap = new MinHeap(c_num)
       heap.push(e) for e in p
-      test_heap(heap)
+      test_heap(heap, order)
       # Verify that sorting the heap returns elements in the reverse order
       p = permutation.slice()
       heap = new MinHeap(c_num, p)
@@ -55,4 +55,9 @@ module.exports =
       reverse_order = order.slice().reverse()
       test.deepEqual(heap.heap, reverse_order,
         "Expected the elements to be sorded in reverse-order ([#{reverse_order.join(',')}]), but received [#{heap.heap.join(',')}]")
+      # Verify that decreasing a key reorders the queue correctly
+      p = permutation.slice()
+      p[order.length >> 1] = 1 + order[order.length - 1]
+      heap = new MinHeap(c_num, p)
+      test_heap(heap, p.slice().sort())
     test.done()

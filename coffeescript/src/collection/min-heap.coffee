@@ -14,11 +14,11 @@ class MinHeap
     l = @left_child(i)
     r = @right_child(i)
     heap = @heap
-    if l < @length and @f(heap[l], heap[i]) < 0
+    if l < @['length'] and @f(heap[l], heap[i]) < 0
       smallest = l
     else
       smallest = i
-    if r < @length and @f(heap[r], heap[smallest]) < 0
+    if r < @['length'] and @f(heap[r], heap[smallest]) < 0
       smallest = r
     if smallest isnt i
       tmp = heap[i]
@@ -27,12 +27,12 @@ class MinHeap
       @heapify(smallest)
     null
   build: () ->
-    i = @length >> 1
+    i = @['length'] >> 1
     while i >= 0
       @heapify(i)
       i -= 1
     null
-  decrease_key: (i, key) ->
+  'decrease_key': (i, key) ->
     f = @f
     heap = @heap
     c = f(key, heap[i])
@@ -48,36 +48,36 @@ class MinHeap
       i = p
       p = parent(i)
     null
-  sort: () ->
+  'sort': () ->
     @build()
-    i = @length - 1
+    i = @['length'] - 1
     heap = @heap
     while i >= 0
       tmp = heap[0]
       heap[0] = heap[i]
       heap[i] = tmp
-      @length -= 1
+      @['length'] -= 1
       @heapify(0)
       i -= 1
     null
-  peek: () ->
-    if @length
+  'peek': () ->
+    if @['length']
       @heap[0]
     else
       null
-  pop: () ->
-    if @length
+  'pop': () ->
+    if @['length']
       heap = @heap
       max = heap[0]
-      heap[0] = heap[@length - 1]
-      @length -= 1
+      heap[0] = heap[@['length'] - 1]
+      @['length'] -= 1
       @heapify(0)
       max
     else
       null
-  push: (key) ->
-    i = @length
-    @length += 1
+  'push': (key) ->
+    i = @['length']
+    @['length'] += 1
     parent = @parent
     p = parent(i)
     heap = @heap
@@ -88,17 +88,19 @@ class MinHeap
       p = parent(i)
     heap[i] = key
     null
-  constructor: (@f, @heap, @length) ->
-    unless heap
-      @heap = heap = []
+  constructor: (f, heap, length) ->
+    heap = [] unless heap
     unless typeof heap.length is 'number'
       throw new Error("heap must be array-like")
     unless typeof length is 'number'
-      @length = length = if heap then heap.length else 0
+      length = if heap then heap.length else 0
     unless typeof f is 'function'
       throw new Error("f must be a function")
     unless 0 <= length <= heap.length
       throw new Error("Expected 0 <= heap length = #{length} <= #{heap.length} = heap size")
+    @f = f
+    @heap = heap
+    @['length'] = length
     @build()
 
 global =
@@ -109,4 +111,5 @@ global =
   else
     this
 
-global.MinHeap = MinHeap
+global['levenshtein'] ||= {}
+global['levenshtein']['MinHeap'] = MinHeap

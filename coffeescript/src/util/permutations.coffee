@@ -1,11 +1,3 @@
-global =
-  if typeof exports is 'object'
-    exports
-  else if typeof window is 'object'
-    window
-  else
-    this
-
 concat = (lists...) ->
   concatenation = []
   for list in lists
@@ -42,4 +34,13 @@ permutations = (list, i) ->
         p.push(expand(l[i], permutations(l, i + 1)))
       concat.apply(null, p)
 
-global.permutations = (list) -> permutations(list, 0)
+global =
+  if typeof exports is 'object'
+    exports
+  else if typeof window is 'object'
+    window
+  else
+    this
+
+global['levenshtein'] ||= {}
+global['levenshtein']['permutations'] = (list) -> permutations(list, 0)

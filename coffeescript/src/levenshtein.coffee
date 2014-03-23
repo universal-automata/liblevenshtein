@@ -24,10 +24,14 @@ STANDARD = 'standard'
 TRANSPOSITION = 'transposition'
 MERGE_AND_SPLIT = 'merge_and_split'
 
-levenshtein = {}
+global =
+  if typeof exports is 'object'
+    exports
+  else if typeof window is 'object'
+    window
+  else
+    this
 
-if typeof window isnt 'undefined'
-  window['levenshtein'] = levenshtein
-else
-  exports['levenshtein'] = levenshtein
+global['levenshtein'] ||= {}
+levenshtein = global['levenshtein']
 
