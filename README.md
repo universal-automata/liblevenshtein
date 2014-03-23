@@ -69,6 +69,18 @@ Each option defaults to `true`.  You can get the original behavior of the
 transducer by setting each option to `false` (where the original behavior was to
 return the terms unsorted and excluding their distances).
 
+### Building the library
+
+#### CoffeeScript / JavaScript
+
+You will need `npm` ([Node.js](http://nodejs.org/)) and `gradle` installed.
+Be sure to install `coffee-script` via `sudo npm install -g coffee-script`.
+
+Once that is installed, you should have the `cake` executable on your `$PATH`.
+`cd` into the `coffeescript/` directory, and run `cake build` or `cake minify`
+(if you want the minified, JavaScript library as well).  Once complete, you
+should find the library under `lib/`.
+
 ### Background
 
 Based largely on the works of [Stoyan Mihov](http://www.lml.bas.bg/~stoyan/),

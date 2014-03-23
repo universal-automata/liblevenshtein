@@ -45,6 +45,12 @@ task 'docs', 'Generate annotated source code with Docco', ->
 task 'build', 'Compile CoffeeScript source files', ->
   build()
 
+task 'minify', 'Builds and minifies liblevenshtein.js', ->
+  build ->
+    closure = spawn 'gradle', ['minify']
+    closure.stdout.on 'data', (data) -> print data.toString()
+    closure.stderr.on 'data', (data) -> print data.toString()
+
 task 'watch', 'Recompile CoffeeScript source files when modified', ->
   build true
 
