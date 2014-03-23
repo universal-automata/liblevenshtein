@@ -81,6 +81,15 @@ Once that is installed, you should have the `cake` executable on your `$PATH`.
 (if you want the minified, JavaScript library as well).  Once complete, you
 should find the library under `lib/`.
 
+### Running the tests
+
+To verify that the library does what it should, I've written a sequence of
+tests.  To run them for the respective languages, do the following:
+
+#### CoffeeScript / JavaScript
+
+`cd` into the `coffeescript/` directory and execute `cake test`
+
 ### Background
 
 Based largely on the works of [Stoyan Mihov](http://www.lml.bas.bg/~stoyan/),
