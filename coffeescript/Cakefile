@@ -14,7 +14,27 @@ build = (watch, callback) ->
   coffee = spawn 'coffee', options
   coffee.stdout.on 'data', (data) -> print data.toString()
   coffee.stderr.on 'data', (data) -> print data.toString()
-  coffee.on 'exit', (status) -> callback?() if status is 0
+  coffee.on 'exit', (status) ->
+    throw new Error('An unexpected error occurred') if status isnt 0
+
+    fs.open 'lib/liblevenshtein.js', 'w', null, (error, fd) ->
+      throw error if error
+      fs.writeSync fd, [
+        '(function(){'
+          '"use strict";'
+          fs.readFileSync('lib/levenshtein.js', 'utf8')
+          fs.readFileSync('lib/levenshtein/distance.js', 'utf8')
+          fs.readFileSync('lib/collection/dawg.js', 'utf8')
+          fs.readFileSync('lib/levenshtein/transducer.js', 'utf8')
+        '}());'
+      ].join('\n')
+      fs.writeSync fd, '\n'
+      fs.close fd, (error) -> throw error if error
+
+    closure = spawn 'gradle', ['minify']
+    closure.stdout.on 'data', (data) -> print data.toString()
+    closure.stderr.on 'data', (data) -> print data.toString()
+    closure.on 'exit', (status) -> callback?() if status is 0
 
 task 'docs', 'Generate annotated source code with Docco', ->
   fs.readdir 'src', (err, contents) ->
@@ -34,4 +54,4 @@ task 'test', 'Run the test suite', ->
   build ->
     {reporters} = require 'nodeunit'
     process.chdir __dirname
-    reporters.default.run ['test']
+    reporters.default.run ['test', 'test/util']

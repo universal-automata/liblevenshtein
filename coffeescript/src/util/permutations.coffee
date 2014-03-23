@@ -8,7 +8,8 @@ global =
 
 concat = (lists...) ->
   concatenation = []
-  (concatenation = concatenation.concat(list)) for list in lists
+  for list in lists
+    concatenation = concatenation.concat(list)
   concatenation
 
 expand = (element, lists) ->

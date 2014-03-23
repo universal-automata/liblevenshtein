@@ -1,4 +1,4 @@
-{permutations} = require '../src/permutations'
+{permutations} = require '../../src/util/permutations'
 
 module.exports =
   'There should be no permutations on an empty list': (test) ->

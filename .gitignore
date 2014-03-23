@@ -1,5 +1,5 @@
-*.swp
-*.swo
+*.sw?
+coffeescript/.gradle/*
 coffeescript/node_modules/*
 java/build/*
 java/.gradle/*
