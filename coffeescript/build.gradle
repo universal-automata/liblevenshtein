@@ -8,7 +8,7 @@ dependencies {
   runtime 'com.google.javascript:closure-compiler:v20131014'
 }
 
-task minify(type: JavaExec) {
+task minify_liblevenshtein(type: JavaExec) {
   main = 'com.google.javascript.jscomp.CommandLineRunner'
   classpath = sourceSets.main.runtimeClasspath
   args = [
@@ -18,3 +18,16 @@ task minify(type: JavaExec) {
     '--js', 'lib/liblevenshtein.js'
   ]
 }
+
+task minify_levenshtein_distance(type: JavaExec) {
+  main = 'com.google.javascript.jscomp.CommandLineRunner'
+  classpath = sourceSets.main.runtimeClasspath
+  args = [
+    '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
+    //'--output_wrapper', '"(function(){\'use strict\';%output%}());"',
+    '--js_output_file', 'lib/levenshtein-distance.min.js',
+    '--js', 'lib/levenshtein-distance.js'
+  ]
+}
+
+task minify(dependsOn: ['minify_liblevenshtein', 'minify_levenshtein_distance'])

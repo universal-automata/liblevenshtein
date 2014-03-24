@@ -32,6 +32,5 @@ global =
   else
     this
 
-global['levenshtein'] ||= {}
-levenshtein = global['levenshtein']
+levenshtein = global['levenshtein'] ||= {}
 

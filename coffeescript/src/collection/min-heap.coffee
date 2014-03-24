@@ -104,10 +104,10 @@ class MinHeap
     @build()
 
 global =
-  if typeof window is 'object'
-    window
-  else if typeof exports is 'object'
+  if typeof exports is 'object'
     exports
+  else if typeof window is 'object'
+    window
   else
     this
 

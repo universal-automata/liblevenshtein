@@ -16,31 +16,45 @@ build = (watch, callback) ->
   coffee.stderr.on 'data', (data) -> print data.toString()
   coffee.on 'exit', (status) ->
     throw new Error("An unexpected error occurred") if status isnt 0
-    fs.open 'lib/liblevenshtein.js', 'w', null, (error, fd) ->
-      throw error if error
 
-      fs.writeSync fd, '(function(){\n'
-      fs.writeSync fd, '"use strict";\n'
+    countdown =
+      count: 0
+      increment: () -> ++ @count
+      decrement: () -> @callback() if 0 is (-- @count) and @callback
+      callback: callback
 
-      files = [
-        'lib/levenshtein.js'
-        'lib/levenshtein/distance.js'
-        'lib/collection/dawg.js'
-        'lib/levenshtein/transducer.js'
-      ]
+    countdown.increment()
+    concat_files = (path, files) ->
+      fs.open path, 'w', null, (error, fd) ->
+        throw error if error
 
-      for file in files
-        fs.writeSync fd, fs.readFileSync(file, 'utf8')
+        fs.writeSync fd, '(function(){\n'
+        fs.writeSync fd, '"use strict";\n'
+
+        for file in files
+          fs.writeSync fd, fs.readFileSync(file, 'utf8')
+          fs.writeSync fd, '\n'
+
+        fs.writeSync fd, '}());'
         fs.writeSync fd, '\n'
 
-      fs.writeSync fd, '}());'
-      fs.writeSync fd, '\n'
+        fs.close fd, (error) -> throw error if error
+        countdown.decrement()
 
-      fs.close fd, (error) ->
-        if error
-          throw error
-        else
-          callback?()
+    countdown.increment()
+    concat_files 'lib/liblevenshtein.js', [
+      'lib/levenshtein.js'
+      'lib/collection/dawg.js'
+      'lib/levenshtein/transducer.js'
+    ]
+
+    countdown.increment()
+    concat_files 'lib/levenshtein-distance.js', [
+      'lib/levenshtein.js'
+      'lib/levenshtein/distance.js'
+    ]
+
+    countdown.decrement()
 
 task 'docs', 'Generate annotated source code with Docco', ->
   fs.readdir 'src', (err, contents) ->
