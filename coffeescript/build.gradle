@@ -14,8 +14,8 @@ task minify_liblevenshtein(type: JavaExec) {
   args = [
     '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
     //'--output_wrapper', '"(function(){\'use strict\';%output%}());"',
-    '--js_output_file', 'lib/liblevenshtein.min.js',
-    '--js', 'lib/liblevenshtein.js'
+    '--js_output_file', 'lib/levenshtein-transducer.min.js',
+    '--js', 'lib/levenshtein-transducer.js'
   ]
 }
 

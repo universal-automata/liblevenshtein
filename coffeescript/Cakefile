@@ -42,7 +42,7 @@ build = (watch, callback) ->
         countdown.decrement()
 
     countdown.increment()
-    concat_files 'lib/liblevenshtein.js', [
+    concat_files 'lib/levenshtein-transducer.js', [
       'lib/levenshtein.js'
       'lib/collection/dawg.js'
       'lib/levenshtein/transducer.js'

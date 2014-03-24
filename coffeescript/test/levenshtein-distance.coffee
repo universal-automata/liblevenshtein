@@ -11,29 +11,31 @@ lorem_ipsum = do ->
 
 axioms =
   equal_self_similarity: (test) ->
+    d = @distance
     i = 0
     while i < lorem_ipsum.length
       a = lorem_ipsum[i]
-      x = @distance(a,a)
+      x = d(a,a)
       j = 0
       while j < lorem_ipsum.length
         b = lorem_ipsum[j]
-        y = @distance(b,b)
+        y = d(b,b)
         if x isnt y
           test.ok false, "Expected d(#{a},#{a}) = d(#{b},#{b})"
         j += 1
       i += 1
     test.done()
   minimality: (test) ->
+    d = @distance
     i = 0
     while i < lorem_ipsum.length
       a = lorem_ipsum[i]
-      x = @distance(a,a)
+      x = d(a,a)
       j = 0
       while j < i
         b = lorem_ipsum[j]
-        y = @distance(a,b)
-        z = @distance(b,a)
+        y = d(a,b)
+        z = d(b,a)
         unless y > x
           test.ok false, "Expected d(#{a},#{b}) > d(#{a},#{a})"
         unless z > x
@@ -42,8 +44,8 @@ axioms =
       j = i + 1
       while j < lorem_ipsum.length
         b = lorem_ipsum[j]
-        y = @distance(a,b)
-        z = @distance(b,a)
+        y = d(a,b)
+        z = d(b,a)
         unless y > x
           test.ok false, "Expected d(#{a},#{b}) > d(#{a},#{a})"
         unless z > x
@@ -52,32 +54,34 @@ axioms =
       i += 1
     test.done()
   symmetry: (test) ->
+    d = @distance
     i = 0
     while i < lorem_ipsum.length
       a = lorem_ipsum[i]
       j = 0
       while j < lorem_ipsum.length
         b = lorem_ipsum[j]
-        x = @distance(a,b)
-        y = @distance(b,a)
+        x = d(a,b)
+        y = d(b,a)
         if x isnt y
           test.ok false, "Expected d(#{a},#{b}) = d(#{b},#{a})"
         j += 1
       i += 1
     test.done()
   triangle_inequality: (test) ->
+    d = @distance
     i = 0
     while i < lorem_ipsum.length
       a = lorem_ipsum[i]
       j = 0
       while j < lorem_ipsum.length
         b = lorem_ipsum[j]
-        x = @distance(a,b)
+        x = d(a,b)
         k = 0
         while k < lorem_ipsum.length
           c = lorem_ipsum[k]
-          y = @distance(a,c)
-          z = @distance(b,c)
+          y = d(a,c)
+          z = d(b,c)
           unless x + y >= z
             test.ok false, "Expected d(#{a},#{b}) + d(#{a},#{c} >= d(#{b},#{c}))"
           unless x + z >= y
