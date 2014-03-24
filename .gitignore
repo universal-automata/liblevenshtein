@@ -1,7 +1,7 @@
 *.sw?
 coffeescript/.gradle/*
 coffeescript/node_modules/*
-coffeescript/lib/*
+*/build/*
 java/build/*
 java/.gradle/*
 .sass-cache/*

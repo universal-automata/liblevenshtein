@@ -79,7 +79,7 @@ Be sure to install `coffee-script` via `sudo npm install -g coffee-script`.
 Once that is installed, you should have the `cake` executable on your `$PATH`.
 `cd` into the `coffeescript/` directory, and run `cake build` or `cake minify`
 (if you want the minified, JavaScript library as well).  Once complete, you
-should find the library under `lib/`.
+should find the library under `build/`.
 
 ### Running the tests
 

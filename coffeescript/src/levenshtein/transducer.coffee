@@ -1,6 +1,3 @@
-LIST = 'list'
-DAWG = 'dawg'
-
 ###*
 # The algorithm for imitating Levenshtein automata was taken from the
 # following journal article:
@@ -50,8 +47,8 @@ transducer = (args) ->
     throw new Error('dictionary must be either an Array or levenshtein.Dawg')
 
   sorted = false unless typeof sorted is 'boolean'
-  dictionary_type = LIST unless dictionary_type in [LIST, DAWG]
-  algorithm = STANDARD unless algorithm in [STANDARD, TRANSPOSITION, MERGE_AND_SPLIT]
+  dictionary_type = 'list' unless dictionary_type in ['list', 'dawg']
+  algorithm = 'standard' unless algorithm in ['standard', 'transposition', 'merge_and_split']
   sort_matches = true unless typeof sort_matches is 'boolean'
   include_distance = true unless typeof include_distance is 'boolean'
   case_insensitive = true unless typeof case_insensitive is 'boolean'
@@ -64,7 +61,7 @@ transducer = (args) ->
     return -1
 
   transition_for_position = switch algorithm
-    when STANDARD then (n) ->
+    when 'standard' then (n) ->
       ([i,e], vector, offset) ->
         h = i - offset; w = vector.length
         if e < n
@@ -114,7 +111,7 @@ transducer = (args) ->
         else
           null
 
-    when TRANSPOSITION then (n) ->
+    when 'transposition' then (n) ->
       ([i,e,t], vector, offset) ->
         h = i - offset; w = vector.length
         if e == 0 < n
@@ -225,7 +222,7 @@ transducer = (args) ->
           else # h == w
             null
 
-    when MERGE_AND_SPLIT then (n) ->
+    when 'merge_and_split' then (n) ->
       ([i,e,s], vector, offset) ->
         h = i - offset; w = vector.length
         if e == 0 < n
@@ -311,7 +308,7 @@ transducer = (args) ->
             null
 
   bisect_left =
-    if algorithm is STANDARD
+    if algorithm is 'standard'
       (state, position) ->
         [i,e] = position; l = 0; u = state.length
         while l < u
@@ -335,7 +332,7 @@ transducer = (args) ->
         return l
 
   copy =
-    if algorithm is STANDARD
+    if algorithm is 'standard'
       (state) -> ([i,e] for [i,e] in state)
     else
       (state) -> ([i,e,x] for [i,e,x] in state)
@@ -343,10 +340,10 @@ transducer = (args) ->
   # NOTE: See my comment above bisect_error_right(state,e,l) and how I am
   # using it in unsubsume_for(n) for why I am not checking (e < f) below.
   subsumes = switch algorithm
-    when STANDARD then (i,e, j,f) ->
+    when 'standard' then (i,e, j,f) ->
       #(e < f) && Math.abs(j - i) <= (f - e)
       ((i < j) && (j - i) || (i - j)) <= (f - e)
-    when TRANSPOSITION then (i,e,s, j,f,t, n) ->
+    when 'transposition' then (i,e,s, j,f,t, n) ->
       if s is 1
         if t is 1
           #(e < f) && (i == j)
@@ -365,7 +362,7 @@ transducer = (args) ->
         else
           #(e < f) && Math.abs(j - i) <= (f - e)
           ((i < j) && (j - i) || (i - j)) <= (f - e)
-    when MERGE_AND_SPLIT then(i,e,s, j,f,t) ->
+    when 'merge_and_split' then(i,e,s, j,f,t) ->
       if s is 1 and t is 0
         false
       else
@@ -388,7 +385,7 @@ transducer = (args) ->
     return l
 
   unsubsume_for = switch algorithm
-    when STANDARD then (n) ->
+    when 'standard' then (n) ->
       (state) ->
         m = 0
         while x = state[m]
@@ -401,7 +398,7 @@ transducer = (args) ->
               n += 1
           m += 1
         return
-    when TRANSPOSITION then (n) ->
+    when 'transposition' then (n) ->
       (state) ->
         m = 0
         while x = state[m]
@@ -414,7 +411,7 @@ transducer = (args) ->
               n += 1
           m += 1
         return
-    when MERGE_AND_SPLIT then (n) ->
+    when 'merge_and_split' then (n) ->
       (state) ->
         m = 0
         while x = state[m]
@@ -429,7 +426,7 @@ transducer = (args) ->
         return
 
   stringify_state =
-    if algorithm is STANDARD
+    if algorithm is 'standard'
       (state) ->
         signature = ''
         for [i,e] in state
@@ -443,7 +440,7 @@ transducer = (args) ->
         signature
 
   insert_for_subsumption =
-    if algorithm is STANDARD
+    if algorithm is 'standard'
       (state_prime, next_state) ->
         # Order according to error first, then boundary (both ascending).
         # While sorting the elements, remove any duplicates.
@@ -469,7 +466,7 @@ transducer = (args) ->
         return
 
   sort_for_transition =
-    if algorithm is STANDARD
+    if algorithm is 'standard'
       (state) ->
         state.sort (a,b) -> a[0] - b[0] || a[1] - b[1]
         return
@@ -497,7 +494,7 @@ transducer = (args) ->
       else
         null
 
-  if dictionary_type is LIST
+  if dictionary_type is 'list'
     dictionary.sort() unless sorted
     dawg = new Dawg(dictionary)
   else
@@ -511,7 +508,7 @@ transducer = (args) ->
     vector
 
   is_final =
-    if algorithm is STANDARD
+    if algorithm is 'standard'
       (state, w, n) ->
         for [i,e] in state
           return true if (w - i) <= (n - e)
@@ -537,7 +534,7 @@ transducer = (args) ->
   # in an accepting state, and take the minimum distance among all its accepting
   # positions as the corresponding Levenshtein distance.
   minimum_distance =
-    if algorithm is STANDARD
+    if algorithm is 'standard'
       (state, w) ->
         minimum = Infinity
         for [i,e] in state
@@ -603,7 +600,7 @@ transducer = (args) ->
         (matches, match) -> matches.push(match)
 
   initial_state =
-    if algorithm is STANDARD
+    if algorithm is 'standard'
       [[0,0]]
     else
       [[0,0,0]]

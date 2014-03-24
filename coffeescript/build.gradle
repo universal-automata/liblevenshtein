@@ -13,9 +13,9 @@ task minify_liblevenshtein(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
   args = [
     '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
-    //'--output_wrapper', '"(function(){\'use strict\';%output%}());"',
-    '--js_output_file', 'lib/liblevenshtein.min.js',
-    '--js', 'lib/liblevenshtein.js'
+    //'--output_wrapper', '(function(){"use strict";%output%}());',
+    '--js_output_file', 'build/liblevenshtein.min.js',
+    '--js', 'build/liblevenshtein.js'
   ]
 }
 
@@ -24,9 +24,9 @@ task minify_levenshtein_transducer(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
   args = [
     '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
-    //'--output_wrapper', '"(function(){\'use strict\';%output%}());"',
-    '--js_output_file', 'lib/levenshtein-transducer.min.js',
-    '--js', 'lib/levenshtein-transducer.js'
+    //'--output_wrapper', '(function(){"use strict";%output%}());',
+    '--js_output_file', 'build/levenshtein-transducer.min.js',
+    '--js', 'build/levenshtein-transducer.js'
   ]
 }
 
@@ -35,9 +35,9 @@ task minify_levenshtein_distance(type: JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
   args = [
     '--compilation_level', 'ADVANCED_OPTIMIZATIONS',
-    //'--output_wrapper', '"(function(){\'use strict\';%output%}());"',
-    '--js_output_file', 'lib/levenshtein-distance.min.js',
-    '--js', 'lib/levenshtein-distance.js'
+    //'--output_wrapper', '(function(){"use strict";%output%}());',
+    '--js_output_file', 'build/levenshtein-distance.min.js',
+    '--js', 'build/levenshtein-distance.js'
   ]
 }
 
