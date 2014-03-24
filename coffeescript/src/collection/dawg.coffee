@@ -1,23 +1,3 @@
-# Copyright (c) 2012 Dylon Edwards
-# 
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-# 
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-# 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-
 # ============================================================================
 # Taken and modified for my purposes from the following source:
 #  o http://stevehanov.ca/blog/index.php?id=115
@@ -50,10 +30,13 @@ class DawgNode
     for label, node of @['edges'] # insertion sort
       edge = label + node.id.toString()
       edges.splice(@bisect_left(edges, edge, 0, edges.length), 0, edge)
-    (if @['is_final'] then '1' else '0') + edges.join('')
+    (+ @['is_final']) + edges.join('')
 
 class Dawg
   constructor: (dictionary) ->
+    unless dictionary and typeof dictionary.length is 'number'
+      throw new Error("Expected dictionary to be array-like")
+
     @previous_word = ''
     @['root'] = new DawgNode()
 
@@ -64,18 +47,23 @@ class Dawg
     @minimized_nodes = {}
 
     @['insert'](word) for word in dictionary
-    @['finish']()
+    @finish()
 
   'insert': (word) ->
     # Find longest common prefix between word and previous word
     i = 0; previous_word = @previous_word
 
-    upper_bound = if word.length < previous_word.length then word.length else previous_word.length
+    upper_bound =
+      if word.length < previous_word.length
+        word.length
+      else
+        previous_word.length
+
     i += 1 while i < upper_bound and word[i] is previous_word[i]
 
     # Check the unchecked_nodes for redundant nodes, proceeding from last one
     # down to the common prefix size.  Then truncate the list at that point.
-    @['minimize'](i)
+    @minimize(i)
     unchecked_nodes = @unchecked_nodes
 
     # Add the suffix, starting from the correct node mid-way through the graph.
@@ -84,7 +72,7 @@ class Dawg
     else
       node = unchecked_nodes[unchecked_nodes.length - 1][2]
 
-    while character = word[i]
+    while (character = word[i]) isnt `undefined`
       next_node = new DawgNode()
       node['edges'][character] = next_node
       unchecked_nodes.push([node, character, next_node])
@@ -95,12 +83,12 @@ class Dawg
     @previous_word = word
     return
 
-  'finish': ->
+  finish: ->
     # minimize all unchecked_nodes
-    @['minimize'](0)
+    @minimize(0)
     return
 
-  'minimize': (lower_bound) ->
+  minimize: (lower_bound) ->
     # proceed from the leaf up to a certain point
     minimized_nodes = @minimized_nodes
     unchecked_nodes = @unchecked_nodes
@@ -125,6 +113,15 @@ class Dawg
       return false unless node
     node['is_final']
 
-levenshtein['DawgNode'] = DawgNode
-levenshtein['Dawg'] = Dawg
+global =
+  if typeof exports is 'object'
+    exports
+  else if typeof window is 'object'
+    window
+  else
+    this
+
+global['levenshtein'] ||= {}
+global['levenshtein']['DawgNode'] = DawgNode
+global['levenshtein']['Dawg'] = Dawg
 
