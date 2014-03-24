@@ -17,8 +17,7 @@
   "devDependencies": {
     "nodeunit": "~0.8.6",
     "coffee-script": "~1.7.1",
-    "wrench": "~1.5.8",
-    "js-yaml": "~3.0.2"
+    "wrench": "~1.5.8"
   },
   "engines":
   {

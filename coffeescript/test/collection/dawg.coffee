@@ -1,11 +1,13 @@
-yaml = require 'js-yaml'
 fs = require 'fs'
 
 {levenshtein: {Dawg}} = require '../../src/collection/dawg'
 
 programming_languages = do ->
-  path = "#{__dirname}/../../../shared/resources/programming-languages.yaml"
-  yaml.safeLoad fs.readFileSync(path, 'utf8')
+  path = "#{__dirname}/../../../shared/resources/programming-languages.txt"
+  programming_languages = fs.readFileSync(path, 'utf8').split('\n')
+  if programming_languages[programming_languages.length - 1] is ''
+    programming_languages.pop() #-> drop the empty string
+  programming_languages
 
 module.exports =
   'Instantiating a DAWG without a list should throw an error': (test) ->

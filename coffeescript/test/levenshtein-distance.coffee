@@ -1,11 +1,13 @@
-yaml = require 'js-yaml'
 fs = require 'fs'
 
 {levenshtein: {distance}} = require '../lib/levenshtein-distance'
 
 lorem_ipsum = do ->
-  path = "#{__dirname}/../../shared/resources/lorem-ipsum-terms.yaml"
-  yaml.safeLoad fs.readFileSync(path, 'utf8')
+  path = "#{__dirname}/../../shared/resources/lorem-ipsum-terms.txt"
+  lorem_ipsum = fs.readFileSync(path, 'utf8').split('\n')
+  if lorem_ipsum[lorem_ipsum.length - 1] is ''
+    lorem_ipsum.pop() #-> drop the empty string
+  lorem_ipsum
 
 axioms =
   equal_self_similarity: (test) ->
@@ -88,7 +90,7 @@ axioms =
     test.done()
 
 operations = (algorithm, transposition=2, merge=2, split=2) ->
-  tests = {
+  tests =
     setUp: (callback) ->
       @distance = distance(algorithm)
       callback()
@@ -114,7 +116,6 @@ operations = (algorithm, transposition=2, merge=2, split=2) ->
       test.strictEqual @distance('foo', 'fbo'), 1
       test.strictEqual @distance('foo', 'fob'), 1
       test.done()
-  }
   tests["A transposition should incur a penalty of #{transposition} unit(s)"] =
     (test) ->
       test.strictEqual @distance('foo', 'ofo'), transposition
