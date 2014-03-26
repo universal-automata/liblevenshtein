@@ -12,7 +12,7 @@ build = (watch, callback) ->
   options = ['-c', '-o', 'build', 'src']
   options.unshift '-w' if watch
 
-  coffee = spawn 'coffee', options
+  coffee = spawn "#{__dirname}/node_modules/coffee-script/bin/coffee", options
   coffee.stdout.on 'data', (data) -> print data.toString()
   coffee.stderr.on 'data', (data) -> print data.toString()
   coffee.on 'exit', (status) ->
@@ -63,12 +63,14 @@ build = (watch, callback) ->
     countdown.decrement()
 
 task 'docs', 'Generate annotated source code with Docco', ->
-  fs.readdir 'src', (err, contents) ->
-    files = ("src/#{file}" for file in contents when /\.coffee$/.test file)
-    docco = spawn 'docco', files
-    docco.stdout.on 'data', (data) -> print data.toString()
-    docco.stderr.on 'data', (data) -> print data.toString()
-    docco.on 'exit', (status) -> callback?() if status is 0
+  src_files = []
+  for file in wrench.readdirSyncRecursive('src')
+    path = "src/#{file}"
+    src_files.push(path) if /\.coffee$/.test(path)
+  docco = spawn "#{__dirname}/node_modules/docco/bin/docco", src_files
+  docco.stdout.on 'data', (data) -> print data.toString()
+  docco.stderr.on 'data', (data) -> print data.toString()
+  docco.on 'exit', (status) -> callback?() if status is 0
 
 task 'build', 'Compile CoffeeScript source files', ->
   build()

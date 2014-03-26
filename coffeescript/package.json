@@ -17,7 +17,9 @@
   "devDependencies": {
     "nodeunit": "~0.8.6",
     "coffee-script": "~1.7.1",
-    "wrench": "~1.5.8"
+    "wrench": "~1.5.8",
+    "docco": "~0.6.3",
+    "seed-random": "~2.2.0"
   },
   "engines":
   {

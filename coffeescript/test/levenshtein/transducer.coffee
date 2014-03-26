@@ -1,7 +1,7 @@
 fs = require 'fs'
 
 {levenshtein: {distance}} = require '../../src/levenshtein/distance'
-{levenshtein: {transducer}} = require '../../src/levenshtein/transducer'
+{levenshtein: {Transducer}} = require '../../src/levenshtein/transducer'
 
 lorem_ipsum = do ->
   path = "#{__dirname}/../../../shared/resources/lorem-ipsum-terms.txt"
@@ -10,3 +10,5 @@ lorem_ipsum = do ->
     lorem_ipsum.pop() #-> drop the empty string
   lorem_ipsum
 
+module.exports =
+  setUp: (callback) -> callback()

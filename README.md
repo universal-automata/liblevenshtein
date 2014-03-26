@@ -73,13 +73,12 @@ return the terms unsorted and excluding their distances).
 
 #### CoffeeScript / JavaScript
 
-You will need `npm` ([Node.js](http://nodejs.org/)) and `gradle` installed.
-Be sure to install `coffee-script` via `sudo npm install -g coffee-script`.
+You will need `npm` ([Node.js](http://nodejs.org/)) and `gradle` installed. Once
+`npm` is installed, `cd` into the `coffeescript/` directory and execute `npm
+install`.
 
-Once that is installed, you should have the `cake` executable on your `$PATH`.
-`cd` into the `coffeescript/` directory, and run `cake build` or `cake minify`
-(if you want the minified, JavaScript library as well).  Once complete, you
-should find the library under `build/`.
+Afterwards, simply run `cake build` or `cake minify` (if you want the minified,
+JavaScript library as well).  You should then find the library under `build/`.
 
 ### Running the tests
 
@@ -88,7 +87,8 @@ tests.  To run them for the respective languages, do the following:
 
 #### CoffeeScript / JavaScript
 
-`cd` into the `coffeescript/` directory and execute `cake test`
+`cd` into the `coffeescript/` directory and execute `npm install` (if you
+haven't already), followed by `cake test`.
 
 ### Background
 

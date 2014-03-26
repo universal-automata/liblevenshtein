@@ -16,7 +16,7 @@ distance = (algorithm) ->
 
     # Calculates the Levenshtein distance between words v and w, using the
     # following primitive operations: deletion, insertion, and substitution.
-    when 'standard' then do ->
+    when 'standard' then do (; distance) ->
       memoized_distance = {}
       distance = (v, w) ->
         key = v + '\0' + w
@@ -53,7 +53,7 @@ distance = (algorithm) ->
     # Calculates the Levenshtein distance between words v and w, using the
     # following primitive operations: deletion, insertion, substitution, and
     # transposition.
-    when 'transposition' then do ->
+    when 'transposition' then do (; distance) ->
       memoized_distance = {}
       distance = (v, w) ->
         key = v + '\0' + w
@@ -96,7 +96,7 @@ distance = (algorithm) ->
     # Calculates the Levenshtein distance between words v and w, using the
     # following primitive operations: deletion, insertion, substitution,
     # merge, and split.
-    when 'merge_and_split' then do ->
+    when 'merge_and_split' then do (; distance) ->
       memoized_distance = {}
       distance = (v, w) ->
         key = v + '\0' + w
