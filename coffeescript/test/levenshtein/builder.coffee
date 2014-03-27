@@ -9,6 +9,9 @@ seed_random = require 'seed-random'
 {levenshtein: {truth_table}} = require '../../src/util/truth-table'
 {levenshtein: {mutate}} = require '../../src/util/mutate'
 
+{levenshtein: {operations}} = require '../../src/util/operations'
+{insertion, deletion, substitution, transposition, merge, split} = operations
+
 [dawg, lorem_ipsum] = do ->
   path = "#{__dirname}/../../../shared/resources/lorem-ipsum-terms.txt"
   lorem_ipsum = fs.readFileSync(path, 'utf8').split('\n')
@@ -19,8 +22,9 @@ seed_random = require 'seed-random'
 test_property = (property, valid, invalid) ->
   (test) ->
     for value in valid
-      test.strictEqual @builder[property](value), @builder
-      test.ok @builder[property]() is value
+      builder = @builder[property](value)
+      test.ok builder instanceof Builder
+      test.ok builder[property]() is value
     for value in invalid
       test.throws -> @builder.dictionary_sorted(value)
     test.done()
@@ -51,7 +55,6 @@ test_candidates = (test, terms, term, n, transducer, distance, algorithm) ->
         "For algorithm=#{algorithm}, expected transduced "+
         "distance(#{term},#{candidate}) = #{distance(term,candidate)}, "+
         "but was #{d}."
-      throw new Error("Bam!")
     if d > n
       test.ok false,
         "For algorithm=#{algorithm}, the transduced distance, #{d}, is "+
@@ -111,65 +114,14 @@ module.exports =
       alphabet.push String.fromCharCode(c) for c in [32..128] #-> No Ctrl-chars
       alphabet.join('')
 
-    insertion = (term) ->
-      # Select a random character to insert
-      c = alphabet[(random() * alphabet.length) >> 0]
-      # Select a random index at which to insert the character
-      i = (random() * (1 + term.length)) >> 0
-      # Insert the charater at the random index
-      term.slice(0,i) + c + term.slice(1 + i)
-
-    deletion = (term) ->
-      # Select a random index for deletion
-      i = (random() * term.length) >> 0
-      # Delete the character at the random index
-      term.slice(0,i) + term.slice(i+1)
-
-    substitution = (term) ->
-      # Select a random character to substitute
-      c = alphabet[(random() * alphabet.length) >> 0]
-      # Select a random index for substitution
-      i = (random() * term.length) >> 0
-      # Substitute the character at the random index
-      term.slice(0,i) + c + term.slice(i+1)
-
-    transposition = (term) ->
-      if term.length > 1
-        # Select a random index to transpose
-        i = (random() * (term.length - 1)) >> 0
-        # Transpose the characters at i and i+1
-        term.slice(0,i) + term[i+1] + term[i] + term.slice(i+2)
-      else
-        term
-
-    merge = (term) ->
-      if term.length > 1
-        # Select a random character to merge-in
-        c = alphabet[(random() * alphabet.length) >> 0]
-        # Select a random index to merge
-        i = (random() * (term.length - 1)) >> 0
-        # Merge the characters at i and i+1
-        term.slice(0,i) + c + term.slice(i+2)
-      else
-        term
-
-    split = (term) ->
-      # Select two random characters to split-out
-      c = alphabet[(random() * alphabet.length) >> 0]
-      d = alphabet[(random() * alphabet.length) >> 0]
-      # Select a random index to split
-      i = (random() * (term.length - 1)) >> 0
-      # Split the character at i
-      term.slice(0,i) + c + d + term.slice(i+1)
-
     # The probabilities will be normalized
     mutations = [
-      [1.0, insertion]
-      [1.0, deletion]
-      [1.0, substitution]
-      [1.0, transposition]
-      [1.0, merge]
-      [1.0, split]
+      [1.0, (term) -> insertion(term, alphabet, random)]
+      [1.0, (term) -> deletion(term, alphabet, random)]
+      [1.0, (term) -> substitution(term, alphabet, random)]
+      [1.0, (term) -> transposition(term, alphabet, random)]
+      [1.0, (term) -> merge(term, alphabet, random)]
+      [1.0, (term) -> split(term, alphabet, random)]
     ]
 
     builder = new Builder().dictionary(dawg).sort_matches(false)

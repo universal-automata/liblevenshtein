@@ -17,14 +17,21 @@ class Builder
     if source
       unless source instanceof Builder
         throw new Error('Expected source to be an instance of Builder')
-      for property in ['_dictionary', '_dictionary_sorted', '_algorithm', '_sort_matches', '_case_insensitive_sort', '_include_distance']
-        this[property] = source[property]
+      @_dictionary = source._dictionary
+      @_dictionary_sorted = source.dictionary_sorted
+      @_algorithm = source._algorithm
+      @_sort_matches = source._sort_matches
+      @_case_insensitive_sort = source._case_insensitive_sort
+      @_include_distance = source._include_distance
 
   _build: (attributes) ->
     builder = new Builder()
-    for own property of this
-      if '_' is property[0]
-        builder[property] = this[property]
+    builder._dictionary = @_dictionary
+    builder._dictionary_sorted = @dictionary_sorted
+    builder._algorithm = @_algorithm
+    builder._sort_matches = @_sort_matches
+    builder._case_insensitive_sort = @_case_insensitive_sort
+    builder._include_distance = @_include_distance
     for own attribute of attributes
       builder['_' + attribute] = attributes[attribute]
     builder
@@ -35,8 +42,7 @@ class Builder
     else
       unless dictionary instanceof Array or dictionary instanceof Dawg
         throw new Error('dictionary must be either an Array or Dawg')
-      @_dictionary = dictionary
-      this
+      @_build(dictionary: dictionary)
 
   dictionary_sorted: (dictionary_sorted) ->
     if dictionary_sorted is `undefined`
@@ -44,8 +50,7 @@ class Builder
     else
       unless typeof dictionary_sorted is 'boolean'
         throw new Error('dictionary_sorted must be a boolean')
-      @_dictionary_sorted = dictionary_sorted
-      this
+      @_build(dictionary_sorted: dictionary_sorted)
 
   algorithm: (algorithm) ->
     if algorithm is `undefined`
@@ -54,8 +59,7 @@ class Builder
       unless algorithm in ['standard', 'transposition', 'merge_and_split']
         throw new Error(
           'algorithm must be standard, transposition, or merge_and_split')
-      @_algorithm = algorithm
-      this
+      @_build(algorithm: algorithm)
 
   sort_matches: (sort_matches) ->
     if sort_matches is `undefined`
@@ -63,8 +67,7 @@ class Builder
     else
       unless typeof sort_matches is 'boolean'
         throw new Error('sort_matches must be a boolean')
-      @_sort_matches = sort_matches
-      this
+      @_build(sort_matches: sort_matches)
 
   case_insensitive_sort: (case_insensitive_sort) ->
     if case_insensitive_sort is `undefined`
@@ -72,8 +75,7 @@ class Builder
     else
       unless typeof case_insensitive_sort is 'boolean'
         throw new Error('case_insensitive_sort must be a boolean')
-      @_case_insensitive_sort = case_insensitive_sort
-      this
+      @_build(case_insensitive_sort: case_insensitive_sort)
 
   include_distance: (include_distance) ->
     if include_distance is `undefined`
@@ -81,8 +83,7 @@ class Builder
     else
       unless typeof include_distance is 'boolean'
         throw new Error('include_distance must be a boolean')
-      @_include_distance = include_distance
-      this
+      @_build(include_distance: include_distance)
 
   # The distance of each position in a state can be defined as follows:
   #
@@ -590,23 +591,26 @@ class Builder
 
   transducer: () ->
     if @dictionary() instanceof Array
-      @dictionary().sort() unless @dictionary_sorted()
-      @dictionary new Dawg(@dictionary())
-    new Transducer({
-      minimum_distance: @_minimum_distance()
-      build_matches: () -> []
-      transition_for_state: @_transition_for_state()
-      characteristic_vector: @_characteristic_vector()
-      edges: (dawg_node) -> dawg_node['edges']
-      is_final: (dawg_node) -> dawg_node['is_final']
-      root: do (dawg = @dictionary()) ->
-        () -> dawg['root']
-      initial_state: do (initial_state=@_initial_state()) ->
-        () => initial_state
-      transform: do (comparator = @_comparator()) =>
-        (matches) =>
-          @_map(comparator, matches, (pair) -> pair[0])
-    })
+      dictionary = @dictionary().slice()
+      dictionary.sort() unless @dictionary_sorted()
+      transducer = @_build(dictionary: new Dawg(dictionary))
+      transducer.transducer()
+    else
+      new Transducer({
+        minimum_distance: @_minimum_distance()
+        build_matches: () -> []
+        transition_for_state: @_transition_for_state()
+        characteristic_vector: @_characteristic_vector()
+        edges: (dawg_node) -> dawg_node['edges']
+        is_final: (dawg_node) -> dawg_node['is_final']
+        root: do (dawg = @dictionary()) ->
+          () -> dawg['root']
+        initial_state: do (initial_state=@_initial_state()) ->
+          () => initial_state
+        transform: do (comparator = @_comparator()) =>
+          (matches) =>
+            @_map(comparator, matches, (pair) -> pair[0])
+      })
 
 global =
   if typeof exports is 'object'

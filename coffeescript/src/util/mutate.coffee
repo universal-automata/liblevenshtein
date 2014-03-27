@@ -12,9 +12,8 @@ mutate = (mutations, max_mutations, random, target) ->
   i = -1
   mutations[i][0] /= p_sum while (++i) < mutations.length
 
-  num_mutations = Math.random() * max_mutations
-  i = -1
-  while (++i) < num_mutations
+  num_mutations = random() * max_mutations
+  i = -1; while (++i) < num_mutations
     rand = random()
     p_sum = 0
     j = 0
