@@ -64,14 +64,6 @@ test_candidates = (test, terms, term, n, transducer, distance, algorithm) ->
   num_candidates = 0
   num_candidates += distance(term, candidate) <= n for candidate in terms
   if candidates.length isnt num_candidates
-    console.log ['distance', distance.toString()] #-> correct function?
-    candidates = transducer.transduce(term, n)
-    while candidates.peek()
-      [candidate, d] = candidates.pop()
-      console.log ['candidate', candidate, 'distance', d]
-    for candidate in terms
-      if distance(term, candidate) <= n
-        console.log ['correct(candidate)', candidate, 'correct(distance)', distance(term, candidate)]
     test.ok false,
       "For algorithm=#{algorithm}, term=#{term}, expected the number of "+
       "transduced candidates to be #{num_candidates}, but was "+
@@ -95,6 +87,10 @@ module.exports =
       test_property('include_distance', [true, false], ['true', 1, 0, null])
     'maximum_candidates should be readable and writable':
       test_property('maximum_candidates', [0, 42, Infinity], [-1, null])
+    'custom_comparator should be readable and writable':
+      test_property('custom_comparator', [(a,b) -> a[1] - b[1]], ['foo', null])
+    'custom_transform should be readable and writable':
+      test_property('custom_transform', [([t,d]) -> t], ['foo', null])
   'Builder#transducer should return an instance of Transducer for every combination of options': (test) ->
     property_values = [
       ['dictionary', [[], lorem_ipsum, dawg]]
@@ -103,6 +99,8 @@ module.exports =
       ['case_insensitive_sort', [true, false]]
       ['include_distance', [true, false]]
       ['maximum_candidates', [0, 42, Infinity]]
+      ['custom_comparator', (a,b) -> a[1] * 2 - b[1]]
+      ['custom_transform', ([t,d]) -> t.toUpperCase()]
     ]
     for truths in truth_table(property_values.length)
       test_builder(test, property_values, truths)

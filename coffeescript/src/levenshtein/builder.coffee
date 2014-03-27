@@ -30,6 +30,12 @@ fields =
   '_include_distance': true
   # Maximum number of spelling candidates to return
   '_maximum_candidates': Infinity
+  # Customer comparator for the max-heap (optional). This should be an arity-2
+  # function that accepts two pairs of ["term", distance] values.
+  '_custom_comparator': null
+  # Custom transform for spelling candidates (optional). This should be an
+  # arity-1 function that accepts a pair of ["term", distance] values.
+  '_custom_transform': null
 
 class Builder
   constructor: (source=fields) ->
@@ -94,6 +100,22 @@ class Builder
         throw new Error("maximum_candidates must be non-negative")
       @_build('maximum_candidates': maximum_candidates)
 
+  'custom_comparator': (custom_comparator) ->
+    if custom_comparator is `undefined`
+      @['_custom_comparator']
+    else
+      if typeof custom_comparator isnt 'function'
+        throw new Error('Expected custom_comparator to be a function')
+      @_build('custom_comparator': custom_comparator)
+
+  'custom_transform': (custom_transform) ->
+    if custom_transform is `undefined`
+      @['_custom_transform']
+    else
+      if typeof custom_transform isnt 'function'
+        throw new Error('Expected custom_transform to be a function')
+      @_build('custom_transform': custom_transform)
+
   # The distance of each position in a state can be defined as follows:
   #
   #   distance = w - i + e
@@ -125,7 +147,9 @@ class Builder
         minimum
 
   _comparator: () ->
-    if @['_sort_candidates']
+    if typeof @['_custom_comparator'] is 'function'
+      @['_custom_comparator']
+    else if @['_sort_candidates']
       # Sort by minimum distance from the query term.
       comparator = (a,b) -> a[1] - b[1]
       # Sort in a case-insensitive manner.
@@ -142,18 +166,25 @@ class Builder
     else
       () -> 0 #-> If we don't want to sort the matches, make all terms equal
 
-  _map: (comparator, matches, transform) ->
-    if isFinite @['_maximum_candidates']
-      matches['sort']() #-> sorts in reverse
-      matches = matches['heap']
-    else if @['_sort_candidates']
-      heap = matches
-      matches = []
-      matches.push heap['pop']() while heap['peek']() isnt null
-    unless @['_include_distance']
-      i = -1; while (++i) < matches.length
-        matches[i] = matches[i][0]
-    matches
+  _transform: (comparator) ->
+    transform =
+      if typeof @['_custom_transform'] is 'function'
+        @['_custom_transform']
+      else if @['_include_distance'] is false
+        (candidate) -> candidate[0]
+
+    (matches) =>
+      if isFinite @['_maximum_candidates']
+        matches['sort']() #-> sorts in reverse
+        matches = matches['heap']
+      else if @['_sort_candidates']
+        heap = matches
+        matches = []
+        matches.push heap['pop']() while heap['peek']() isnt null
+      if typeof transform is 'function'
+        i = -1; while (++i) < matches.length
+          matches[i] = transform(matches[i])
+      matches
 
   _initial_state: () ->
     if @['_algorithm'] is 'standard'
@@ -619,7 +650,6 @@ class Builder
         candidates
     else
       (candidates, candidate) ->
-        #console.log ['candidates.length', candidates.length, 'candidates.heap', candidates.heap, 'candidate', candidate]
         candidates.push(candidate)
         candidates
 
@@ -643,8 +673,7 @@ class Builder
       'initial_state': do (initial_state=@_initial_state()) ->
         () => initial_state
       'push': @_push(comparator)
-      'transform': (matches) =>
-        @_map(comparator, matches, (pair) -> pair[0])
+      'transform': @_transform(comparator)
     })
 
 global['levenshtein']['Builder'] = Builder
