@@ -52,7 +52,9 @@ build = (watch, callback) ->
     countdown.increment()
     concat_files 'build/levenshtein-transducer.js', [
       'build/collection/dawg.js'
+      'build/collection/max-heap.js'
       'build/levenshtein/transducer.js'
+      'build/levenshtein/builder.js'
     ]
 
     countdown.increment()

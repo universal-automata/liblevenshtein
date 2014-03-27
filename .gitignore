@@ -2,6 +2,7 @@
 coffeescript/.gradle/*
 coffeescript/node_modules/*
 coffeescript/build/*
+coffeescript/coverage/*
 coffeescript/docs/*
 java/build/*
 java/.gradle/*

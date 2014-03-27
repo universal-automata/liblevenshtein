@@ -24,9 +24,12 @@ test_property = (property, valid, invalid) ->
     for value in valid
       builder = @builder[property](value)
       test.ok builder instanceof Builder
-      test.ok builder[property]() is value
+      if value instanceof Array
+        test.ok builder[property]() instanceof Dawg
+      else
+        test.ok builder[property]() is value
     for value in invalid
-      test.throws -> @builder.dictionary_sorted(value)
+      test.throws -> @builder[property](value)
     test.done()
 
 test_builder = (test, property_values, truths, builder=new Builder(), i=0) ->
@@ -47,9 +50,7 @@ test_builder = (test, property_values, truths, builder=new Builder(), i=0) ->
 
 test_candidates = (test, terms, term, n, transducer, distance, algorithm) ->
   candidates = transducer.transduce(term, n)
-  candidates_length = candidates.length
-  while candidates.peek()
-    [candidate, d] = candidates.pop()
+  for [candidate, d] in candidates
     if d isnt distance(term, candidate)
       test.ok false,
         "For algorithm=#{algorithm}, expected transduced "+
@@ -62,7 +63,7 @@ test_candidates = (test, terms, term, n, transducer, distance, algorithm) ->
       throw new Error("Bam!")
   num_candidates = 0
   num_candidates += distance(term, candidate) <= n for candidate in terms
-  if candidates_length isnt num_candidates
+  if candidates.length isnt num_candidates
     console.log ['distance', distance.toString()] #-> correct function?
     candidates = transducer.transduce(term, n)
     while candidates.peek()
@@ -74,7 +75,7 @@ test_candidates = (test, terms, term, n, transducer, distance, algorithm) ->
     test.ok false,
       "For algorithm=#{algorithm}, term=#{term}, expected the number of "+
       "transduced candidates to be #{num_candidates}, but was "+
-      "#{candidates_length}"
+      "#{candidates.length}"
     throw new Error("Bam!")
 
 module.exports =
@@ -84,24 +85,24 @@ module.exports =
       callback()
     'dictionary should be readable and writable':
       test_property('dictionary', [['foo'], ['bar'], new Dawg(['foo'])], ['foo', null, `undefined`])
-    'dictionary_sorted should be readable and writable':
-      test_property('dictionary_sorted', [true, false], ['true', 1, 0, null])
     'algorithm should be readable and writable':
       test_property('algorithm', ['standard', 'transposition', 'merge_and_split'], ['foobar', null, `undefined`])
-    'sort_matches should be readable and writable':
-      test_property('sort_matches', [true, false], ['true', 1, 0, null])
+    'sort_candidates should be readable and writable':
+      test_property('sort_candidates', [true, false], ['true', 1, 0, null])
     'case_insensitive_sort should be readable and writable':
       test_property('case_insensitive_sort', [true, false], ['true', 1, 0, null])
     'include_distance should be readable and writable':
       test_property('include_distance', [true, false], ['true', 1, 0, null])
+    'maximum_candidates should be readable and writable':
+      test_property('maximum_candidates', [0, 42, Infinity], [-1, null])
   'Builder#transducer should return an instance of Transducer for every combination of options': (test) ->
     property_values = [
       ['dictionary', [[], lorem_ipsum, dawg]]
-      ['dictionary_sorted', [true, false]]
       ['algorithm', ['standard', 'transposition', 'merge_and_split']]
-      ['sort_matches', [true, false]]
+      ['sort_candidates', [true, false]]
       ['case_insensitive_sort', [true, false]]
       ['include_distance', [true, false]]
+      ['maximum_candidates', [0, 42, Infinity]]
     ]
     for truths in truth_table(property_values.length)
       test_builder(test, property_values, truths)
@@ -124,7 +125,7 @@ module.exports =
       [1.0, (term) -> split(term, alphabet, random)]
     ]
 
-    builder = new Builder().dictionary(dawg).sort_matches(false)
+    builder = new Builder().dictionary(dawg).sort_candidates(false)
     transducers =
       standard: [
         builder.algorithm('standard').transducer()

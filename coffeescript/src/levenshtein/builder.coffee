@@ -1,81 +1,98 @@
+global =
+  if typeof exports is 'object'
+    exports
+  else if typeof window is 'object'
+    window
+  else
+    this
+
+global['levenshtein'] ||= {}
+
 if typeof require is 'function'
-  {levenshtein: {MinHeap}} = require '../collection/min-heap'
+  {levenshtein: {MaxHeap}} = require '../collection/max-heap'
   {levenshtein: {Transducer}} = require './transducer'
   {levenshtein: {Dawg}} = require '../collection/dawg'
 else
-  {MinHeap, Transducer, Dawg} = levenshtein
+  MaxHeap = global['levenshtein']['MaxHeap']
+  Transducer = global['levenshtein']['Transducer']
+  Dawg = global['levenshtein']['Dawg']
+
+fields =
+  # Dictionary of terms
+  '_dictionary': new Dawg([])
+  # Search algorithm to use
+  '_algorithm': 'standard'
+  # Sort the candidates as they are discovered
+  '_sort_candidates': true
+  # If sort_candidates, then sort them in a case-insensitive fashion
+  '_case_insensitive_sort': true
+  # Include the distance from the query term for each spelling candidate
+  '_include_distance': true
+  # Maximum number of spelling candidates to return
+  '_maximum_candidates': Infinity
 
 class Builder
-  _dictionary: []
-  _algorithm: 'standard'
-  _sort_matches: true
-  _case_insensitive_sort: true
-  _include_distance: true
-
-  constructor: (source) ->
-    if source
-      unless source instanceof Builder
-        throw new Error('Expected source to be an instance of Builder')
-      @_dictionary = source._dictionary
-      @_algorithm = source._algorithm
-      @_sort_matches = source._sort_matches
-      @_case_insensitive_sort = source._case_insensitive_sort
-      @_include_distance = source._include_distance
+  constructor: (source=fields) ->
+    for own field of fields
+      this[field] = source[field]
 
   _build: (attributes) ->
-    builder = new Builder()
-    builder._dictionary = @_dictionary
-    builder._algorithm = @_algorithm
-    builder._sort_matches = @_sort_matches
-    builder._case_insensitive_sort = @_case_insensitive_sort
-    builder._include_distance = @_include_distance
+    builder = new Builder(this)
     for own attribute, value of attributes
       builder['_' + attribute] = value
     builder
 
-  dictionary: (dictionary, sorted) ->
+  'dictionary': (dictionary, sorted) ->
     if dictionary is `undefined`
-      @_dictionary
+      @['_dictionary']
     else
       unless dictionary instanceof Array or dictionary instanceof Dawg
         throw new Error('dictionary must be either an Array or Dawg')
       if dictionary instanceof Array
         dictionary.sort() unless sorted
         dictionary = new Dawg(dictionary)
-      @_build(dictionary: dictionary)
+      @_build('dictionary': dictionary)
 
-  algorithm: (algorithm) ->
+  'algorithm': (algorithm) ->
     if algorithm is `undefined`
-      @_algorithm
+      @['_algorithm']
     else
       unless algorithm in ['standard', 'transposition', 'merge_and_split']
         throw new Error(
           'algorithm must be standard, transposition, or merge_and_split')
-      @_build(algorithm: algorithm)
+      @_build('algorithm': algorithm)
 
-  sort_matches: (sort_matches) ->
-    if sort_matches is `undefined`
-      @_sort_matches
+  'sort_candidates': (sort_candidates) ->
+    if sort_candidates is `undefined`
+      @['_sort_candidates']
     else
-      unless typeof sort_matches is 'boolean'
-        throw new Error('sort_matches must be a boolean')
-      @_build(sort_matches: sort_matches)
+      unless typeof sort_candidates is 'boolean'
+        throw new Error('sort_candidates must be a boolean')
+      @_build('sort_candidates': sort_candidates)
 
-  case_insensitive_sort: (case_insensitive_sort) ->
+  'case_insensitive_sort': (case_insensitive_sort) ->
     if case_insensitive_sort is `undefined`
-      @_case_insensitive_sort
+      @['_case_insensitive_sort']
     else
       unless typeof case_insensitive_sort is 'boolean'
         throw new Error('case_insensitive_sort must be a boolean')
-      @_build(case_insensitive_sort: case_insensitive_sort)
+      @_build('case_insensitive_sort': case_insensitive_sort)
 
-  include_distance: (include_distance) ->
+  'include_distance': (include_distance) ->
     if include_distance is `undefined`
-      @_include_distance
+      @['_include_distance']
     else
       unless typeof include_distance is 'boolean'
         throw new Error('include_distance must be a boolean')
-      @_build(include_distance: include_distance)
+      @_build('include_distance': include_distance)
+
+  'maximum_candidates': (maximum_candidates) ->
+    if maximum_candidates is `undefined`
+      @['_maximum_candidates']
+    else
+      if maximum_candidates < 0
+        throw new Error("maximum_candidates must be non-negative")
+      @_build('maximum_candidates': maximum_candidates)
 
   # The distance of each position in a state can be defined as follows:
   #
@@ -92,7 +109,7 @@ class Builder
   # in an accepting state, and take the minimum distance among all its accepting
   # positions as the corresponding Levenshtein distance.
   _minimum_distance: () ->
-    if @algorithm() is 'standard'
+    if @['_algorithm'] is 'standard'
       (state, w) ->
         minimum = Infinity
         for [i,e] in state
@@ -108,33 +125,38 @@ class Builder
         minimum
 
   _comparator: () ->
-    if @sort_matches()
+    if @['_sort_candidates']
       # Sort by minimum distance from the query term.
       comparator = (a,b) -> a[1] - b[1]
       # Sort in a case-insensitive manner.
-      comparator = do(comparator) ->
+      comparator = do (comparator) ->
         (a,b) ->
-          comparator() || a.toLowerCase().localeCompare(b.toLowerCase())
+          comparator(a,b) || a[0].toLowerCase().localeCompare(b[0].toLowerCase())
       # If the terms are the same, case-insensitive, then compare them in a
       # case-sensitive manner.
-      unless @case_insensitive_sort()
-        comparator = do(comparator) ->
+      unless @['_case_insensitive_sort']
+        comparator = do (comparator) ->
           (a,b) ->
-            comparator() || a.localeCompare(b)
+            comparator(a,b) || a[0].localeCompare(b[0])
+      comparator
     else
       () -> 0 #-> If we don't want to sort the matches, make all terms equal
 
   _map: (comparator, matches, transform) ->
-    heap = new MinHeap(comparator, matches)
-    unless @include_distance()
-      heap.peek = do(peek=heap.peek) ->
-        () -> transform peek.call(heap)
-      heap.pop = do(pop=heap.pop) ->
-        () -> transform pop.call(heap)
-    heap
+    if isFinite @['_maximum_candidates']
+      matches['sort']() #-> sorts in reverse
+      matches = matches['heap']
+    else if @['_sort_candidates']
+      heap = matches
+      matches = []
+      matches.push heap['pop']() while heap['peek']() isnt null
+    unless @['_include_distance']
+      i = -1; while (++i) < matches.length
+        matches[i] = matches[i][0]
+    matches
 
   _initial_state: () ->
-    if @algorithm() is 'standard'
+    if @['_algorithm'] is 'standard'
       [[0,0]]
     else
       [[0,0,0]]
@@ -142,7 +164,7 @@ class Builder
   # Accepts a state vector and sorts its elements in ascending order.
   _sort_for_transition: () ->
     comparator = (a,b) -> a[0] - b[0] || a[1] - b[1]
-    if @algorithm() in ['transposition', 'merge_and_split']
+    if @['_algorithm'] in ['transposition', 'merge_and_split']
       comparator = do (comparator) ->
         (a,b) -> comparator(a,b) || a[2] - b[2]
     (state) -> state.sort(comparator)
@@ -158,7 +180,7 @@ class Builder
   # a position, state vector and table offset of the current state to its next
   # state.
   _transition_for_position: () ->
-    switch @algorithm()
+    switch @['_algorithm']
       when 'standard' then (n) =>
         ([i,e], vector, offset) =>
           h = i - offset; w = vector.length
@@ -424,7 +446,7 @@ class Builder
   _unsubsume: () =>
     subsumes = @_subsumes()
     bisect_error_right = @_bisect_error_right
-    switch @algorithm()
+    switch @['_algorithm']
       when 'standard'
         (state) ->
           m = 0
@@ -468,7 +490,7 @@ class Builder
   # NOTE: See my comment above bisect_error_right(state,e,l) and how I am using
   # it in _unsubsume for why I am not checking (e < f) below.
   _subsumes: () ->
-    switch @algorithm()
+    switch @['_algorithm']
       when 'standard' then (i,e, j,f) ->
         #(e < f) && Math.abs(j - i) <= (f - e)
         ((i < j) && (j - i) || (i - j)) <= (f - e)
@@ -499,7 +521,7 @@ class Builder
           ((i < j) && (j - i) || (i - j)) <= (f - e)
 
   _bisect_left: () ->
-    if @algorithm() is 'standard'
+    if @['_algorithm']
       (state, position) ->
         [i,e] = position; l = 0; u = state.length
         while l < u
@@ -526,7 +548,7 @@ class Builder
   # subsumption-friendly manner.
   _merge_for_subsumption: () ->
     bisect_left = @_bisect_left()
-    if @algorithm() is 'standard'
+    if @['_algorithm'] is 'standard'
       (state_prime, next_state) ->
         # Order according to error first, then boundary (both ascending).
         # While sorting the elements, remove any duplicates.
@@ -581,30 +603,48 @@ class Builder
         j += 1
       vector
 
-  transducer: () ->
+  _push: (compare) ->
+    maximum_candidates = @['_maximum_candidates']
+    if isFinite maximum_candidates
+      (candidates, candidate) ->
+        if candidates.length is maximum_candidates
+          # We are maintaining a max-heap so that the element furthest from the
+          # query term will be on the top.  If the new candidate is closer to
+          # the query term then it should replace the old one.
+          if compare(candidate, candidates['peek']()) < 0
+            candidates['pop']()
+            candidates.push(candidate)
+        else
+          candidates.push(candidate)
+        candidates
+    else
+      (candidates, candidate) ->
+        #console.log ['candidates.length', candidates.length, 'candidates.heap', candidates.heap, 'candidate', candidate]
+        candidates.push(candidate)
+        candidates
+
+  'transducer': () ->
+    comparator = @_comparator()
     new Transducer({
-      minimum_distance: @_minimum_distance()
-      build_matches: () -> []
-      transition_for_state: @_transition_for_state()
-      characteristic_vector: @_characteristic_vector()
-      edges: (dawg_node) -> dawg_node['edges']
-      is_final: (dawg_node) -> dawg_node['is_final']
-      root: do (dawg = @dictionary()) ->
+      'minimum_distance': @_minimum_distance()
+      'build_matches': do =>
+        if isFinite @['_maximum_candidates']
+          () -> new MaxHeap(comparator)
+        else if @['_sort_candidates']
+          () -> new MaxHeap (a,b) -> - comparator(a,b)
+        else
+          () -> []
+      'transition_for_state': @_transition_for_state()
+      'characteristic_vector': @_characteristic_vector()
+      'edges': (dawg_node) -> dawg_node['edges']
+      'is_final': (dawg_node) -> dawg_node['is_final']
+      'root': do (dawg = @['_dictionary']) ->
         () -> dawg['root']
-      initial_state: do (initial_state=@_initial_state()) ->
+      'initial_state': do (initial_state=@_initial_state()) ->
         () => initial_state
-      transform: do (comparator = @_comparator()) =>
-        (matches) =>
-          @_map(comparator, matches, (pair) -> pair[0])
+      'push': @_push(comparator)
+      'transform': (matches) =>
+        @_map(comparator, matches, (pair) -> pair[0])
     })
 
-global =
-  if typeof exports is 'object'
-    exports
-  else if typeof window is 'object'
-    window
-  else
-    this
-
-global['levenshtein'] ||= {}
 global['levenshtein']['Builder'] = Builder
