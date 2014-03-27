@@ -1,4 +1,5 @@
 *.sw?
+wiki
 coffeescript/.gradle/*
 coffeescript/node_modules/*
 coffeescript/build/*
