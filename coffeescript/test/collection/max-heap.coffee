@@ -1,26 +1,26 @@
-{levenshtein: {MinHeap}} = require '../../src/collection/min-heap'
+{levenshtein: {MaxHeap}} = require '../../src/collection/max-heap'
 {levenshtein: {permutations}} = require '../../src/util/permutations'
 
-c_num = (a,b) -> a - b #-> comparator for numbers
+c_num = (a,b) -> b - a #-> comparator for numbers
 
 module.exports =
   'Instantiating a heap improperly should throw an error': (test) ->
     # No comparator
-    test.throws -> new MinHeap()
-    test.throws -> new MinHeap([1])
+    test.throws -> new MaxHeap()
+    test.throws -> new MaxHeap([1])
     # Heap length too large
-    test.throws -> new MinHeap(c_num, [], 1)
-    test.throws -> new MinHeap(c_num, [], -1)
+    test.throws -> new MaxHeap(c_num, [], 1)
+    test.throws -> new MaxHeap(c_num, [], -1)
     # Done
     test.done()
-  'A min-heap on 0 elements should return null on *.peek() and *.pop()': (test) ->
-    heap = new MinHeap(c_num)
+  'A max-heap on 0 elements should return null on *.peek() and *.pop()': (test) ->
+    heap = new MaxHeap(c_num)
     test.strictEqual(heap.peek(), null, 'expectected heap.peek() to return null')
     test.strictEqual(heap.pop(), null, 'expected heap.pop() to return null')
     test.done()
-  'A min-heap with 1 element should return that element on *.peek() and *.pop(), and after *.pop() should return null.': (test) ->
+  'A max-heap with 1 element should return that element on *.peek() and *.pop(), and after *.pop() should return null.': (test) ->
     value = 42
-    heap = new MinHeap(c_num, [value])
+    heap = new MaxHeap(c_num, [value])
     test.strictEqual(heap.peek(), value, "expected heap.peek() to return #{value}")
     test.strictEqual(heap.pop(), value, "expected heap.pop() to return #{value}")
     test.strictEqual(heap.peek(), null, 'expected heap.peek() to return null')
@@ -41,16 +41,16 @@ module.exports =
     for permutation in permutations(order)
       # Test heapified elements
       p = permutation.slice()
-      heap = new MinHeap(c_num, p)
+      heap = new MaxHeap(c_num, p)
       test_heap(heap, order)
       # Test adding elements, one-by-one
       p = permutation.slice()
-      heap = new MinHeap(c_num)
+      heap = new MaxHeap(c_num)
       heap.push(e) for e in p
       test_heap(heap, order)
       # Verify that sorting the heap returns elements in the reverse order
       p = permutation.slice()
-      heap = new MinHeap(c_num, p)
+      heap = new MaxHeap(c_num, p)
       heap.sort()
       reverse_order = order.slice().reverse()
       test.deepEqual(heap.heap, reverse_order,
@@ -58,6 +58,6 @@ module.exports =
       # Verify that decreasing a key reorders the queue correctly
       p = permutation.slice()
       p[order.length >> 1] = 1 + order[order.length - 1]
-      heap = new MinHeap(c_num, p)
+      heap = new MaxHeap(c_num, p)
       test_heap(heap, p.slice().sort())
     test.done()
