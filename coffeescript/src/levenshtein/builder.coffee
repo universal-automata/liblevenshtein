@@ -32,8 +32,8 @@ class Builder
     builder._sort_matches = @_sort_matches
     builder._case_insensitive_sort = @_case_insensitive_sort
     builder._include_distance = @_include_distance
-    for own attribute of attributes
-      builder['_' + attribute] = attributes[attribute]
+    for own attribute, value of attributes
+      builder['_' + attribute] = value
     builder
 
   dictionary: (dictionary) ->
