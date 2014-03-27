@@ -7,7 +7,6 @@ else
 
 class Builder
   _dictionary: []
-  _dictionary_sorted: false
   _algorithm: 'standard'
   _sort_matches: true
   _case_insensitive_sort: true
@@ -18,7 +17,6 @@ class Builder
       unless source instanceof Builder
         throw new Error('Expected source to be an instance of Builder')
       @_dictionary = source._dictionary
-      @_dictionary_sorted = source.dictionary_sorted
       @_algorithm = source._algorithm
       @_sort_matches = source._sort_matches
       @_case_insensitive_sort = source._case_insensitive_sort
@@ -27,7 +25,6 @@ class Builder
   _build: (attributes) ->
     builder = new Builder()
     builder._dictionary = @_dictionary
-    builder._dictionary_sorted = @dictionary_sorted
     builder._algorithm = @_algorithm
     builder._sort_matches = @_sort_matches
     builder._case_insensitive_sort = @_case_insensitive_sort
@@ -36,21 +33,16 @@ class Builder
       builder['_' + attribute] = value
     builder
 
-  dictionary: (dictionary) ->
+  dictionary: (dictionary, sorted) ->
     if dictionary is `undefined`
       @_dictionary
     else
       unless dictionary instanceof Array or dictionary instanceof Dawg
         throw new Error('dictionary must be either an Array or Dawg')
+      if dictionary instanceof Array
+        dictionary.sort() unless sorted
+        dictionary = new Dawg(dictionary)
       @_build(dictionary: dictionary)
-
-  dictionary_sorted: (dictionary_sorted) ->
-    if dictionary_sorted is `undefined`
-      @_dictionary_sorted
-    else
-      unless typeof dictionary_sorted is 'boolean'
-        throw new Error('dictionary_sorted must be a boolean')
-      @_build(dictionary_sorted: dictionary_sorted)
 
   algorithm: (algorithm) ->
     if algorithm is `undefined`
@@ -590,27 +582,21 @@ class Builder
       vector
 
   transducer: () ->
-    if @dictionary() instanceof Array
-      dictionary = @dictionary().slice()
-      dictionary.sort() unless @dictionary_sorted()
-      transducer = @_build(dictionary: new Dawg(dictionary))
-      transducer.transducer()
-    else
-      new Transducer({
-        minimum_distance: @_minimum_distance()
-        build_matches: () -> []
-        transition_for_state: @_transition_for_state()
-        characteristic_vector: @_characteristic_vector()
-        edges: (dawg_node) -> dawg_node['edges']
-        is_final: (dawg_node) -> dawg_node['is_final']
-        root: do (dawg = @dictionary()) ->
-          () -> dawg['root']
-        initial_state: do (initial_state=@_initial_state()) ->
-          () => initial_state
-        transform: do (comparator = @_comparator()) =>
-          (matches) =>
-            @_map(comparator, matches, (pair) -> pair[0])
-      })
+    new Transducer({
+      minimum_distance: @_minimum_distance()
+      build_matches: () -> []
+      transition_for_state: @_transition_for_state()
+      characteristic_vector: @_characteristic_vector()
+      edges: (dawg_node) -> dawg_node['edges']
+      is_final: (dawg_node) -> dawg_node['is_final']
+      root: do (dawg = @dictionary()) ->
+        () -> dawg['root']
+      initial_state: do (initial_state=@_initial_state()) ->
+        () => initial_state
+      transform: do (comparator = @_comparator()) =>
+        (matches) =>
+          @_map(comparator, matches, (pair) -> pair[0])
+    })
 
 global =
   if typeof exports is 'object'
