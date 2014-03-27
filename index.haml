@@ -7,7 +7,7 @@
     %link{:href => 'stylesheets/stylesheet.css', :media => 'screen', :rel => 'stylesheet', :type => 'text/css'}/
     %link{:href => 'index.css', :media => 'screen', :rel => 'stylesheet', :type => 'text/css'}/
     %script{:type => 'text/javascript', :src => 'http://code.jquery.com/jquery-2.1.0.min.js'}
-    %script{:type => 'text/javascript', :src => 'javascripts/v1.1.1/liblevenshtein.min.js'}
+    %script{:type => 'text/javascript', :src => 'javascripts/2.0.0/levenshtein-transducer.min.js'}
     %script{:type => 'text/javascript', :src => 'programming-languages.js'}
     %script{:type => 'text/javascript', :src => 'index.js'}
     %title libLevenshtein
@@ -47,6 +47,66 @@
           %tr
             %td{:colspan => 3}
               %textarea.programming-languages{:readonly => true, :title => 'List of prgramming languages'}
+        %pre
+          %code
+            = preserve do
+              :escaped
+                'use strict'
+
+                $ ($) ->
+                  transducer = null
+
+                  $progs = $('textarea.programming-languages')
+                  defaults = levenshtein.programming_languages.join('\n')
+
+                  $term = $('input.query-term')
+                  $dist = $('select.edit-distance')
+                  $algo = $('select.algorithm')
+
+                  term = ''
+                  dist = 2
+                  algo = 'transposition'
+
+                  builder = new levenshtein.Builder()
+                    .dictionary(levenshtein.programming_languages, true)
+                    .maximum_candidates(10)
+                    .include_distance(false)
+                    .case_insensitive_sort(true)
+                    .sort_candidates(true)
+
+                  reset_transducer = () ->
+                    transducer = builder.algorithm(algo).transducer()
+
+                  filter = () ->
+                    if term = $.trim $term.val()
+                      candidates = transducer.transduce(term, dist)
+                      $progs.val candidates.join('\n')
+                    else
+                      $progs.val(defaults)
+                    null
+
+                  $term.keyup (event) ->
+                    filter()
+                    true
+
+                  $dist.change (event) ->
+                    dist = +$dist.find('option:selected').val()
+                    filter()
+                    true
+
+                  $algo.change (event) ->
+                    algo = $algo.find('option:selected').val()
+                    reset_transducer()
+                    filter()
+                    true
+
+                  $dist.val(dist) #-> 0-indexed
+                  $algo.find("option[value='\#{algo}']").prop('selected', true)
+                  reset_transducer()
+                  filter()
+                  $term.focus()
+                  true
+
     / FOOTER
     #footer_wrap.outer
       %footer.inner
