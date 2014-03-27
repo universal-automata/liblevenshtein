@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>transducer.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="dawg.html">
+                dawg.coffee
+              </a>
+            
+              
+              <a class="source" href="max-heap.html">
+                max-heap.coffee
+              </a>
+            
+              
+              <a class="source" href="builder.html">
+                builder.coffee
+              </a>
+            
+              
+              <a class="source" href="distance.html">
+                distance.coffee
+              </a>
+            
+              
+              <a class="source" href="transducer.html">
+                transducer.coffee
+              </a>
+            
+              
+              <a class="source" href="mutate.html">
+                mutate.coffee
+              </a>
+            
+              
+              <a class="source" href="operations.html">
+                operations.coffee
+              </a>
+            
+              
+              <a class="source" href="permutations.html">
+                permutations.coffee
+              </a>
+            
+              
+              <a class="source" href="truth-table.html">
+                truth-table.coffee
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>transducer.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <h2 id="-">*</h2>
+<p>The algorithm for imitating Levenshtein automata was taken from the
+following journal article:</p>
+<p>@ARTICLE{Schulz02faststring,
+  author = {Klaus Schulz and Stoyan Mihov},
+  title = {Fast String Correction with Levenshtein-Automata},
+  journal = {INTERNATIONAL JOURNAL OF DOCUMENT ANALYSIS AND RECOGNITION},
+  year = {2002},
+  volume = {5},
+  pages = {67—85}
+}</p>
+<p>As well, this Master Thesis helped me understand its concepts:</p>
+<p>  www.fmi.uni-sofia.bg/fmi/logic/theses/mitankin-en.pdf</p>
+<p>The supervisor of the student who submitted the thesis was one of the
+authors of the journal article, above.</p>
+<p>The algorithm for constructing a DAWG (Direct Acyclic Word Graph) from the
+input dictionary of words (DAWGs are otherwise known as an MA-FSA, or
+Minimal Acyclic Finite-State Automata), was taken and modified from the
+following blog from Steve Hanov:</p>
+<p>  <a href="http://stevehanov.ca/blog/index.php?id=115">http://stevehanov.ca/blog/index.php?id=115</a></p>
+<p>The algorithm therein was taken from the following paper:</p>
+<p>@MISC{Daciuk00incrementalconstruction,
+  author = {Jan Daciuk and Bruce W. Watson and Richard E. Watson and Stoyan Mihov},
+  title = {Incremental Construction of Minimal Acyclic Finite-State Automata},
+  year = {2000}
+}</p>
+<h1 id="-">#</h1>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Transducer</span></span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Accepts a state corresponding to some dictionary term and the length of the
+query term, and identifies the minimum distance between the terms.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'minimum_distance'</span>: <span class="hljs-function"><span class="hljs-params">(state, w)</span> -&gt;</span>
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'minimum_distance not specified on construction'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Returns a collection for storing spelling candidates. The only requirement
+is that it has a push(candidate) method and can be passed to
+this.transform(matches)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'build_matches'</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'build_matches not specified on construction'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Returns the initial state of the Levenshtein automaton</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'initial_state'</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'initial_state not specified on construction'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Returns the root of the dictionary</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'root'</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'root not specified on construction'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Returns a mapping of labels to dictionary states, which correspond to the
+outgoing edges of a dictionary state.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'edges'</span>: <span class="hljs-function"><span class="hljs-params">(q_D)</span> -&gt;</span>
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'edges not specified on construction'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Determines whether a dictionary state is final</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'is_final'</span>: <span class="hljs-function"><span class="hljs-params">(q_D)</span> -&gt;</span>
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'is_final not specified on construction'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Transforms a collection of spelling candidates as necessary</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'transform'</span>: <span class="hljs-function"><span class="hljs-params">(matches)</span> -&gt;</span>
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'transform not specified on construction'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Accepts the maximum edit distance and returns a function that transitions
+among states.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'transition_for_state'</span>: <span class="hljs-function"><span class="hljs-params">(n)</span> -&gt;</span>
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'transition_for_state not specified on construction'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Returns the characteristic vector of a set of parameters (see the paper,
+“Fast String Correction with Levenshtein-Automata”)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'characteristic_vector'</span>: <span class="hljs-function"><span class="hljs-params">(x, term, k, i)</span> -&gt;</span>
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'characteristic_vector not specified on construction'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>Pushes a spelling candidate onto the matches</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'push'</span>: <span class="hljs-function"><span class="hljs-params">(matches, candidate)</span> -&gt;</span>
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'push not specified on construction'</span>)
+
+  <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(attributes)</span> -&gt;</span>
+    <span class="hljs-keyword">for</span> own attribute <span class="hljs-keyword">of</span> attributes
+      <span class="hljs-keyword">this</span>[attribute] = attributes[attribute]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Returns every term in the dictionary that is within n units of error from
+the query term.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'transduce'</span>: <span class="hljs-function"><span class="hljs-params">(term, n)</span> -&gt;</span>
+    w = term.length
+    transition = @[<span class="hljs-string">'transition_for_state'</span>](n)
+    matches = @[<span class="hljs-string">'build_matches'</span>]()
+    stack = [[<span class="hljs-string">''</span>, @[<span class="hljs-string">'root'</span>](), @[<span class="hljs-string">'initial_state'</span>]()]]
+    <span class="hljs-keyword">while</span> stack.length &gt; <span class="hljs-number">0</span>
+      [V, q_D, M] = stack[<span class="hljs-string">'pop'</span>](); i = M[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]
+      a = <span class="hljs-number">2</span> * n + <span class="hljs-number">1</span>; b = w - i
+      k = <span class="hljs-keyword">if</span> a &lt; b <span class="hljs-keyword">then</span> a <span class="hljs-keyword">else</span> b
+      <span class="hljs-keyword">for</span> x, next_q_D <span class="hljs-keyword">of</span> @[<span class="hljs-string">'edges'</span>](q_D)
+        vector = @[<span class="hljs-string">'characteristic_vector'</span>](x, term, k, i)
+        next_M = transition(M, vector)
+        <span class="hljs-keyword">if</span> next_M
+          next_V = V + x
+          stack.push([next_V, next_q_D, next_M])
+          <span class="hljs-keyword">if</span> @[<span class="hljs-string">'is_final'</span>](next_q_D)
+            distance = @[<span class="hljs-string">'minimum_distance'</span>](next_M, w)
+            <span class="hljs-keyword">if</span> distance &lt;= n
+              @[<span class="hljs-string">'push'</span>](matches, [next_V, distance])
+    @[<span class="hljs-string">'transform'</span>](matches)
+
+<span class="hljs-built_in">global</span> =
+  <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> <span class="hljs-built_in">exports</span> <span class="hljs-keyword">is</span> <span class="hljs-string">'object'</span>
+    <span class="hljs-built_in">exports</span>
+  <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> <span class="hljs-built_in">window</span> <span class="hljs-keyword">is</span> <span class="hljs-string">'object'</span>
+    <span class="hljs-built_in">window</span>
+  <span class="hljs-keyword">else</span>
+    <span class="hljs-keyword">this</span>
+
+<span class="hljs-built_in">global</span>[<span class="hljs-string">'levenshtein'</span>] ||= {}
+<span class="hljs-built_in">global</span>[<span class="hljs-string">'levenshtein'</span>][<span class="hljs-string">'Transducer'</span>] = Transducer</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

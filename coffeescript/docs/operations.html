@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>operations.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="dawg.html">
+                dawg.coffee
+              </a>
+            
+              
+              <a class="source" href="max-heap.html">
+                max-heap.coffee
+              </a>
+            
+              
+              <a class="source" href="builder.html">
+                builder.coffee
+              </a>
+            
+              
+              <a class="source" href="distance.html">
+                distance.coffee
+              </a>
+            
+              
+              <a class="source" href="transducer.html">
+                transducer.coffee
+              </a>
+            
+              
+              <a class="source" href="mutate.html">
+                mutate.coffee
+              </a>
+            
+              
+              <a class="source" href="operations.html">
+                operations.coffee
+              </a>
+            
+              
+              <a class="source" href="permutations.html">
+                permutations.coffee
+              </a>
+            
+              
+              <a class="source" href="truth-table.html">
+                truth-table.coffee
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>operations.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-built_in">global</span> =
+  <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> <span class="hljs-built_in">exports</span> <span class="hljs-keyword">is</span> <span class="hljs-string">'object'</span>
+    <span class="hljs-built_in">exports</span>
+  <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> <span class="hljs-built_in">window</span> <span class="hljs-keyword">is</span> <span class="hljs-string">'object'</span>
+    <span class="hljs-built_in">window</span>
+  <span class="hljs-keyword">else</span>
+    <span class="hljs-keyword">this</span>
+
+<span class="hljs-built_in">global</span>[<span class="hljs-string">'levenshtein'</span>] ||= {}
+<span class="hljs-built_in">global</span>[<span class="hljs-string">'levenshtein'</span>][<span class="hljs-string">'operations'</span>] =
+  <span class="hljs-attribute">insertion</span>: <span class="hljs-function"><span class="hljs-params">(term, alphabet, random)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Select a random character to insert</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    c = alphabet[(random() * alphabet.length) &gt;&gt; <span class="hljs-number">0</span>]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Select a random index at which to insert the character</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    i = (random() * (<span class="hljs-number">1</span> + term.length)) &gt;&gt; <span class="hljs-number">0</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Insert the charater at the random index</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    term.slice(<span class="hljs-number">0</span>,i) + c + term.slice(<span class="hljs-number">1</span> + i)
+
+  <span class="hljs-attribute">deletion</span>: <span class="hljs-function"><span class="hljs-params">(term, alphabet, random)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Select a random index for deletion</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    i = (random() * term.length) &gt;&gt; <span class="hljs-number">0</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Delete the character at the random index</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    term.slice(<span class="hljs-number">0</span>,i) + term.slice(i+<span class="hljs-number">1</span>)
+
+  <span class="hljs-attribute">substitution</span>: <span class="hljs-function"><span class="hljs-params">(term, alphabet, random)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Select a random character to substitute</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    c = alphabet[(random() * alphabet.length) &gt;&gt; <span class="hljs-number">0</span>]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Select a random index for substitution</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    i = (random() * term.length) &gt;&gt; <span class="hljs-number">0</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Substitute the character at the random index</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    term.slice(<span class="hljs-number">0</span>,i) + c + term.slice(i+<span class="hljs-number">1</span>)
+
+  <span class="hljs-attribute">transposition</span>: <span class="hljs-function"><span class="hljs-params">(term, alphabet, random)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> term.length &gt; <span class="hljs-number">1</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Select a random index to transpose</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      i = (random() * (term.length - <span class="hljs-number">1</span>)) &gt;&gt; <span class="hljs-number">0</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>Transpose the characters at i and i+1</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      term.slice(<span class="hljs-number">0</span>,i) + term[i+<span class="hljs-number">1</span>] + term[i] + term.slice(i+<span class="hljs-number">2</span>)
+    <span class="hljs-keyword">else</span>
+      term
+
+  <span class="hljs-attribute">merge</span>: <span class="hljs-function"><span class="hljs-params">(term, alphabet, random)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> term.length &gt; <span class="hljs-number">1</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Select a random character to merge-in</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      c = alphabet[(random() * alphabet.length) &gt;&gt; <span class="hljs-number">0</span>]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Select a random index to merge</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      i = (random() * (term.length - <span class="hljs-number">1</span>)) &gt;&gt; <span class="hljs-number">0</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Merge the characters at i and i+1</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      term.slice(<span class="hljs-number">0</span>,i) + c + term.slice(i+<span class="hljs-number">2</span>)
+    <span class="hljs-keyword">else</span>
+      term
+
+  <span class="hljs-attribute">split</span>: <span class="hljs-function"><span class="hljs-params">(term, alphabet, random)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>Select two random characters to split-out</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    c = alphabet[(random() * alphabet.length) &gt;&gt; <span class="hljs-number">0</span>]
+    d = alphabet[(random() * alphabet.length) &gt;&gt; <span class="hljs-number">0</span>]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>Select a random index to split</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    i = (random() * (term.length - <span class="hljs-number">1</span>)) &gt;&gt; <span class="hljs-number">0</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>Split the character at i</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    term.slice(<span class="hljs-number">0</span>,i) + c + d + term.slice(i+<span class="hljs-number">1</span>)</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

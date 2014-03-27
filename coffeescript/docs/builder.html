@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>builder.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="dawg.html">
+                dawg.coffee
+              </a>
+            
+              
+              <a class="source" href="max-heap.html">
+                max-heap.coffee
+              </a>
+            
+              
+              <a class="source" href="builder.html">
+                builder.coffee
+              </a>
+            
+              
+              <a class="source" href="distance.html">
+                distance.coffee
+              </a>
+            
+              
+              <a class="source" href="transducer.html">
+                transducer.coffee
+              </a>
+            
+              
+              <a class="source" href="mutate.html">
+                mutate.coffee
+              </a>
+            
+              
+              <a class="source" href="operations.html">
+                operations.coffee
+              </a>
+            
+              
+              <a class="source" href="permutations.html">
+                permutations.coffee
+              </a>
+            
+              
+              <a class="source" href="truth-table.html">
+                truth-table.coffee
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>builder.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-built_in">global</span> =
+  <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> <span class="hljs-built_in">exports</span> <span class="hljs-keyword">is</span> <span class="hljs-string">'object'</span>
+    <span class="hljs-built_in">exports</span>
+  <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> <span class="hljs-built_in">window</span> <span class="hljs-keyword">is</span> <span class="hljs-string">'object'</span>
+    <span class="hljs-built_in">window</span>
+  <span class="hljs-keyword">else</span>
+    <span class="hljs-keyword">this</span>
+
+<span class="hljs-built_in">global</span>[<span class="hljs-string">'levenshtein'</span>] ||= {}
+
+<span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> <span class="hljs-built_in">require</span> <span class="hljs-keyword">is</span> <span class="hljs-string">'function'</span>
+  {<span class="hljs-attribute">levenshtein</span>: {MaxHeap}} = <span class="hljs-built_in">require</span> <span class="hljs-string">'../collection/max-heap'</span>
+  {<span class="hljs-attribute">levenshtein</span>: {Transducer}} = <span class="hljs-built_in">require</span> <span class="hljs-string">'./transducer'</span>
+  {<span class="hljs-attribute">levenshtein</span>: {Dawg}} = <span class="hljs-built_in">require</span> <span class="hljs-string">'../collection/dawg'</span>
+<span class="hljs-keyword">else</span>
+  MaxHeap = <span class="hljs-built_in">global</span>[<span class="hljs-string">'levenshtein'</span>][<span class="hljs-string">'MaxHeap'</span>]
+  Transducer = <span class="hljs-built_in">global</span>[<span class="hljs-string">'levenshtein'</span>][<span class="hljs-string">'Transducer'</span>]
+  Dawg = <span class="hljs-built_in">global</span>[<span class="hljs-string">'levenshtein'</span>][<span class="hljs-string">'Dawg'</span>]
+
+fields =</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Dictionary of terms</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'_dictionary'</span>: <span class="hljs-keyword">new</span> Dawg([])</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Search algorithm to use</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'_algorithm'</span>: <span class="hljs-string">'standard'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Sort the candidates as they are discovered</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'_sort_candidates'</span>: <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>If sort_candidates, then sort them in a case-insensitive fashion</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'_case_insensitive_sort'</span>: <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Include the distance from the query term for each spelling candidate</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'_include_distance'</span>: <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Maximum number of spelling candidates to return</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'_maximum_candidates'</span>: Infinity</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Customer comparator for the max-heap (optional). This should be an arity-2
+function that accepts two pairs of [“term”, distance] values.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'_custom_comparator'</span>: <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Custom transform for spelling candidates (optional). This should be an
+arity-1 function that accepts a pair of [“term”, distance] values.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'_custom_transform'</span>: <span class="hljs-literal">null</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Builder</span></span>
+  <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(source=fields)</span> -&gt;</span>
+    <span class="hljs-keyword">for</span> own field <span class="hljs-keyword">of</span> fields
+      <span class="hljs-keyword">this</span>[field] = source[field]
+
+  <span class="hljs-attribute">_build</span>: <span class="hljs-function"><span class="hljs-params">(attributes)</span> -&gt;</span>
+    builder = <span class="hljs-keyword">new</span> Builder(<span class="hljs-keyword">this</span>)
+    <span class="hljs-keyword">for</span> own attribute, value <span class="hljs-keyword">of</span> attributes
+      builder[<span class="hljs-string">'_'</span> + attribute] = value
+    builder
+
+  <span class="hljs-string">'dictionary'</span>: <span class="hljs-function"><span class="hljs-params">(dictionary, sorted)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> dictionary <span class="hljs-keyword">is</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
+      @[<span class="hljs-string">'_dictionary'</span>]
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-keyword">unless</span> dictionary <span class="hljs-keyword">instanceof</span> Array <span class="hljs-keyword">or</span> dictionary <span class="hljs-keyword">instanceof</span> Dawg
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'dictionary must be either an Array or Dawg'</span>)
+      <span class="hljs-keyword">if</span> dictionary <span class="hljs-keyword">instanceof</span> Array
+        dictionary.sort() <span class="hljs-keyword">unless</span> sorted
+        dictionary = <span class="hljs-keyword">new</span> Dawg(dictionary)
+      <span class="hljs-property">@_build</span>(<span class="hljs-string">'dictionary'</span>: dictionary)
+
+  <span class="hljs-string">'algorithm'</span>: <span class="hljs-function"><span class="hljs-params">(algorithm)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> algorithm <span class="hljs-keyword">is</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
+      @[<span class="hljs-string">'_algorithm'</span>]
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-keyword">unless</span> algorithm <span class="hljs-keyword">in</span> [<span class="hljs-string">'standard'</span>, <span class="hljs-string">'transposition'</span>, <span class="hljs-string">'merge_and_split'</span>]
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(
+          <span class="hljs-string">'algorithm must be standard, transposition, or merge_and_split'</span>)
+      <span class="hljs-property">@_build</span>(<span class="hljs-string">'algorithm'</span>: algorithm)
+
+  <span class="hljs-string">'sort_candidates'</span>: <span class="hljs-function"><span class="hljs-params">(sort_candidates)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> sort_candidates <span class="hljs-keyword">is</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
+      @[<span class="hljs-string">'_sort_candidates'</span>]
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-keyword">unless</span> <span class="hljs-keyword">typeof</span> sort_candidates <span class="hljs-keyword">is</span> <span class="hljs-string">'boolean'</span>
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'sort_candidates must be a boolean'</span>)
+      <span class="hljs-property">@_build</span>(<span class="hljs-string">'sort_candidates'</span>: sort_candidates)
+
+  <span class="hljs-string">'case_insensitive_sort'</span>: <span class="hljs-function"><span class="hljs-params">(case_insensitive_sort)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> case_insensitive_sort <span class="hljs-keyword">is</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
+      @[<span class="hljs-string">'_case_insensitive_sort'</span>]
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-keyword">unless</span> <span class="hljs-keyword">typeof</span> case_insensitive_sort <span class="hljs-keyword">is</span> <span class="hljs-string">'boolean'</span>
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'case_insensitive_sort must be a boolean'</span>)
+      <span class="hljs-property">@_build</span>(<span class="hljs-string">'case_insensitive_sort'</span>: case_insensitive_sort)
+
+  <span class="hljs-string">'include_distance'</span>: <span class="hljs-function"><span class="hljs-params">(include_distance)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> include_distance <span class="hljs-keyword">is</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
+      @[<span class="hljs-string">'_include_distance'</span>]
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-keyword">unless</span> <span class="hljs-keyword">typeof</span> include_distance <span class="hljs-keyword">is</span> <span class="hljs-string">'boolean'</span>
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'include_distance must be a boolean'</span>)
+      <span class="hljs-property">@_build</span>(<span class="hljs-string">'include_distance'</span>: include_distance)
+
+  <span class="hljs-string">'maximum_candidates'</span>: <span class="hljs-function"><span class="hljs-params">(maximum_candidates)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> maximum_candidates <span class="hljs-keyword">is</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
+      @[<span class="hljs-string">'_maximum_candidates'</span>]
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-keyword">if</span> maximum_candidates &lt; <span class="hljs-number">0</span>
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"maximum_candidates must be non-negative"</span>)
+      <span class="hljs-property">@_build</span>(<span class="hljs-string">'maximum_candidates'</span>: maximum_candidates)
+
+  <span class="hljs-string">'custom_comparator'</span>: <span class="hljs-function"><span class="hljs-params">(custom_comparator)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> custom_comparator <span class="hljs-keyword">is</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
+      @[<span class="hljs-string">'_custom_comparator'</span>]
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> custom_comparator <span class="hljs-keyword">isnt</span> <span class="hljs-string">'function'</span>
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'Expected custom_comparator to be a function'</span>)
+      <span class="hljs-property">@_build</span>(<span class="hljs-string">'custom_comparator'</span>: custom_comparator)
+
+  <span class="hljs-string">'custom_transform'</span>: <span class="hljs-function"><span class="hljs-params">(custom_transform)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> custom_transform <span class="hljs-keyword">is</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
+      @[<span class="hljs-string">'_custom_transform'</span>]
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> custom_transform <span class="hljs-keyword">isnt</span> <span class="hljs-string">'function'</span>
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'Expected custom_transform to be a function'</span>)
+      <span class="hljs-property">@_build</span>(<span class="hljs-string">'custom_transform'</span>: custom_transform)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>The distance of each position in a state can be defined as follows:</p>
+<p>  distance = w - i + e</p>
+<p>For every accepting position, it must be the case that w - i &lt;= n - e.  It
+follows directly that the distance of every accepted position must be no
+more than n:</p>
+<p>(w - i &lt;= n - e) &lt;=&gt; (w - i + e &lt;= n) &lt;=&gt; (distance &lt;= n)</p>
+<p>The Levenshtein distance between any two terms is defined as the minimum
+edit distance between the two terms.  Therefore, iterate over each position
+in an accepting state, and take the minimum distance among all its accepting
+positions as the corresponding Levenshtein distance.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_minimum_distance</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> @[<span class="hljs-string">'_algorithm'</span>] <span class="hljs-keyword">is</span> <span class="hljs-string">'standard'</span>
+      <span class="hljs-function"><span class="hljs-params">(state, w)</span> -&gt;</span>
+        minimum = Infinity
+        <span class="hljs-keyword">for</span> [i,e] <span class="hljs-keyword">in</span> state
+          distance = w - i + e
+          minimum = distance <span class="hljs-keyword">if</span> distance &lt; minimum
+        minimum
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-function"><span class="hljs-params">(state, w)</span> -&gt;</span>
+        minimum = Infinity
+        <span class="hljs-keyword">for</span> [i,e,x] <span class="hljs-keyword">in</span> state
+          distance = w - i + e
+          minimum = distance <span class="hljs-keyword">if</span> x <span class="hljs-keyword">isnt</span> <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> distance &lt; minimum
+        minimum
+
+  <span class="hljs-attribute">_comparator</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> @[<span class="hljs-string">'_custom_comparator'</span>] <span class="hljs-keyword">is</span> <span class="hljs-string">'function'</span>
+      @[<span class="hljs-string">'_custom_comparator'</span>]
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> @[<span class="hljs-string">'_sort_candidates'</span>]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>Sort by minimum distance from the query term.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-function"><span class="hljs-title">comparator</span> = <span class="hljs-params">(a,b)</span> -&gt;</span> a[<span class="hljs-number">1</span>] - b[<span class="hljs-number">1</span>]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Sort in a case-insensitive manner.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      comparator = <span class="hljs-keyword">do</span> <span class="hljs-function"><span class="hljs-params">(comparator)</span> -&gt;</span>
+        <span class="hljs-function"><span class="hljs-params">(a,b)</span> -&gt;</span>
+          comparator(a,b) || a[<span class="hljs-number">0</span>].toLowerCase().localeCompare(b[<span class="hljs-number">0</span>].toLowerCase())</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>If the terms are the same, case-insensitive, then compare them in a
+case-sensitive manner.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>      <span class="hljs-keyword">unless</span> @[<span class="hljs-string">'_case_insensitive_sort'</span>]
+        comparator = <span class="hljs-keyword">do</span> <span class="hljs-function"><span class="hljs-params">(comparator)</span> -&gt;</span>
+          <span class="hljs-function"><span class="hljs-params">(a,b)</span> -&gt;</span>
+            comparator(a,b) || a[<span class="hljs-number">0</span>].localeCompare(b[<span class="hljs-number">0</span>])
+      comparator
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span> <span class="hljs-number">0</span> <span class="hljs-comment">#-&gt; If we don't want to sort the matches, make all terms equal</span>
+
+  <span class="hljs-attribute">_transform</span>: <span class="hljs-function"><span class="hljs-params">(comparator)</span> -&gt;</span>
+    transform =
+      <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> @[<span class="hljs-string">'_custom_transform'</span>] <span class="hljs-keyword">is</span> <span class="hljs-string">'function'</span>
+        @[<span class="hljs-string">'_custom_transform'</span>]
+      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> @[<span class="hljs-string">'_include_distance'</span>] <span class="hljs-keyword">is</span> <span class="hljs-literal">false</span>
+        <span class="hljs-function"><span class="hljs-params">(candidate)</span> -&gt;</span> candidate[<span class="hljs-number">0</span>]
+
+    <span class="hljs-function"><span class="hljs-params">(matches)</span> =&gt;</span>
+      <span class="hljs-keyword">if</span> isFinite @[<span class="hljs-string">'_maximum_candidates'</span>]
+        matches[<span class="hljs-string">'sort'</span>]() <span class="hljs-comment">#-&gt; sorts in reverse</span>
+        matches = matches[<span class="hljs-string">'heap'</span>]
+      <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> @[<span class="hljs-string">'_sort_candidates'</span>]
+        heap = matches
+        matches = []
+        matches.push heap[<span class="hljs-string">'pop'</span>]() <span class="hljs-keyword">while</span> heap[<span class="hljs-string">'peek'</span>]() <span class="hljs-keyword">isnt</span> <span class="hljs-literal">null</span>
+      <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> transform <span class="hljs-keyword">is</span> <span class="hljs-string">'function'</span>
+        i = -<span class="hljs-number">1</span>; <span class="hljs-keyword">while</span> (++i) &lt; matches.length
+          matches[i] = transform(matches[i])
+      matches
+
+  <span class="hljs-attribute">_initial_state</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> @[<span class="hljs-string">'_algorithm'</span>] <span class="hljs-keyword">is</span> <span class="hljs-string">'standard'</span>
+      [[<span class="hljs-number">0</span>,<span class="hljs-number">0</span>]]
+    <span class="hljs-keyword">else</span>
+      [[<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>]]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Accepts a state vector and sorts its elements in ascending order.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_sort_for_transition</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    <span class="hljs-function"><span class="hljs-title">comparator</span> = <span class="hljs-params">(a,b)</span> -&gt;</span> a[<span class="hljs-number">0</span>] - b[<span class="hljs-number">0</span>] || a[<span class="hljs-number">1</span>] - b[<span class="hljs-number">1</span>]
+    <span class="hljs-keyword">if</span> @[<span class="hljs-string">'_algorithm'</span>] <span class="hljs-keyword">in</span> [<span class="hljs-string">'transposition'</span>, <span class="hljs-string">'merge_and_split'</span>]
+      comparator = <span class="hljs-keyword">do</span> <span class="hljs-function"><span class="hljs-params">(comparator)</span> -&gt;</span>
+        <span class="hljs-function"><span class="hljs-params">(a,b)</span> -&gt;</span> comparator(a,b) || a[<span class="hljs-number">2</span>] - b[<span class="hljs-number">2</span>]
+    <span class="hljs-function"><span class="hljs-params">(state)</span> -&gt;</span> state.sort(comparator)
+
+  <span class="hljs-attribute">_index_of</span>: <span class="hljs-function"><span class="hljs-params">(vector, k, i)</span> -&gt;</span>
+    j = <span class="hljs-number">0</span>
+    <span class="hljs-keyword">while</span> j &lt; k
+      <span class="hljs-keyword">return</span> j <span class="hljs-keyword">if</span> vector[i + j]
+      j += <span class="hljs-number">1</span>
+    <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>Accepts a maximum edit distance and returns a transition function that maps
+a position, state vector and table offset of the current state to its next
+state.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_transition_for_position</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    <span class="hljs-keyword">switch</span> @[<span class="hljs-string">'_algorithm'</span>]
+      <span class="hljs-keyword">when</span> <span class="hljs-string">'standard'</span> <span class="hljs-keyword">then</span> <span class="hljs-function"><span class="hljs-params">(n)</span> =&gt;</span>
+        <span class="hljs-function"><span class="hljs-params">([i,e], vector, offset)</span> =&gt;</span>
+          h = i - offset; w = vector.length
+          <span class="hljs-keyword">if</span> e &lt; n
+            <span class="hljs-keyword">if</span> h &lt;= w - <span class="hljs-number">2</span>
+              a = n - e + <span class="hljs-number">1</span>; b = w - h
+              k = <span class="hljs-keyword">if</span> a &lt; b <span class="hljs-keyword">then</span> a <span class="hljs-keyword">else</span> b
+              j = <span class="hljs-property">@_index_of</span>(vector, k, h)
+              <span class="hljs-keyword">if</span> j == <span class="hljs-number">0</span>
+                [
+                  [(i + <span class="hljs-number">1</span>), e]
+                ]
+              <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> j &gt; <span class="hljs-number">0</span>
+                [
+                  [i, (e + <span class="hljs-number">1</span>)]
+                  [(i + <span class="hljs-number">1</span>), (e + <span class="hljs-number">1</span>)]
+                  [(i + j + <span class="hljs-number">1</span>), (e + j)]
+                ]
+              <span class="hljs-keyword">else</span>
+                [
+                  [i, (e + <span class="hljs-number">1</span>)]
+                  [(i + <span class="hljs-number">1</span>), (e + <span class="hljs-number">1</span>)]
+                ]
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> h == w - <span class="hljs-number">1</span>
+              <span class="hljs-keyword">if</span> vector[h]
+                [
+                  [(i + <span class="hljs-number">1</span>), e]
+                ]
+              <span class="hljs-keyword">else</span>
+                [
+                  [i, (e + <span class="hljs-number">1</span>)]
+                  [(i + <span class="hljs-number">1</span>), (e + <span class="hljs-number">1</span>)]
+                ]
+            <span class="hljs-keyword">else</span> <span class="hljs-comment"># h == w</span>
+              [
+                [i, (e + <span class="hljs-number">1</span>)]
+              ]
+          <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> e == n
+            <span class="hljs-keyword">if</span> h &lt;= w - <span class="hljs-number">1</span>
+              <span class="hljs-keyword">if</span> vector[h]
+                [
+                  [(i + <span class="hljs-number">1</span>), n]
+                ]
+              <span class="hljs-keyword">else</span>
+                <span class="hljs-literal">null</span>
+            <span class="hljs-keyword">else</span>
+              <span class="hljs-literal">null</span>
+          <span class="hljs-keyword">else</span>
+            <span class="hljs-literal">null</span>
+
+      <span class="hljs-keyword">when</span> <span class="hljs-string">'transposition'</span> <span class="hljs-keyword">then</span> <span class="hljs-function"><span class="hljs-params">(n)</span> =&gt;</span>
+        <span class="hljs-function"><span class="hljs-params">([i,e,t], vector, offset)</span> =&gt;</span>
+          h = i - offset; w = vector.length
+          <span class="hljs-keyword">if</span> e == <span class="hljs-number">0</span> &lt; n
+            <span class="hljs-keyword">if</span> h &lt;= w - <span class="hljs-number">2</span>
+              a = n - e + <span class="hljs-number">1</span>; b = w - h
+              k = <span class="hljs-keyword">if</span> a &lt; b <span class="hljs-keyword">then</span> a <span class="hljs-keyword">else</span> b
+              j = <span class="hljs-property">@_index_of</span>(vector, k, h)
+              <span class="hljs-keyword">if</span> j == <span class="hljs-number">0</span>
+                [
+                  [(i + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>, <span class="hljs-number">0</span>]
+                ]
+              <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> j == <span class="hljs-number">1</span>
+                [
+                  [i, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>]
+                  [i, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>] <span class="hljs-comment"># t-position</span>
+                  [(i + <span class="hljs-number">1</span>), <span class="hljs-number">1</span>, <span class="hljs-number">0</span>]
+                  [(i + <span class="hljs-number">2</span>), <span class="hljs-number">1</span>, <span class="hljs-number">0</span>] <span class="hljs-comment"># was [(i + j + 1), j, 0], but j=1</span>
+                ]
+              <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> j &gt; <span class="hljs-number">1</span>
+                [
+                  [i, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>]
+                  [(i + <span class="hljs-number">1</span>), <span class="hljs-number">1</span>, <span class="hljs-number">0</span>]
+                  [(i + j + <span class="hljs-number">1</span>), j, <span class="hljs-number">0</span>]
+                ]
+              <span class="hljs-keyword">else</span>
+                [
+                  [i, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>]
+                  [(i + <span class="hljs-number">1</span>), <span class="hljs-number">1</span>, <span class="hljs-number">0</span>]
+                ]
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> h == w - <span class="hljs-number">1</span>
+              <span class="hljs-keyword">if</span> vector[h]
+                [
+                  [(i + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>, <span class="hljs-number">0</span>]
+                ]
+              <span class="hljs-keyword">else</span>
+                [
+                  [i, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>]
+                  [(i + <span class="hljs-number">1</span>), <span class="hljs-number">1</span>, <span class="hljs-number">0</span>]
+                ]
+            <span class="hljs-keyword">else</span> <span class="hljs-comment"># h == w</span>
+              [
+                [i, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>]
+              ]
+          <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-number">1</span> &lt;= e &lt; n
+            <span class="hljs-keyword">if</span> h &lt;= w - <span class="hljs-number">2</span>
+              <span class="hljs-keyword">if</span> t <span class="hljs-keyword">is</span> <span class="hljs-number">0</span> <span class="hljs-comment"># [i,e] is not a t-position</span>
+                a = n - e + <span class="hljs-number">1</span>; b = w - h
+                k = <span class="hljs-keyword">if</span> a &lt; b <span class="hljs-keyword">then</span> a <span class="hljs-keyword">else</span> b
+                j = <span class="hljs-property">@_index_of</span>(vector, k, h)
+                <span class="hljs-keyword">if</span> j == <span class="hljs-number">0</span>
+                  [
+                    [(i + <span class="hljs-number">1</span>), e, <span class="hljs-number">0</span>]
+                  ]
+                <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> j == <span class="hljs-number">1</span>
+                  [
+                    [i, (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+                    [i, (e + <span class="hljs-number">1</span>), <span class="hljs-number">1</span>] <span class="hljs-comment"># t-position</span>
+                    [(i + <span class="hljs-number">1</span>), (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+                    [(i + <span class="hljs-number">2</span>), (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>] <span class="hljs-comment"># was [(i + j + 1), (e + j), 0], but j=1</span>
+                  ]
+                <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> j &gt; <span class="hljs-number">1</span>
+                  [
+                    [i, (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+                    [(i + <span class="hljs-number">1</span>), (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+                    [(i + j + <span class="hljs-number">1</span>), (e + j), <span class="hljs-number">0</span>]
+                  ]
+                <span class="hljs-keyword">else</span>
+                  [
+                    [i, (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+                    [(i + <span class="hljs-number">1</span>), (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+                  ]
+              <span class="hljs-keyword">else</span>
+                <span class="hljs-keyword">if</span> vector[h]
+                  [
+                    [(i + <span class="hljs-number">2</span>), e, <span class="hljs-number">0</span>]
+                  ]
+                <span class="hljs-keyword">else</span>
+                  <span class="hljs-literal">null</span>
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> h == w - <span class="hljs-number">1</span>
+              <span class="hljs-keyword">if</span> vector[h]
+                [
+                  [(i + <span class="hljs-number">1</span>), e, <span class="hljs-number">0</span>]
+                ]
+              <span class="hljs-keyword">else</span>
+                [
+                  [i, (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+                  [(i + <span class="hljs-number">1</span>), (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+                ]
+            <span class="hljs-keyword">else</span> <span class="hljs-comment"># h == w</span>
+              [
+                [i, (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+              ]
+          <span class="hljs-keyword">else</span>
+            <span class="hljs-keyword">if</span> h &lt;= w - <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> t <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+              <span class="hljs-keyword">if</span> vector[h]
+                [
+                  [(i + <span class="hljs-number">1</span>), n, <span class="hljs-number">0</span>]
+                ]
+              <span class="hljs-keyword">else</span>
+                <span class="hljs-literal">null</span>
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> h &lt;= w - <span class="hljs-number">2</span> <span class="hljs-keyword">and</span> t <span class="hljs-keyword">is</span> <span class="hljs-number">1</span> <span class="hljs-comment"># [i,e] is a t-position</span>
+              <span class="hljs-keyword">if</span> vector[h]
+                [
+                  [(i + <span class="hljs-number">2</span>), n, <span class="hljs-number">0</span>]
+                ]
+              <span class="hljs-keyword">else</span>
+                <span class="hljs-literal">null</span>
+            <span class="hljs-keyword">else</span> <span class="hljs-comment"># h == w</span>
+              <span class="hljs-literal">null</span>
+
+      <span class="hljs-keyword">when</span> <span class="hljs-string">'merge_and_split'</span> <span class="hljs-keyword">then</span> <span class="hljs-function"><span class="hljs-params">(n)</span> =&gt;</span>
+        <span class="hljs-function"><span class="hljs-params">([i,e,s], vector, offset)</span> =&gt;</span>
+          h = i - offset; w = vector.length
+          <span class="hljs-keyword">if</span> e == <span class="hljs-number">0</span> &lt; n
+            <span class="hljs-keyword">if</span> h &lt;= w - <span class="hljs-number">2</span>
+              <span class="hljs-keyword">if</span> vector[h]
+                [
+                  [(i + <span class="hljs-number">1</span>), e, <span class="hljs-number">0</span>]
+                ]
+              <span class="hljs-keyword">else</span>
+                [
+                  [i, (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+                  [i, (e + <span class="hljs-number">1</span>), <span class="hljs-number">1</span>] <span class="hljs-comment"># s-position</span>
+                  [(i + <span class="hljs-number">1</span>), (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+                  [(i + <span class="hljs-number">2</span>), (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+                ]
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> h == w - <span class="hljs-number">1</span>
+              <span class="hljs-keyword">if</span> vector[h]
+                [
+                  [(i + <span class="hljs-number">1</span>), e, <span class="hljs-number">0</span>]
+                ]
+              <span class="hljs-keyword">else</span>
+                [
+                  [i, (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+                  [i, (e + <span class="hljs-number">1</span>), <span class="hljs-number">1</span>] <span class="hljs-comment"># s-position</span>
+                  [(i + <span class="hljs-number">1</span>), (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+                ]
+            <span class="hljs-keyword">else</span> <span class="hljs-comment"># h == w</span>
+              [
+                [i, (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+              ]
+          <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> e &lt; n
+            <span class="hljs-keyword">if</span> h &lt;= w - <span class="hljs-number">2</span>
+              <span class="hljs-keyword">if</span> s <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+                <span class="hljs-keyword">if</span> vector[h]
+                  [
+                    [(i + <span class="hljs-number">1</span>), e, <span class="hljs-number">0</span>]
+                  ]
+                <span class="hljs-keyword">else</span>
+                  [
+                    [i, (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+                    [i, (e + <span class="hljs-number">1</span>), <span class="hljs-number">1</span>] <span class="hljs-comment"># s-position</span>
+                    [(i + <span class="hljs-number">1</span>), (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+                    [(i + <span class="hljs-number">2</span>), (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+                  ]
+              <span class="hljs-keyword">else</span> <span class="hljs-comment"># [i,e] is an s-position</span>
+                [
+                  [(i + <span class="hljs-number">1</span>), e, <span class="hljs-number">0</span>]
+                ]
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> h == w - <span class="hljs-number">1</span>
+              <span class="hljs-keyword">if</span> s <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+                <span class="hljs-keyword">if</span> vector[h]
+                  [
+                    [(i + <span class="hljs-number">1</span>), e, <span class="hljs-number">0</span>]
+                  ]
+                <span class="hljs-keyword">else</span>
+                  [
+                    [i, (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+                    [i, (e + <span class="hljs-number">1</span>), <span class="hljs-number">1</span>] <span class="hljs-comment"># s-position</span>
+                    [(i + <span class="hljs-number">1</span>), (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+                  ]
+              <span class="hljs-keyword">else</span> <span class="hljs-comment"># [i,e] is an s-position</span>
+                [
+                  [(i + <span class="hljs-number">1</span>), e, <span class="hljs-number">0</span>]
+                ]
+            <span class="hljs-keyword">else</span> <span class="hljs-comment"># h == w</span>
+              [
+                [i, (e + <span class="hljs-number">1</span>), <span class="hljs-number">0</span>]
+              ]
+          <span class="hljs-keyword">else</span>
+            <span class="hljs-keyword">if</span> h &lt;= w - <span class="hljs-number">1</span>
+              <span class="hljs-keyword">if</span> s <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+                <span class="hljs-keyword">if</span> vector[h]
+                  [
+                    [(i + <span class="hljs-number">1</span>), n, <span class="hljs-number">0</span>]
+                  ]
+                <span class="hljs-keyword">else</span>
+                  <span class="hljs-literal">null</span>
+              <span class="hljs-keyword">else</span> <span class="hljs-comment"># [i,e] is an s-position</span>
+                [
+                  [(i + <span class="hljs-number">1</span>), e, <span class="hljs-number">0</span>]
+                ]
+            <span class="hljs-keyword">else</span> <span class="hljs-comment"># h == w</span>
+              <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>Given two positions [i,e] and [j,f], for [i,e] to subsume [j,f], it must be
+the case that e &lt; f.  Therefore, I can remove a redundant check for (e &lt; f)
+within the subsumes method by finding the first index that contains a
+position having an error greater than the current one (assuming that the
+positions are sorted in ascending order, according to error).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_bisect_error_right</span>: <span class="hljs-function"><span class="hljs-params">(state, e, l)</span> -&gt;</span>
+    u = state.length
+    <span class="hljs-keyword">while</span> l &lt; u
+      i = (l + u) &gt;&gt; <span class="hljs-number">1</span>
+      <span class="hljs-keyword">if</span> e &lt; state[i][<span class="hljs-number">1</span>]
+        u = i
+      <span class="hljs-keyword">else</span>
+        l = i + <span class="hljs-number">1</span>
+    <span class="hljs-keyword">return</span> l</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>Removes all subsumed positions from a state</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_unsubsume</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span>
+    subsumes = <span class="hljs-property">@_subsumes</span>()
+    bisect_error_right = <span class="hljs-property">@_bisect_error_right</span>
+    <span class="hljs-keyword">switch</span> @[<span class="hljs-string">'_algorithm'</span>]
+      <span class="hljs-keyword">when</span> <span class="hljs-string">'standard'</span>
+        <span class="hljs-function"><span class="hljs-params">(state)</span> -&gt;</span>
+          m = <span class="hljs-number">0</span>
+          <span class="hljs-keyword">while</span> x = state[m]
+            [i,e] = x; n = bisect_error_right(state, e, m)
+            <span class="hljs-keyword">while</span> y = state[n]
+              [j,f] = y
+              <span class="hljs-keyword">if</span> subsumes(i,e, j,f)
+                state.splice(n,<span class="hljs-number">1</span>)
+              <span class="hljs-keyword">else</span>
+                n += <span class="hljs-number">1</span>
+            m += <span class="hljs-number">1</span>
+          <span class="hljs-keyword">return</span>
+      <span class="hljs-keyword">when</span> <span class="hljs-string">'transposition'</span>
+        <span class="hljs-function"><span class="hljs-params">(state)</span> -&gt;</span>
+          m = <span class="hljs-number">0</span>
+          <span class="hljs-keyword">while</span> x = state[m]
+            [i,e,s] = x; n = bisect_error_right(state, e, m)
+            <span class="hljs-keyword">while</span> y = state[n]
+              [j,f,t] = y
+              <span class="hljs-keyword">if</span> subsumes(i,e,s, j,f,t, n)
+                state.splice(n,<span class="hljs-number">1</span>)
+              <span class="hljs-keyword">else</span>
+                n += <span class="hljs-number">1</span>
+            m += <span class="hljs-number">1</span>
+          <span class="hljs-keyword">return</span>
+      <span class="hljs-keyword">when</span> <span class="hljs-string">'merge_and_split'</span>
+        <span class="hljs-function"><span class="hljs-params">(state)</span> -&gt;</span>
+          m = <span class="hljs-number">0</span>
+          <span class="hljs-keyword">while</span> x = state[m]
+            [i,e,s] = x; n = bisect_error_right(state, e, m)
+            <span class="hljs-keyword">while</span> y = state[n]
+              [j,f,t] = y
+              <span class="hljs-keyword">if</span> subsumes(i,e,s, j,f,t, n)
+                state.splice(n,<span class="hljs-number">1</span>)
+              <span class="hljs-keyword">else</span>
+                n += <span class="hljs-number">1</span>
+            m += <span class="hljs-number">1</span>
+          <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>NOTE: See my comment above bisect_error_right(state,e,l) and how I am using
+it in _unsubsume for why I am not checking (e &lt; f) below.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_subsumes</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    <span class="hljs-keyword">switch</span> @[<span class="hljs-string">'_algorithm'</span>]
+      <span class="hljs-keyword">when</span> <span class="hljs-string">'standard'</span> <span class="hljs-keyword">then</span> <span class="hljs-function"><span class="hljs-params">(i,e, j,f)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>(e &lt; f) &amp;&amp; Math.abs(j - i) &lt;= (f - e)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        ((i &lt; j) &amp;&amp; (j - i) || (i - j)) &lt;= (f - e)
+      <span class="hljs-keyword">when</span> <span class="hljs-string">'transposition'</span> <span class="hljs-keyword">then</span> <span class="hljs-function"><span class="hljs-params">(i,e,s, j,f,t, n)</span> -&gt;</span>
+        <span class="hljs-keyword">if</span> s <span class="hljs-keyword">is</span> <span class="hljs-number">1</span>
+          <span class="hljs-keyword">if</span> t <span class="hljs-keyword">is</span> <span class="hljs-number">1</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>(e &lt; f) &amp;&amp; (i == j)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            (i == j)
+          <span class="hljs-keyword">else</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>(e &lt; f == n) &amp;&amp; (i == j)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            (f == n) &amp;&amp; (i == j)
+        <span class="hljs-keyword">else</span>
+          <span class="hljs-keyword">if</span> t <span class="hljs-keyword">is</span> <span class="hljs-number">1</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>(e &lt; f) &amp;&amp; Math.abs(j - (i - 1)) &lt;= (f - e)</p>
+<p>NOTE: This is how I derived what follows:
+  Math.abs(j - (i - 1)) = Math.abs(j - i + 1) = Math.abs(j - i) + 1</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            ((i &lt; j) &amp;&amp; (j - i) || (i - j)) + <span class="hljs-number">1</span> &lt;= (f - e)
+          <span class="hljs-keyword">else</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>(e &lt; f) &amp;&amp; Math.abs(j - i) &lt;= (f - e)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            ((i &lt; j) &amp;&amp; (j - i) || (i - j)) &lt;= (f - e)
+      <span class="hljs-keyword">when</span> <span class="hljs-string">'merge_and_split'</span> <span class="hljs-keyword">then</span><span class="hljs-function"><span class="hljs-params">(i,e,s, j,f,t)</span> -&gt;</span>
+        <span class="hljs-keyword">if</span> s <span class="hljs-keyword">is</span> <span class="hljs-number">1</span> <span class="hljs-keyword">and</span> t <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+          <span class="hljs-literal">false</span>
+        <span class="hljs-keyword">else</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>(e &lt; f) &amp;&amp; Math.abs(j - i) &lt;= (f - e)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          ((i &lt; j) &amp;&amp; (j - i) || (i - j)) &lt;= (f - e)
+
+  <span class="hljs-attribute">_bisect_left</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> @[<span class="hljs-string">'_algorithm'</span>]
+      <span class="hljs-function"><span class="hljs-params">(state, position)</span> -&gt;</span>
+        [i,e] = position; l = <span class="hljs-number">0</span>; u = state.length
+        <span class="hljs-keyword">while</span> l &lt; u
+          k = (l + u) &gt;&gt; <span class="hljs-number">1</span>
+          p = state[k]
+          <span class="hljs-keyword">if</span> (e - p[<span class="hljs-number">1</span>] || i - p[<span class="hljs-number">0</span>]) &gt; <span class="hljs-number">0</span>
+            l = k + <span class="hljs-number">1</span>
+          <span class="hljs-keyword">else</span>
+            u = k
+        <span class="hljs-keyword">return</span> l
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-function"><span class="hljs-params">(state, position)</span> -&gt;</span>
+        [i,e,x] = position; l = <span class="hljs-number">0</span>; u = state.length
+        <span class="hljs-keyword">while</span> l &lt; u
+          k = (l + u) &gt;&gt; <span class="hljs-number">1</span>
+          p = state[k]
+          <span class="hljs-keyword">if</span> (e - p[<span class="hljs-number">1</span>] || i - p[<span class="hljs-number">0</span>] || x - p[<span class="hljs-number">2</span>]) &gt; <span class="hljs-number">0</span>
+            l = k + <span class="hljs-number">1</span>
+          <span class="hljs-keyword">else</span>
+            u = k
+        <span class="hljs-keyword">return</span> l</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>Merges the positions of next_state into state_prime, in a
+subsumption-friendly manner.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">_merge_for_subsumption</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    bisect_left = <span class="hljs-property">@_bisect_left</span>()
+    <span class="hljs-keyword">if</span> @[<span class="hljs-string">'_algorithm'</span>] <span class="hljs-keyword">is</span> <span class="hljs-string">'standard'</span>
+      <span class="hljs-function"><span class="hljs-params">(state_prime, next_state)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>Order according to error first, then boundary (both ascending).
+While sorting the elements, remove any duplicates.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">for</span> position <span class="hljs-keyword">in</span> next_state
+          i = bisect_left(state_prime, position)
+          <span class="hljs-keyword">if</span> curr = state_prime[i]
+            <span class="hljs-keyword">if</span> curr[<span class="hljs-number">0</span>] != position[<span class="hljs-number">0</span>] || curr[<span class="hljs-number">1</span>] != position[<span class="hljs-number">1</span>]
+              state_prime.splice(i, <span class="hljs-number">0</span>, position)
+          <span class="hljs-keyword">else</span>
+            state_prime.push(position)
+        <span class="hljs-keyword">return</span>
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-function"><span class="hljs-params">(state_prime, next_state)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>Order according to error first, then boundary (both ascending).
+While sorting the elements, remove any duplicates.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">for</span> position <span class="hljs-keyword">in</span> next_state
+          i = bisect_left(state_prime, position)
+          <span class="hljs-keyword">if</span> curr = state_prime[i]
+            <span class="hljs-keyword">if</span> curr[<span class="hljs-number">0</span>] != position[<span class="hljs-number">0</span>] || curr[<span class="hljs-number">1</span>] != position[<span class="hljs-number">1</span>] || curr[<span class="hljs-number">2</span>] != position[<span class="hljs-number">2</span>]
+              state_prime.splice(i, <span class="hljs-number">0</span>, position)
+          <span class="hljs-keyword">else</span>
+            state_prime.push(position)
+        <span class="hljs-keyword">return</span>
+
+  <span class="hljs-attribute">_transition_for_state</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    merge_for_subsumption = <span class="hljs-property">@_merge_for_subsumption</span>()
+    unsubsume = <span class="hljs-property">@_unsubsume</span>()
+    transition_for_position = <span class="hljs-property">@_transition_for_position</span>()
+    sort_for_transition = <span class="hljs-property">@_sort_for_transition</span>()
+    <span class="hljs-function"><span class="hljs-params">(n)</span> -&gt;</span>
+      transition = transition_for_position(n)
+      <span class="hljs-function"><span class="hljs-params">(state, vector)</span> =&gt;</span>
+        offset = state[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]; state_prime = []
+
+        <span class="hljs-keyword">for</span> position <span class="hljs-keyword">in</span> state
+          next_state = transition(position, vector, offset)
+          <span class="hljs-keyword">continue</span> <span class="hljs-keyword">unless</span> next_state
+          merge_for_subsumption(state_prime, next_state)
+        unsubsume(state_prime)
+
+        <span class="hljs-keyword">if</span> state_prime.length &gt; <span class="hljs-number">0</span>
+          sort_for_transition(state_prime)
+          state_prime
+        <span class="hljs-keyword">else</span>
+          <span class="hljs-literal">null</span>
+
+  <span class="hljs-attribute">_characteristic_vector</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    <span class="hljs-function"><span class="hljs-params">(x, term, k, i)</span> -&gt;</span>
+      vector = []; j = <span class="hljs-number">0</span>
+      <span class="hljs-keyword">while</span> j &lt; k
+        vector.push(x <span class="hljs-keyword">is</span> term[i + j])
+        j += <span class="hljs-number">1</span>
+      vector
+
+  <span class="hljs-attribute">_push</span>: <span class="hljs-function"><span class="hljs-params">(compare)</span> -&gt;</span>
+    maximum_candidates = @[<span class="hljs-string">'_maximum_candidates'</span>]
+    <span class="hljs-keyword">if</span> isFinite maximum_candidates
+      <span class="hljs-function"><span class="hljs-params">(candidates, candidate)</span> -&gt;</span>
+        <span class="hljs-keyword">if</span> candidates.length <span class="hljs-keyword">is</span> maximum_candidates</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>We are maintaining a max-heap so that the element furthest from the
+query term will be on the top.  If the new candidate is closer to
+the query term then it should replace the old one.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">if</span> compare(candidate, candidates[<span class="hljs-string">'peek'</span>]()) &lt; <span class="hljs-number">0</span>
+            candidates[<span class="hljs-string">'pop'</span>]()
+            candidates.push(candidate)
+        <span class="hljs-keyword">else</span>
+          candidates.push(candidate)
+        candidates
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-function"><span class="hljs-params">(candidates, candidate)</span> -&gt;</span>
+        candidates.push(candidate)
+        candidates
+
+  <span class="hljs-string">'transducer'</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    comparator = <span class="hljs-property">@_comparator</span>()
+    <span class="hljs-keyword">new</span> Transducer({
+      <span class="hljs-string">'minimum_distance'</span>: <span class="hljs-property">@_minimum_distance</span>()
+      <span class="hljs-string">'build_matches'</span>: <span class="hljs-keyword">do</span><span class="hljs-function"> =&gt;</span>
+        <span class="hljs-keyword">if</span> isFinite @[<span class="hljs-string">'_maximum_candidates'</span>]
+          <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span> <span class="hljs-keyword">new</span> MaxHeap(comparator)
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> @[<span class="hljs-string">'_sort_candidates'</span>]
+          <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span> <span class="hljs-keyword">new</span> MaxHeap <span class="hljs-function"><span class="hljs-params">(a,b)</span> -&gt;</span> - comparator(a,b)
+        <span class="hljs-keyword">else</span>
+          <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span> []
+      <span class="hljs-string">'transition_for_state'</span>: <span class="hljs-property">@_transition_for_state</span>()
+      <span class="hljs-string">'characteristic_vector'</span>: <span class="hljs-property">@_characteristic_vector</span>()
+      <span class="hljs-string">'edges'</span>: <span class="hljs-function"><span class="hljs-params">(dawg_node)</span> -&gt;</span> dawg_node[<span class="hljs-string">'edges'</span>]
+      <span class="hljs-string">'is_final'</span>: <span class="hljs-function"><span class="hljs-params">(dawg_node)</span> -&gt;</span> dawg_node[<span class="hljs-string">'is_final'</span>]
+      <span class="hljs-string">'root'</span>: <span class="hljs-keyword">do</span> <span class="hljs-function"><span class="hljs-params">(dawg = @[<span class="hljs-string">'_dictionary'</span>])</span> -&gt;</span>
+        <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span> dawg[<span class="hljs-string">'root'</span>]
+      <span class="hljs-string">'initial_state'</span>: <span class="hljs-keyword">do</span> <span class="hljs-function"><span class="hljs-params">(initial_state=<span class="hljs-property">@_initial_state</span>())</span> -&gt;</span>
+        <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> initial_state
+      <span class="hljs-string">'push'</span>: <span class="hljs-property">@_push</span>(comparator)
+      <span class="hljs-string">'transform'</span>: <span class="hljs-property">@_transform</span>(comparator)
+    })
+
+<span class="hljs-built_in">global</span>[<span class="hljs-string">'levenshtein'</span>][<span class="hljs-string">'Builder'</span>] = Builder</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

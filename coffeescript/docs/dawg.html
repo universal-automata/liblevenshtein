@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>dawg.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="dawg.html">
+                dawg.coffee
+              </a>
+            
+              
+              <a class="source" href="max-heap.html">
+                max-heap.coffee
+              </a>
+            
+              
+              <a class="source" href="builder.html">
+                builder.coffee
+              </a>
+            
+              
+              <a class="source" href="distance.html">
+                distance.coffee
+              </a>
+            
+              
+              <a class="source" href="transducer.html">
+                transducer.coffee
+              </a>
+            
+              
+              <a class="source" href="mutate.html">
+                mutate.coffee
+              </a>
+            
+              
+              <a class="source" href="operations.html">
+                operations.coffee
+              </a>
+            
+              
+              <a class="source" href="permutations.html">
+                permutations.coffee
+              </a>
+            
+              
+              <a class="source" href="truth-table.html">
+                truth-table.coffee
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>dawg.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <p>============================================================================</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Taken and modified for my purposes from the following source:</p>
+<h1 id="-o-http-stevehanov-ca-blog-index-php-id-115"> o <a href="http://stevehanov.ca/blog/index.php?id=115">http://stevehanov.ca/blog/index.php?id=115</a></h1>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>This class represents a node in the directed acyclic word graph (DAWG,
+a.k.a.  Minimal Acyclic Finite State Automaton, or MA-FSA).  It has a list
+of edges to other nodes.  It has functions for testing whether it is
+equivalent to another node.  Nodes are equivalent if they have identical
+edges, and each identical edge leads to identical states.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DawgNode</span></span>
+  <span class="hljs-property">@next_id</span> = <span class="hljs-number">0</span>
+
+  <span class="hljs-attribute">constructor</span>:<span class="hljs-function"> -&gt;</span>
+    <span class="hljs-property">@id</span> = DawgNode.next_id; DawgNode.next_id += <span class="hljs-number">1</span>
+    @[<span class="hljs-string">'is_final'</span>] = <span class="hljs-literal">false</span>
+    @[<span class="hljs-string">'edges'</span>] = {}
+
+  <span class="hljs-attribute">bisect_left</span>: <span class="hljs-function"><span class="hljs-params">(edges, edge, lower, upper)</span> -&gt;</span>
+    <span class="hljs-keyword">while</span> lower &lt; upper
+      i = (lower + upper) &gt;&gt; <span class="hljs-number">1</span>
+      <span class="hljs-keyword">if</span> edges[i] &lt; edge
+        lower = i + <span class="hljs-number">1</span>
+      <span class="hljs-keyword">else</span>
+        upper = i
+    <span class="hljs-keyword">return</span> lower
+
+  <span class="hljs-string">'toString'</span>:<span class="hljs-function"> -&gt;</span>
+    edges = []
+    <span class="hljs-keyword">for</span> label, node <span class="hljs-keyword">of</span> @[<span class="hljs-string">'edges'</span>] <span class="hljs-comment"># insertion sort</span>
+      edge = label + node.id.toString()
+      edges.splice(<span class="hljs-property">@bisect_left</span>(edges, edge, <span class="hljs-number">0</span>, edges.length), <span class="hljs-number">0</span>, edge)
+    (+ @[<span class="hljs-string">'is_final'</span>]) + edges.join(<span class="hljs-string">''</span>)
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Dawg</span></span>
+  <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(dictionary)</span> -&gt;</span>
+    <span class="hljs-keyword">unless</span> dictionary <span class="hljs-keyword">and</span> <span class="hljs-keyword">typeof</span> dictionary.length <span class="hljs-keyword">is</span> <span class="hljs-string">'number'</span>
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"Expected dictionary to be array-like"</span>)
+
+    <span class="hljs-property">@previous_word</span> = <span class="hljs-string">''</span>
+    @[<span class="hljs-string">'root'</span>] = <span class="hljs-keyword">new</span> DawgNode()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Here is a list of nodes that have not been checked for duplication.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@unchecked_nodes</span> = []</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Here is a list of unique nodes that have been checked for duplication.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@minimized_nodes</span> = {}
+
+    @[<span class="hljs-string">'insert'</span>](word) <span class="hljs-keyword">for</span> word <span class="hljs-keyword">in</span> dictionary
+    <span class="hljs-property">@finish</span>()
+
+  <span class="hljs-string">'insert'</span>: <span class="hljs-function"><span class="hljs-params">(word)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Find longest common prefix between word and previous word</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    i = <span class="hljs-number">0</span>; previous_word = <span class="hljs-property">@previous_word</span>
+
+    upper_bound =
+      <span class="hljs-keyword">if</span> word.length &lt; previous_word.length
+        word.length
+      <span class="hljs-keyword">else</span>
+        previous_word.length
+
+    i += <span class="hljs-number">1</span> <span class="hljs-keyword">while</span> i &lt; upper_bound <span class="hljs-keyword">and</span> word[i] <span class="hljs-keyword">is</span> previous_word[i]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Check the unchecked_nodes for redundant nodes, proceeding from last one
+down to the common prefix size.  Then truncate the list at that point.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@minimize</span>(i)
+    unchecked_nodes = <span class="hljs-property">@unchecked_nodes</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Add the suffix, starting from the correct node mid-way through the graph.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> unchecked_nodes.length <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+      node = @[<span class="hljs-string">'root'</span>]
+    <span class="hljs-keyword">else</span>
+      node = unchecked_nodes[unchecked_nodes.length - <span class="hljs-number">1</span>][<span class="hljs-number">2</span>]
+
+    <span class="hljs-keyword">while</span> (character = word[i]) <span class="hljs-keyword">isnt</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
+      next_node = <span class="hljs-keyword">new</span> DawgNode()
+      node[<span class="hljs-string">'edges'</span>][character] = next_node
+      unchecked_nodes.push([node, character, next_node])
+      node = next_node
+      i += <span class="hljs-number">1</span>
+
+    node[<span class="hljs-string">'is_final'</span>] = <span class="hljs-literal">true</span>
+    <span class="hljs-property">@previous_word</span> = word
+    <span class="hljs-keyword">return</span>
+
+  <span class="hljs-attribute">finish</span>:<span class="hljs-function"> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>minimize all unchecked_nodes</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-property">@minimize</span>(<span class="hljs-number">0</span>)
+    <span class="hljs-keyword">return</span>
+
+  <span class="hljs-attribute">minimize</span>: <span class="hljs-function"><span class="hljs-params">(lower_bound)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>proceed from the leaf up to a certain point</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    minimized_nodes = <span class="hljs-property">@minimized_nodes</span>
+    unchecked_nodes = <span class="hljs-property">@unchecked_nodes</span>
+
+    j = unchecked_nodes.length
+    <span class="hljs-keyword">while</span> j &gt; lower_bound
+      [parent, character, child] = unchecked_nodes.pop()
+      child_key = child.toString()
+      <span class="hljs-keyword">if</span> child_key <span class="hljs-keyword">of</span> minimized_nodes</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>replace the child with the previously encountered one</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        parent[<span class="hljs-string">'edges'</span>][character] = minimized_nodes[child_key]
+      <span class="hljs-keyword">else</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>add the state to the minimized nodes</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        minimized_nodes[child_key] = child
+      j -= <span class="hljs-number">1</span>
+    <span class="hljs-keyword">return</span>
+
+  <span class="hljs-string">'accepts'</span>: <span class="hljs-function"><span class="hljs-params">(word)</span> -&gt;</span>
+    node = @[<span class="hljs-string">'root'</span>]
+    <span class="hljs-keyword">for</span> edge <span class="hljs-keyword">in</span> word
+      node = node[<span class="hljs-string">'edges'</span>][edge]
+      <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">unless</span> node
+    node[<span class="hljs-string">'is_final'</span>]
+
+<span class="hljs-built_in">global</span> =
+  <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> <span class="hljs-built_in">exports</span> <span class="hljs-keyword">is</span> <span class="hljs-string">'object'</span>
+    <span class="hljs-built_in">exports</span>
+  <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> <span class="hljs-built_in">window</span> <span class="hljs-keyword">is</span> <span class="hljs-string">'object'</span>
+    <span class="hljs-built_in">window</span>
+  <span class="hljs-keyword">else</span>
+    <span class="hljs-keyword">this</span>
+
+<span class="hljs-built_in">global</span>[<span class="hljs-string">'levenshtein'</span>] ||= {}
+<span class="hljs-built_in">global</span>[<span class="hljs-string">'levenshtein'</span>][<span class="hljs-string">'DawgNode'</span>] = DawgNode
+<span class="hljs-built_in">global</span>[<span class="hljs-string">'levenshtein'</span>][<span class="hljs-string">'Dawg'</span>] = Dawg</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

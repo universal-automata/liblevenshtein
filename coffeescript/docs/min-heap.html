@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>min-heap.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="dawg.html">
+                dawg.coffee
+              </a>
+            
+              
+              <a class="source" href="min-heap.html">
+                min-heap.coffee
+              </a>
+            
+              
+              <a class="source" href="builder.html">
+                builder.coffee
+              </a>
+            
+              
+              <a class="source" href="distance.html">
+                distance.coffee
+              </a>
+            
+              
+              <a class="source" href="transducer.html">
+                transducer.coffee
+              </a>
+            
+              
+              <a class="source" href="permutations.html">
+                permutations.coffee
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>min-heap.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MinHeap</span></span>
+  <span class="hljs-attribute">parent</span>: <span class="hljs-function"><span class="hljs-params">(i)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Index of the parent of the element of A, having the index, i</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    ((i + <span class="hljs-number">1</span>) &gt;&gt; <span class="hljs-number">1</span>) - <span class="hljs-number">1</span>
+  <span class="hljs-attribute">left_child</span>: <span class="hljs-function"><span class="hljs-params">(i)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Index of the left child of the element of A, having the index, i</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    (i &lt;&lt; <span class="hljs-number">1</span>) + <span class="hljs-number">1</span>
+  <span class="hljs-attribute">right_child</span>: <span class="hljs-function"><span class="hljs-params">(i)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Index of the right child of the element of A, having the index, i</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    (i &lt;&lt; <span class="hljs-number">1</span>) + <span class="hljs-number">2</span>
+  <span class="hljs-attribute">heapify</span>: <span class="hljs-function"><span class="hljs-params">(i)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Modifies the heap array, A, such that its index, i, points to the root of
+a sub-heap.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    l = <span class="hljs-property">@left_child</span>(i)
+    r = <span class="hljs-property">@right_child</span>(i)
+    heap = <span class="hljs-property">@heap</span>
+    <span class="hljs-keyword">if</span> l &lt; @[<span class="hljs-string">'length'</span>] <span class="hljs-keyword">and</span> <span class="hljs-property">@f</span>(heap[l], heap[i]) &lt; <span class="hljs-number">0</span>
+      smallest = l
+    <span class="hljs-keyword">else</span>
+      smallest = i
+    <span class="hljs-keyword">if</span> r &lt; @[<span class="hljs-string">'length'</span>] <span class="hljs-keyword">and</span> <span class="hljs-property">@f</span>(heap[r], heap[smallest]) &lt; <span class="hljs-number">0</span>
+      smallest = r
+    <span class="hljs-keyword">if</span> smallest <span class="hljs-keyword">isnt</span> i
+      tmp = heap[i]
+      heap[i] = heap[smallest]
+      heap[smallest] = tmp
+      <span class="hljs-property">@heapify</span>(smallest)
+    <span class="hljs-literal">null</span>
+  <span class="hljs-attribute">build</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    i = @[<span class="hljs-string">'length'</span>] &gt;&gt; <span class="hljs-number">1</span>
+    <span class="hljs-keyword">while</span> i &gt;= <span class="hljs-number">0</span>
+      <span class="hljs-property">@heapify</span>(i)
+      i -= <span class="hljs-number">1</span>
+    <span class="hljs-literal">null</span>
+  <span class="hljs-string">'decrease_key'</span>: <span class="hljs-function"><span class="hljs-params">(i, key)</span> -&gt;</span>
+    f = <span class="hljs-property">@f</span>
+    heap = <span class="hljs-property">@heap</span>
+    c = f(key, heap[i])
+    <span class="hljs-keyword">if</span> c &gt; <span class="hljs-number">0</span>
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"Expected <span class="hljs-subst">#{key}</span> to be at no more than heap[<span class="hljs-subst">#{i}</span>] = <span class="hljs-subst">#{heap[i]}</span>"</span>)
+    heap[i] = key
+    parent = <span class="hljs-property">@parent</span>
+    p = parent(i)
+    <span class="hljs-keyword">while</span> i <span class="hljs-keyword">and</span> f(heap[p], heap[i]) &gt; <span class="hljs-number">0</span>
+      tmp = heap[i]
+      heap[i] = heap[p]
+      heap[p] = tmp
+      i = p
+      p = parent(i)
+    <span class="hljs-literal">null</span>
+  <span class="hljs-string">'sort'</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    <span class="hljs-property">@build</span>()
+    i = @[<span class="hljs-string">'length'</span>] - <span class="hljs-number">1</span>
+    heap = <span class="hljs-property">@heap</span>
+    <span class="hljs-keyword">while</span> i &gt;= <span class="hljs-number">0</span>
+      tmp = heap[<span class="hljs-number">0</span>]
+      heap[<span class="hljs-number">0</span>] = heap[i]
+      heap[i] = tmp
+      @[<span class="hljs-string">'length'</span>] -= <span class="hljs-number">1</span>
+      <span class="hljs-property">@heapify</span>(<span class="hljs-number">0</span>)
+      i -= <span class="hljs-number">1</span>
+    <span class="hljs-literal">null</span>
+  <span class="hljs-string">'peek'</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> @[<span class="hljs-string">'length'</span>]
+      <span class="hljs-property">@heap</span>[<span class="hljs-number">0</span>]
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-literal">null</span>
+  <span class="hljs-string">'pop'</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> @[<span class="hljs-string">'length'</span>]
+      heap = <span class="hljs-property">@heap</span>
+      max = heap[<span class="hljs-number">0</span>]
+      heap[<span class="hljs-number">0</span>] = heap[@[<span class="hljs-string">'length'</span>] - <span class="hljs-number">1</span>]
+      @[<span class="hljs-string">'length'</span>] -= <span class="hljs-number">1</span>
+      <span class="hljs-property">@heapify</span>(<span class="hljs-number">0</span>)
+      max
+    <span class="hljs-keyword">else</span>
+      <span class="hljs-literal">null</span>
+  <span class="hljs-string">'push'</span>: <span class="hljs-function"><span class="hljs-params">(key)</span> -&gt;</span>
+    i = @[<span class="hljs-string">'length'</span>]
+    @[<span class="hljs-string">'length'</span>] += <span class="hljs-number">1</span>
+    parent = <span class="hljs-property">@parent</span>
+    p = parent(i)
+    heap = <span class="hljs-property">@heap</span>
+    f = <span class="hljs-property">@f</span>
+    <span class="hljs-keyword">while</span> i &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> f(heap[p], key) &gt; <span class="hljs-number">0</span>
+      heap[i] = heap[p]
+      i = p
+      p = parent(i)
+    heap[i] = key
+    <span class="hljs-literal">null</span>
+  <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(f, heap, length)</span> -&gt;</span>
+    heap = [] <span class="hljs-keyword">unless</span> heap
+    <span class="hljs-keyword">unless</span> <span class="hljs-keyword">typeof</span> heap.length <span class="hljs-keyword">is</span> <span class="hljs-string">'number'</span>
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"heap must be array-like"</span>)
+    <span class="hljs-keyword">unless</span> <span class="hljs-keyword">typeof</span> length <span class="hljs-keyword">is</span> <span class="hljs-string">'number'</span>
+      length = <span class="hljs-keyword">if</span> heap <span class="hljs-keyword">then</span> heap.length <span class="hljs-keyword">else</span> <span class="hljs-number">0</span>
+    <span class="hljs-keyword">unless</span> <span class="hljs-keyword">typeof</span> f <span class="hljs-keyword">is</span> <span class="hljs-string">'function'</span>
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"f must be a function"</span>)
+    <span class="hljs-keyword">unless</span> <span class="hljs-number">0</span> &lt;= length &lt;= heap.length
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"Expected 0 &lt;= heap length = <span class="hljs-subst">#{length}</span> &lt;= <span class="hljs-subst">#{heap.length}</span> = heap size"</span>)
+    <span class="hljs-property">@f</span> = f
+    <span class="hljs-property">@heap</span> = heap
+    @[<span class="hljs-string">'length'</span>] = length
+    <span class="hljs-property">@build</span>()
+
+<span class="hljs-built_in">global</span> =
+  <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> <span class="hljs-built_in">exports</span> <span class="hljs-keyword">is</span> <span class="hljs-string">'object'</span>
+    <span class="hljs-built_in">exports</span>
+  <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> <span class="hljs-built_in">window</span> <span class="hljs-keyword">is</span> <span class="hljs-string">'object'</span>
+    <span class="hljs-built_in">window</span>
+  <span class="hljs-keyword">else</span>
+    <span class="hljs-keyword">this</span>
+
+<span class="hljs-built_in">global</span>[<span class="hljs-string">'levenshtein'</span>] ||= {}
+<span class="hljs-built_in">global</span>[<span class="hljs-string">'levenshtein'</span>][<span class="hljs-string">'MinHeap'</span>] = MinHeap</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
