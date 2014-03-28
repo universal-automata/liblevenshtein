@@ -36,85 +36,21 @@ fields =
   # Custom transform for spelling candidates (optional). This should be an
   # arity-1 function that accepts a pair of ["term", distance] values.
   '_custom_transform': null
+  # Maximum number of spelling errors that are tollerated. This can be
+  # overridden with the second parameter to Transducer.transduce(term, n)
+  '_maximum_edit_distance': Infinity
 
 class Builder
-  constructor: (source=fields) ->
-    for own field of fields
-      this[field] = source[field]
+  constructor: (source) ->
+    if source instanceof Builder
+      for own field of fields
+        this[field] = source[field]
 
   _build: (attributes) ->
     builder = new Builder(this)
     for own attribute, value of attributes
       builder['_' + attribute] = value
     builder
-
-  'dictionary': (dictionary, sorted) ->
-    if dictionary is `undefined`
-      @['_dictionary']
-    else
-      unless dictionary instanceof Array or dictionary instanceof Dawg
-        throw new Error('dictionary must be either an Array or Dawg')
-      if dictionary instanceof Array
-        dictionary.sort() unless sorted
-        dictionary = new Dawg(dictionary)
-      @_build('dictionary': dictionary)
-
-  'algorithm': (algorithm) ->
-    if algorithm is `undefined`
-      @['_algorithm']
-    else
-      unless algorithm in ['standard', 'transposition', 'merge_and_split']
-        throw new Error(
-          'algorithm must be standard, transposition, or merge_and_split')
-      @_build('algorithm': algorithm)
-
-  'sort_candidates': (sort_candidates) ->
-    if sort_candidates is `undefined`
-      @['_sort_candidates']
-    else
-      unless typeof sort_candidates is 'boolean'
-        throw new Error('sort_candidates must be a boolean')
-      @_build('sort_candidates': sort_candidates)
-
-  'case_insensitive_sort': (case_insensitive_sort) ->
-    if case_insensitive_sort is `undefined`
-      @['_case_insensitive_sort']
-    else
-      unless typeof case_insensitive_sort is 'boolean'
-        throw new Error('case_insensitive_sort must be a boolean')
-      @_build('case_insensitive_sort': case_insensitive_sort)
-
-  'include_distance': (include_distance) ->
-    if include_distance is `undefined`
-      @['_include_distance']
-    else
-      unless typeof include_distance is 'boolean'
-        throw new Error('include_distance must be a boolean')
-      @_build('include_distance': include_distance)
-
-  'maximum_candidates': (maximum_candidates) ->
-    if maximum_candidates is `undefined`
-      @['_maximum_candidates']
-    else
-      if maximum_candidates < 0
-        throw new Error("maximum_candidates must be non-negative")
-      @_build('maximum_candidates': maximum_candidates)
-
-  'custom_comparator': (custom_comparator) ->
-    if custom_comparator is `undefined`
-      @['_custom_comparator']
-    else
-      if typeof custom_comparator isnt 'function'
-        throw new Error('Expected custom_comparator to be a function')
-      @_build('custom_comparator': custom_comparator)
-
-  'custom_transform': (custom_transform) ->
-    if custom_transform is `undefined`
-      @['_custom_transform']
-    else
-      if typeof custom_transform isnt 'function'
-        throw new Error('Expected custom_transform to be a function')
-      @_build('custom_transform': custom_transform)
 
   # The distance of each position in a state can be defined as follows:
   #
@@ -676,6 +612,78 @@ class Builder
       'transform': @_transform(comparator)
     })
 
-  'transducer': () -> @build()
+  'transducer': () -> @['build']()
+
+# Initialize the default, property values
+for own property, value of fields
+  Builder::[property] = value
+
+# Performs no operation
+noop = () -> return
+# Identity function: returns whatever you give it
+identity = (x) -> x
+
+def_property = def_properties = (properties, params; property, i) ->
+  [validate, translate] = [params['validate'], params['translate']]
+  if typeof properties is 'string'
+    properties = [properties]
+  unless properties instanceof Array
+    throw new Error('Expected "properties" to be of type Array')
+  if validate isnt `undefined` and typeof validate isnt 'function'
+    throw new Error('Expected "validate" to be of type Function')
+  if translate isnt `undefined` and typeof translate isnt 'function'
+    throw new Error('Expected "translate" to be of type Function')
+
+  validate ||= noop
+  translate ||= identity
+
+  for property, i in properties
+    if typeof property isnt 'string'
+      throw new Error(
+        "Expected property at index #{i} of properties to be of type String")
+    do (property) ->
+      field = '_' + property
+      Builder::[property] =
+        (value, opts...) ->
+          if value is `undefined`
+            @[field]
+          else
+            validate(value, opts, property)
+            value = translate(value, opts, property)
+            attributes = {}
+            attributes[property] = value
+            @_build(attributes)
+  true
+
+def_property 'dictionary',
+  'validate': (dictionary) ->
+    unless dictionary instanceof Array or dictionary instanceof Dawg
+      throw new Error('dictionary must be either an Array or Dawg')
+  'translate': (dictionary, [sorted]) ->
+    if dictionary instanceof Array
+      dictionary.sort() unless sorted is true
+      dictionary = new Dawg(dictionary)
+    dictionary
+
+def_property 'algorithm',
+  'validate': (algorithm) ->
+    unless algorithm in ['standard', 'transposition', 'merge_and_split']
+      throw new Error(
+        'algorithm must be standard, transposition, or merge_and_split')
+
+def_properties ['sort_candidates', 'case_insensitive_sort', 'include_distance'],
+  'validate': (value, _, property) ->
+    unless typeof value is 'boolean'
+      throw new Error("Expected type of \"#{property}\" to be boolean")
+
+def_properties ['maximum_candidates', 'maximum_edit_distance'],
+  'validate': (value, _, property) ->
+    unless typeof value is 'number' and 0 <= value
+      throw new Error("Expected \"#{property}\" to be a non-negative number")
+
+def_properties ['custom_comparator', 'custom_transform'],
+  'validate': (value, _, property) ->
+    unless typeof value is 'function'
+      throw new Error("Expected \"#{property}\" to be a function")
 
 global['levenshtein']['Builder'] = Builder

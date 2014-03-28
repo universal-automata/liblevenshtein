@@ -47,6 +47,10 @@ test_builder = (test, property_values, truths, builder=new Builder(), i=0) ->
       params = (builder[property]() for [property, values] in property_values)
       test.ok fail,
         "Expected builder.build() to return an instance of Transducer for #{params}"
+    unless builder.transducer() instanceof Transducer
+      params = (builder[property]() for [property, values] in property_values)
+      test.ok fail,
+        "Expected builder.transducer() to return an instance of Transducer for #{params}"
 
 test_candidates = (test, terms, term, n, transducer, distance, algorithm) ->
   candidates = transducer.transduce(term, n)
@@ -60,7 +64,6 @@ test_candidates = (test, terms, term, n, transducer, distance, algorithm) ->
       test.ok false,
         "For algorithm=#{algorithm}, the transduced distance, #{d}, is "+
         "greater than the threshold, #{n}!"
-      throw new Error("Bam!")
   num_candidates = 0
   num_candidates += distance(term, candidate) <= n for candidate in terms
   if candidates.length isnt num_candidates
@@ -123,7 +126,11 @@ module.exports =
       [1.0, (term) -> split(term, alphabet, random)]
     ]
 
-    builder = new Builder().dictionary(dawg).sort_candidates(false)
+    builder = new Builder()
+      .dictionary(dawg)
+      .sort_candidates(false)
+      .include_distance(true)
+
     transducers =
       standard: [
         builder.algorithm('standard').build()
