@@ -2,7 +2,7 @@
   "name": "liblevenshtein",
   "description": "Various utilities regarding Levenshtein transducers.",
   "author": "Dylon Edwards",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "licenses": [
     {
       "type": "MIT",
