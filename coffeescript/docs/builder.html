@@ -227,86 +227,7 @@ arity-1 function that accepts a pair of [“term”, distance] values.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'_custom_transform'</span>: <span class="hljs-literal">null</span>
-
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Builder</span></span>
-  <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(source=fields)</span> -&gt;</span>
-    <span class="hljs-keyword">for</span> own field <span class="hljs-keyword">of</span> fields
-      <span class="hljs-keyword">this</span>[field] = source[field]
-
-  <span class="hljs-attribute">_build</span>: <span class="hljs-function"><span class="hljs-params">(attributes)</span> -&gt;</span>
-    builder = <span class="hljs-keyword">new</span> Builder(<span class="hljs-keyword">this</span>)
-    <span class="hljs-keyword">for</span> own attribute, value <span class="hljs-keyword">of</span> attributes
-      builder[<span class="hljs-string">'_'</span> + attribute] = value
-    builder
-
-  <span class="hljs-string">'dictionary'</span>: <span class="hljs-function"><span class="hljs-params">(dictionary, sorted)</span> -&gt;</span>
-    <span class="hljs-keyword">if</span> dictionary <span class="hljs-keyword">is</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
-      @[<span class="hljs-string">'_dictionary'</span>]
-    <span class="hljs-keyword">else</span>
-      <span class="hljs-keyword">unless</span> dictionary <span class="hljs-keyword">instanceof</span> Array <span class="hljs-keyword">or</span> dictionary <span class="hljs-keyword">instanceof</span> Dawg
-        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'dictionary must be either an Array or Dawg'</span>)
-      <span class="hljs-keyword">if</span> dictionary <span class="hljs-keyword">instanceof</span> Array
-        dictionary.sort() <span class="hljs-keyword">unless</span> sorted
-        dictionary = <span class="hljs-keyword">new</span> Dawg(dictionary)
-      <span class="hljs-property">@_build</span>(<span class="hljs-string">'dictionary'</span>: dictionary)
-
-  <span class="hljs-string">'algorithm'</span>: <span class="hljs-function"><span class="hljs-params">(algorithm)</span> -&gt;</span>
-    <span class="hljs-keyword">if</span> algorithm <span class="hljs-keyword">is</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
-      @[<span class="hljs-string">'_algorithm'</span>]
-    <span class="hljs-keyword">else</span>
-      <span class="hljs-keyword">unless</span> algorithm <span class="hljs-keyword">in</span> [<span class="hljs-string">'standard'</span>, <span class="hljs-string">'transposition'</span>, <span class="hljs-string">'merge_and_split'</span>]
-        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(
-          <span class="hljs-string">'algorithm must be standard, transposition, or merge_and_split'</span>)
-      <span class="hljs-property">@_build</span>(<span class="hljs-string">'algorithm'</span>: algorithm)
-
-  <span class="hljs-string">'sort_candidates'</span>: <span class="hljs-function"><span class="hljs-params">(sort_candidates)</span> -&gt;</span>
-    <span class="hljs-keyword">if</span> sort_candidates <span class="hljs-keyword">is</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
-      @[<span class="hljs-string">'_sort_candidates'</span>]
-    <span class="hljs-keyword">else</span>
-      <span class="hljs-keyword">unless</span> <span class="hljs-keyword">typeof</span> sort_candidates <span class="hljs-keyword">is</span> <span class="hljs-string">'boolean'</span>
-        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'sort_candidates must be a boolean'</span>)
-      <span class="hljs-property">@_build</span>(<span class="hljs-string">'sort_candidates'</span>: sort_candidates)
-
-  <span class="hljs-string">'case_insensitive_sort'</span>: <span class="hljs-function"><span class="hljs-params">(case_insensitive_sort)</span> -&gt;</span>
-    <span class="hljs-keyword">if</span> case_insensitive_sort <span class="hljs-keyword">is</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
-      @[<span class="hljs-string">'_case_insensitive_sort'</span>]
-    <span class="hljs-keyword">else</span>
-      <span class="hljs-keyword">unless</span> <span class="hljs-keyword">typeof</span> case_insensitive_sort <span class="hljs-keyword">is</span> <span class="hljs-string">'boolean'</span>
-        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'case_insensitive_sort must be a boolean'</span>)
-      <span class="hljs-property">@_build</span>(<span class="hljs-string">'case_insensitive_sort'</span>: case_insensitive_sort)
-
-  <span class="hljs-string">'include_distance'</span>: <span class="hljs-function"><span class="hljs-params">(include_distance)</span> -&gt;</span>
-    <span class="hljs-keyword">if</span> include_distance <span class="hljs-keyword">is</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
-      @[<span class="hljs-string">'_include_distance'</span>]
-    <span class="hljs-keyword">else</span>
-      <span class="hljs-keyword">unless</span> <span class="hljs-keyword">typeof</span> include_distance <span class="hljs-keyword">is</span> <span class="hljs-string">'boolean'</span>
-        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'include_distance must be a boolean'</span>)
-      <span class="hljs-property">@_build</span>(<span class="hljs-string">'include_distance'</span>: include_distance)
-
-  <span class="hljs-string">'maximum_candidates'</span>: <span class="hljs-function"><span class="hljs-params">(maximum_candidates)</span> -&gt;</span>
-    <span class="hljs-keyword">if</span> maximum_candidates <span class="hljs-keyword">is</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
-      @[<span class="hljs-string">'_maximum_candidates'</span>]
-    <span class="hljs-keyword">else</span>
-      <span class="hljs-keyword">if</span> maximum_candidates &lt; <span class="hljs-number">0</span>
-        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"maximum_candidates must be non-negative"</span>)
-      <span class="hljs-property">@_build</span>(<span class="hljs-string">'maximum_candidates'</span>: maximum_candidates)
-
-  <span class="hljs-string">'custom_comparator'</span>: <span class="hljs-function"><span class="hljs-params">(custom_comparator)</span> -&gt;</span>
-    <span class="hljs-keyword">if</span> custom_comparator <span class="hljs-keyword">is</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
-      @[<span class="hljs-string">'_custom_comparator'</span>]
-    <span class="hljs-keyword">else</span>
-      <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> custom_comparator <span class="hljs-keyword">isnt</span> <span class="hljs-string">'function'</span>
-        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'Expected custom_comparator to be a function'</span>)
-      <span class="hljs-property">@_build</span>(<span class="hljs-string">'custom_comparator'</span>: custom_comparator)
-
-  <span class="hljs-string">'custom_transform'</span>: <span class="hljs-function"><span class="hljs-params">(custom_transform)</span> -&gt;</span>
-    <span class="hljs-keyword">if</span> custom_transform <span class="hljs-keyword">is</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
-      @[<span class="hljs-string">'_custom_transform'</span>]
-    <span class="hljs-keyword">else</span>
-      <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> custom_transform <span class="hljs-keyword">isnt</span> <span class="hljs-string">'function'</span>
-        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'Expected custom_transform to be a function'</span>)
-      <span class="hljs-property">@_build</span>(<span class="hljs-string">'custom_transform'</span>: custom_transform)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'_custom_transform'</span>: <span class="hljs-literal">null</span></pre></div></div>
             
         </li>
         
@@ -316,6 +237,30 @@ arity-1 function that accepts a pair of [“term”, distance] values.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Maximum number of spelling errors that are tollerated. This can be
+overridden with the second parameter to Transducer.transduce(term, n)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-string">'_default_edit_distance'</span>: Infinity
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Builder</span></span>
+  <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(source, attributes)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> source <span class="hljs-keyword">instanceof</span> Builder
+      <span class="hljs-keyword">for</span> own field <span class="hljs-keyword">of</span> fields
+        <span class="hljs-keyword">this</span>[field] = source[field]
+      <span class="hljs-keyword">for</span> own attribute, value <span class="hljs-keyword">of</span> attributes
+        <span class="hljs-keyword">this</span>[<span class="hljs-string">'_'</span> + attribute] = value</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
               <p>The distance of each position in a state can be defined as follows:</p>
 <p>  distance = w - i + e</p>
@@ -354,11 +299,11 @@ positions as the corresponding Levenshtein distance.</p>
         </li>
         
         
-        <li id="section-11">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p>Sort by minimum distance from the query term.</p>
 
@@ -369,11 +314,11 @@ positions as the corresponding Levenshtein distance.</p>
         </li>
         
         
-        <li id="section-12">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
               <p>Sort in a case-insensitive manner.</p>
 
@@ -386,11 +331,11 @@ positions as the corresponding Levenshtein distance.</p>
         </li>
         
         
-        <li id="section-13">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-13">&#182;</a>
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>If the terms are the same, case-insensitive, then compare them in a
 case-sensitive manner.</p>
@@ -434,11 +379,11 @@ case-sensitive manner.</p>
         </li>
         
         
-        <li id="section-14">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-14">&#182;</a>
+                <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
               <p>Accepts a state vector and sorts its elements in ascending order.</p>
 
@@ -461,11 +406,11 @@ case-sensitive manner.</p>
         </li>
         
         
-        <li id="section-15">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>Accepts a maximum edit distance and returns a transition function that maps
 a position, state vector and table offset of the current state to its next
@@ -724,11 +669,11 @@ state.</p>
         </li>
         
         
-        <li id="section-16">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>Given two positions [i,e] and [j,f], for [i,e] to subsume [j,f], it must be
 the case that e &lt; f.  Therefore, I can remove a redundant check for (e &lt; f)
@@ -751,11 +696,11 @@ positions are sorted in ascending order, according to error).</p>
         </li>
         
         
-        <li id="section-17">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <p>Removes all subsumed positions from a state</p>
 
@@ -808,11 +753,11 @@ positions are sorted in ascending order, according to error).</p>
         </li>
         
         
-        <li id="section-18">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>NOTE: See my comment above bisect_error_right(state,e,l) and how I am using
 it in _unsubsume for why I am not checking (e &lt; f) below.</p>
@@ -826,11 +771,11 @@ it in _unsubsume for why I am not checking (e &lt; f) below.</p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>(e &lt; f) &amp;&amp; Math.abs(j - i) &lt;= (f - e)</p>
 
@@ -844,11 +789,11 @@ it in _unsubsume for why I am not checking (e &lt; f) below.</p>
         </li>
         
         
-        <li id="section-20">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>(e &lt; f) &amp;&amp; (i == j)</p>
 
@@ -860,11 +805,11 @@ it in _unsubsume for why I am not checking (e &lt; f) below.</p>
         </li>
         
         
-        <li id="section-21">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>(e &lt; f == n) &amp;&amp; (i == j)</p>
 
@@ -877,11 +822,11 @@ it in _unsubsume for why I am not checking (e &lt; f) below.</p>
         </li>
         
         
-        <li id="section-22">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>(e &lt; f) &amp;&amp; Math.abs(j - (i - 1)) &lt;= (f - e)</p>
 <p>NOTE: This is how I derived what follows:
@@ -895,11 +840,11 @@ it in _unsubsume for why I am not checking (e &lt; f) below.</p>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>(e &lt; f) &amp;&amp; Math.abs(j - i) &lt;= (f - e)</p>
 
@@ -914,11 +859,11 @@ it in _unsubsume for why I am not checking (e &lt; f) below.</p>
         </li>
         
         
-        <li id="section-24">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>(e &lt; f) &amp;&amp; Math.abs(j - i) &lt;= (f - e)</p>
 
@@ -953,11 +898,11 @@ it in _unsubsume for why I am not checking (e &lt; f) below.</p>
         </li>
         
         
-        <li id="section-25">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
               <p>Merges the positions of next_state into state_prime, in a
 subsumption-friendly manner.</p>
@@ -972,11 +917,11 @@ subsumption-friendly manner.</p>
         </li>
         
         
-        <li id="section-26">
+        <li id="section-27">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-27">&#182;</a>
               </div>
               <p>Order according to error first, then boundary (both ascending).
 While sorting the elements, remove any duplicates.</p>
@@ -997,11 +942,11 @@ While sorting the elements, remove any duplicates.</p>
         </li>
         
         
-        <li id="section-27">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>Order according to error first, then boundary (both ascending).
 While sorting the elements, remove any duplicates.</p>
@@ -1056,11 +1001,11 @@ While sorting the elements, remove any duplicates.</p>
         </li>
         
         
-        <li id="section-28">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
               <p>We are maintaining a max-heap so that the element furthest from the
 query term will be on the top.  If the new candidate is closer to
@@ -1079,7 +1024,7 @@ the query term then it should replace the old one.</p>
         candidates.push(candidate)
         candidates
 
-  <span class="hljs-string">'transducer'</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+  <span class="hljs-string">'build'</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
     comparator = <span class="hljs-property">@_comparator</span>()
     <span class="hljs-keyword">new</span> Transducer({
       <span class="hljs-string">'minimum_distance'</span>: <span class="hljs-property">@_minimum_distance</span>()
@@ -1099,8 +1044,134 @@ the query term then it should replace the old one.</p>
       <span class="hljs-string">'initial_state'</span>: <span class="hljs-keyword">do</span> <span class="hljs-function"><span class="hljs-params">(initial_state=<span class="hljs-property">@_initial_state</span>())</span> -&gt;</span>
         <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> initial_state
       <span class="hljs-string">'push'</span>: <span class="hljs-property">@_push</span>(comparator)
+      <span class="hljs-string">'default_edit_distance'</span>: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> @[<span class="hljs-string">'default_edit_distance'</span>]()
       <span class="hljs-string">'transform'</span>: <span class="hljs-property">@_transform</span>(comparator)
-    })
+    })</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>Aliases Builder::transducer to Builder::build, for those who prefer the
+syntax, builder.transducer(), over builder.build()</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-attribute">Builder</span>::[<span class="hljs-string">'transducer'</span>] = <span class="hljs-attribute">Builder</span>::[<span class="hljs-string">'build'</span>]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <p>Initialize the default, property values</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">for</span> own property, value <span class="hljs-keyword">of</span> fields
+  <span class="hljs-attribute">Builder</span>::[property] = value</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
+              </div>
+              <p>Performs no operation</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">noop</span> = <span class="hljs-params">()</span> -&gt;</span> <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-33">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <p>Identity function: returns whatever you give it</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">identity</span> = <span class="hljs-params">(x)</span> -&gt;</span> x
+
+def_property = <span class="hljs-function"><span class="hljs-title">def_properties</span> = <span class="hljs-params">(properties, params; property, i)</span> -&gt;</span>
+  [validate, translate] = [params[<span class="hljs-string">'validate'</span>], params[<span class="hljs-string">'translate'</span>]]
+  <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> properties <span class="hljs-keyword">is</span> <span class="hljs-string">'string'</span>
+    properties = [properties]
+  <span class="hljs-keyword">unless</span> properties <span class="hljs-keyword">instanceof</span> Array
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'Expected "properties" to be of type Array'</span>)
+  <span class="hljs-keyword">if</span> validate <span class="hljs-keyword">isnt</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>` <span class="hljs-keyword">and</span> <span class="hljs-keyword">typeof</span> validate <span class="hljs-keyword">isnt</span> <span class="hljs-string">'function'</span>
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'Expected "validate" to be of type Function'</span>)
+  <span class="hljs-keyword">if</span> translate <span class="hljs-keyword">isnt</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>` <span class="hljs-keyword">and</span> <span class="hljs-keyword">typeof</span> translate <span class="hljs-keyword">isnt</span> <span class="hljs-string">'function'</span>
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'Expected "translate" to be of type Function'</span>)
+
+  validate ||= noop
+  translate ||= identity
+
+  <span class="hljs-keyword">for</span> property, i <span class="hljs-keyword">in</span> properties
+    <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> property <span class="hljs-keyword">isnt</span> <span class="hljs-string">'string'</span>
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(
+        <span class="hljs-string">"Expected property at index <span class="hljs-subst">#{i}</span> of properties to be of type String"</span>)
+    <span class="hljs-keyword">do</span> <span class="hljs-function"><span class="hljs-params">(property)</span> -&gt;</span>
+      field = <span class="hljs-string">'_'</span> + property
+      <span class="hljs-attribute">Builder</span>::[property] =
+        <span class="hljs-function"><span class="hljs-params">(value, opts...)</span> -&gt;</span>
+          <span class="hljs-keyword">if</span> value <span class="hljs-keyword">is</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
+            @[field]
+          <span class="hljs-keyword">else</span>
+            validate(value, opts, property)
+            value = translate(value, opts, property)
+            attributes = {}
+            attributes[property] = value
+            <span class="hljs-keyword">new</span> Builder(<span class="hljs-keyword">this</span>, attributes)
+  <span class="hljs-literal">true</span>
+
+def_property <span class="hljs-string">'dictionary'</span>,
+  <span class="hljs-string">'validate'</span>: <span class="hljs-function"><span class="hljs-params">(dictionary)</span> -&gt;</span>
+    <span class="hljs-keyword">unless</span> dictionary <span class="hljs-keyword">instanceof</span> Array <span class="hljs-keyword">or</span> dictionary <span class="hljs-keyword">instanceof</span> Dawg
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">'dictionary must be either an Array or Dawg'</span>)
+  <span class="hljs-string">'translate'</span>: <span class="hljs-function"><span class="hljs-params">(dictionary, [sorted])</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> dictionary <span class="hljs-keyword">instanceof</span> Array
+      dictionary.sort() <span class="hljs-keyword">unless</span> sorted <span class="hljs-keyword">is</span> <span class="hljs-literal">true</span>
+      dictionary = <span class="hljs-keyword">new</span> Dawg(dictionary)
+    dictionary
+
+def_property <span class="hljs-string">'algorithm'</span>,
+  <span class="hljs-string">'validate'</span>: <span class="hljs-function"><span class="hljs-params">(algorithm)</span> -&gt;</span>
+    <span class="hljs-keyword">unless</span> algorithm <span class="hljs-keyword">in</span> [<span class="hljs-string">'standard'</span>, <span class="hljs-string">'transposition'</span>, <span class="hljs-string">'merge_and_split'</span>]
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(
+        <span class="hljs-string">'algorithm must be standard, transposition, or merge_and_split'</span>)
+
+def_properties [<span class="hljs-string">'sort_candidates'</span>, <span class="hljs-string">'case_insensitive_sort'</span>, <span class="hljs-string">'include_distance'</span>],
+  <span class="hljs-string">'validate'</span>: <span class="hljs-function"><span class="hljs-params">(value, _, property)</span> -&gt;</span>
+    <span class="hljs-keyword">unless</span> <span class="hljs-keyword">typeof</span> value <span class="hljs-keyword">is</span> <span class="hljs-string">'boolean'</span>
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"Expected type of \"<span class="hljs-subst">#{property}</span>\" to be boolean"</span>)
+
+def_properties [<span class="hljs-string">'maximum_candidates'</span>, <span class="hljs-string">'default_edit_distance'</span>],
+  <span class="hljs-string">'validate'</span>: <span class="hljs-function"><span class="hljs-params">(value, _, property)</span> -&gt;</span>
+    <span class="hljs-keyword">unless</span> <span class="hljs-keyword">typeof</span> value <span class="hljs-keyword">is</span> <span class="hljs-string">'number'</span> <span class="hljs-keyword">and</span> <span class="hljs-number">0</span> &lt;= value
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"Expected \"<span class="hljs-subst">#{property}</span>\" to be a non-negative number"</span>)
+
+def_properties [<span class="hljs-string">'custom_comparator'</span>, <span class="hljs-string">'custom_transform'</span>],
+  <span class="hljs-string">'validate'</span>: <span class="hljs-function"><span class="hljs-params">(value, _, property)</span> -&gt;</span>
+    <span class="hljs-keyword">unless</span> <span class="hljs-keyword">typeof</span> value <span class="hljs-keyword">is</span> <span class="hljs-string">'function'</span>
+      <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> Error(<span class="hljs-string">"Expected \"<span class="hljs-subst">#{property}</span>\" to be a function"</span>)
 
 <span class="hljs-built_in">global</span>[<span class="hljs-string">'levenshtein'</span>][<span class="hljs-string">'Builder'</span>] = Builder</pre></div></div>
             
