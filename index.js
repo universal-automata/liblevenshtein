@@ -2,7 +2,7 @@
 (function() {
   'use strict';
   $(function($) {
-    var $algo, $dist, $progs, $term, algo, builder, defaults, dist, filter, reset_transducer, term, transducer;
+    var $algo, $dist, $progs, $term, algo, builder, defaults, dist, filter, memo, reset_transducer, term, transducer;
     transducer = null;
     $progs = $('textarea.programming-languages');
     defaults = levenshtein.programming_languages.join('\n');
@@ -12,15 +12,18 @@
     term = '';
     dist = 2;
     algo = 'transposition';
+    memo = {};
     builder = new levenshtein.Builder().dictionary(levenshtein.programming_languages, true).maximum_candidates(10).include_distance(false).case_insensitive_sort(true).sort_candidates(true);
     reset_transducer = function() {
-      return transducer = builder.algorithm(algo).transducer();
+      transducer = builder.algorithm(algo).transducer();
+      memo = {};
+      return null;
     };
     filter = function() {
       var candidates;
       if (term = $.trim($term.val())) {
-        candidates = transducer.transduce(term, dist);
-        $progs.val(candidates.join('\n'));
+        candidates = memo[term] || (memo[term] = transducer.transduce(term, dist).join('\n'));
+        $progs.val(candidates);
       } else {
         $progs.val(defaults);
       }

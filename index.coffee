@@ -13,6 +13,7 @@ $ ($) ->
   term = ''
   dist = 2
   algo = 'transposition'
+  memo = {}
 
   builder = new levenshtein.Builder()
     .dictionary(levenshtein.programming_languages, true)
@@ -23,11 +24,13 @@ $ ($) ->
 
   reset_transducer = () ->
     transducer = builder.algorithm(algo).transducer()
+    memo = {}
+    null
 
   filter = () ->
     if term = $.trim $term.val()
-      candidates = transducer.transduce(term, dist)
-      $progs.val candidates.join('\n')
+      candidates = memo[term] ||= transducer.transduce(term, dist).join('\n')
+      $progs.val candidates
     else
       $progs.val(defaults)
     null
