@@ -653,7 +653,7 @@ class Builder
         candidates.push(candidate)
         candidates
 
-  'transducer': () ->
+  'build': () ->
     comparator = @_comparator()
     new Transducer({
       'minimum_distance': @_minimum_distance()
@@ -675,5 +675,7 @@ class Builder
       'push': @_push(comparator)
       'transform': @_transform(comparator)
     })
+
+  'transducer': () -> @build()
 
 global['levenshtein']['Builder'] = Builder

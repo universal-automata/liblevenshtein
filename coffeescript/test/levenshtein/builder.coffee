@@ -43,10 +43,10 @@ test_builder = (test, property_values, truths, builder=new Builder(), i=0) ->
     else
       test_builder(test, property_values, truths, builder, 1+i)
   else
-    unless builder.transducer() instanceof Transducer
+    unless builder.build() instanceof Transducer
       params = (builder[property]() for [property, values] in property_values)
       test.ok fail,
-        "Expected builder.transducer() to return an instance of Transducer for #{params}"
+        "Expected builder.build() to return an instance of Transducer for #{params}"
 
 test_candidates = (test, terms, term, n, transducer, distance, algorithm) ->
   candidates = transducer.transduce(term, n)
@@ -126,15 +126,15 @@ module.exports =
     builder = new Builder().dictionary(dawg).sort_candidates(false)
     transducers =
       standard: [
-        builder.algorithm('standard').transducer()
+        builder.algorithm('standard').build()
         distance('standard')
       ]
       transposition: [
-        builder.algorithm('transposition').transducer()
+        builder.algorithm('transposition').build()
         distance('transposition')
       ]
       merge_and_split: [
-        builder.algorithm('merge_and_split').transducer()
+        builder.algorithm('merge_and_split').build()
         distance('merge_and_split')
       ]
 
