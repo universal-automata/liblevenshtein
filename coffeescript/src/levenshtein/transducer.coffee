@@ -80,6 +80,11 @@ class Transducer
   'push': (matches, candidate) ->
     throw new Error('push not specified on construction')
 
+  # Specifies the default, maximum edit distance a spelling candidate may be
+  # from a query term.
+  'default_edit_distance': () ->
+    throw new Error('default_edit_distance not specified on construction')
+
   constructor: (attributes) ->
     for own attribute of attributes
       this[attribute] = attributes[attribute]
@@ -87,6 +92,7 @@ class Transducer
   # Returns every term in the dictionary that is within n units of error from
   # the query term.
   'transduce': (term, n) ->
+    n = @['default_edit_distance']() unless typeof n is 'number'
     w = term.length
     transition = @['transition_for_state'](n)
     matches = @['build_matches']()

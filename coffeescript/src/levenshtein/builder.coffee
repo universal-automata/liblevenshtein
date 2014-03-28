@@ -38,7 +38,7 @@ fields =
   '_custom_transform': null
   # Maximum number of spelling errors that are tollerated. This can be
   # overridden with the second parameter to Transducer.transduce(term, n)
-  '_maximum_edit_distance': Infinity
+  '_default_edit_distance': Infinity
 
 class Builder
   constructor: (source, attributes) ->
@@ -605,6 +605,7 @@ class Builder
       'initial_state': do (initial_state=@_initial_state()) ->
         () => initial_state
       'push': @_push(comparator)
+      'default_edit_distance': () => @['default_edit_distance']()
       'transform': @_transform(comparator)
     })
 
@@ -674,7 +675,7 @@ def_properties ['sort_candidates', 'case_insensitive_sort', 'include_distance'],
     unless typeof value is 'boolean'
       throw new Error("Expected type of \"#{property}\" to be boolean")
 
-def_properties ['maximum_candidates', 'maximum_edit_distance'],
+def_properties ['maximum_candidates', 'default_edit_distance'],
   'validate': (value, _, property) ->
     unless typeof value is 'number' and 0 <= value
       throw new Error("Expected \"#{property}\" to be a non-negative number")

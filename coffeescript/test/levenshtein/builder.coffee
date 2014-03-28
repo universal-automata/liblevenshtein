@@ -94,6 +94,21 @@ module.exports =
       test_property('custom_comparator', [(a,b) -> a[1] - b[1]], ['foo', null])
     'custom_transform should be readable and writable':
       test_property('custom_transform', [([t,d]) -> t], ['foo', null])
+    'default_edit_distance should be readable and writable':
+      test_property('default_edit_distance', [0, 2, Infinity], [-1, null])
+  'Default edit distance should be overwritable': (test) ->
+    dictionary = ['foo', 'bar', 'baz']
+    builder = new Builder()
+      .dictionary(dictionary)
+      .include_distance(true)
+      .sort_candidates(true)
+      .default_edit_distance(2)
+    transducer = builder.build()
+    candidates = transducer.transduce('foo')
+    test.deepEqual(candidates, [['foo', 0]])
+    candidates = transducer.transduce('foo', 3)
+    test.deepEqual(candidates, [['foo', 0], ['bar', 3], ['baz', 3]])
+    test.done()
   'Builder#transducer should return an instance of Transducer for every combination of options': (test) ->
     property_values = [
       ['dictionary', [[], lorem_ipsum, dawg]]
@@ -102,6 +117,7 @@ module.exports =
       ['case_insensitive_sort', [true, false]]
       ['include_distance', [true, false]]
       ['maximum_candidates', [0, 42, Infinity]]
+      ['default_edit_distance', [0, 2, Infinity]]
       ['custom_comparator', (a,b) -> a[1] * 2 - b[1]]
       ['custom_transform', ([t,d]) -> t.toUpperCase()]
     ]
