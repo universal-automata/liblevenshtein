@@ -1,6 +1,6 @@
 # libLevenshtein
 
-## A library for generating Finite State Transducers based on Levenshtein Automata.
+### A library for generating Finite State Transducers based on Levenshtein Automata.
 
 Levenshtein transducers accept a query term and return all terms in a
 dictionary that are within n spelling errors away from it. They constitute a
