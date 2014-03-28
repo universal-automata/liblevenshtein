@@ -41,16 +41,12 @@ fields =
   '_maximum_edit_distance': Infinity
 
 class Builder
-  constructor: (source) ->
+  constructor: (source, attributes) ->
     if source instanceof Builder
       for own field of fields
         this[field] = source[field]
-
-  _build: (attributes) ->
-    builder = new Builder(this)
-    for own attribute, value of attributes
-      builder['_' + attribute] = value
-    builder
+      for own attribute, value of attributes
+        this['_' + attribute] = value
 
   # The distance of each position in a state can be defined as follows:
   #
@@ -612,7 +608,9 @@ class Builder
       'transform': @_transform(comparator)
     })
 
-  'transducer': () -> @['build']()
+# Aliases Builder::transducer to Builder::build, for those who prefer the
+# syntax, builder.transducer(), over builder.build()
+Builder::['transducer'] = Builder::['build']
 
 # Initialize the default, property values
 for own property, value of fields
@@ -652,7 +650,7 @@ def_property = def_properties = (properties, params; property, i) ->
             value = translate(value, opts, property)
             attributes = {}
             attributes[property] = value
-            @_build(attributes)
+            new Builder(this, attributes)
   true
 
 def_property 'dictionary',
