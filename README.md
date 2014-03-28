@@ -15,7 +15,7 @@ To use the library on your website, reference the desired file from the
   <head>
     <!-- stuff ... -->
     <script type="text/javascript"
-      src="http://dylon.github.com/liblevenshtein/javascripts/2.0.0/levenshtein-transducer.min.js">
+      src="http://dylon.github.com/liblevenshtein/javascripts/2.0.1/levenshtein-transducer.min.js">
     </script>
     <!-- more stuff ... -->
   </head>
