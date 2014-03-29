@@ -65,7 +65,7 @@ $(function ($) {
     .include_distance(false)             // just return the ordered terms (drop the distances)
     .maximum_candidates(10);             // only want the top-10 candidates
 
-  var transducer = builder.transducer();
+  var transducer = builder.build();
 
   var $queryTerm = $('#query-term-input-field');
   $queryTerm.keyup(function (event) {
@@ -83,7 +83,7 @@ $(function ($) {
 });
 ```
 
-This will give the user autocompletion hints (up to 10 of them) as he types in
-the search box.
+This will give the user autocompletion hints (up to 10 of them, because we
+specified `.maximum_candidates(10)`) as he types in the search box.
 
 For more details, please see the [wiki](https://github.com/dylon/liblevenshtein/wiki).
