@@ -21,9 +21,10 @@ as by selecting the sequence of terms that have the greatest probability of
 appearing together).
 
 For a quick demonstration, please visit the [Github Page,
-here](http://dylon.github.io/liblevenshtein/). The library is currently written
-only in CoffeeScript (and JavaScript), but I will be porting it to other
-languages and frameworks, soon.
+here](http://dylon.github.io/liblevenshtein/).
+
+The library is currently written only in CoffeeScript (and JavaScript), but I
+will be porting it to other languages and frameworks, soon.
 
 ### Basic Usage:
 
