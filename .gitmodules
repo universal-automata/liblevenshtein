@@ -1,3 +1,6 @@
 [submodule "coffeescript"]
 	path = coffeescript
 	url = git@github.com:dylon/liblevenshtein-coffeescript.git
+[submodule "shared"]
+	path = shared
+	url = git@github.com:dylon/liblevenshtein-shared.git
