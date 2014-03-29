@@ -23,8 +23,8 @@ appearing together).
 For a quick demonstration, please visit the [Github Page,
 here](http://dylon.github.io/liblevenshtein/).
 
-The library is currently written only in CoffeeScript (and JavaScript), but I
-will be porting it to other languages and frameworks, soon.
+The library is currently only written in CoffeeScript (and JavaScript), but I
+will be porting it to other languages, soon.
 
 ### Basic Usage:
 
