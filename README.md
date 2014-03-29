@@ -85,4 +85,10 @@ $(function ($) {
 
 This will give the user autocompletion hints as he types in the search box.
 
-For more details, please see the [wiki](https://github.com/dylon/liblevenshtein/wiki).
+This library is based largely on the work of [Stoyan
+Mihov](http://www.lml.bas.bg/~stoyan/), [Klaus
+Schulz](http://www.klaus-schulze.com/), and Petar Nikolaev Mitankin: "[Fast
+String Correction with
+Levenshtein-Automata](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.16.652
+"Klaus Schulz and Stoyan Mihov (2002)")".  For more details, please see the
+[wiki](https://github.com/dylon/liblevenshtein/wiki).
