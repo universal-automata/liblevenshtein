@@ -83,7 +83,6 @@ $(function ($) {
 });
 ```
 
-This will give the user autocompletion hints (up to 10 of them, because we
-specified `.maximum_candidates(10)`) as he types in the search box.
+This will give the user autocompletion hints as he types in the search box.
 
 For more details, please see the [wiki](https://github.com/dylon/liblevenshtein/wiki).
