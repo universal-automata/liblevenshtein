@@ -1,0 +1,3 @@
+[submodule "coffeescript"]
+	path = coffeescript
+	url = git@github.com:dylon/liblevenshtein-coffeescript.git
