@@ -24,7 +24,9 @@ For a quick demonstration, please visit the [Github Page,
 here](http://dylon.github.io/liblevenshtein/).
 
 The library is currently only written in CoffeeScript (and JavaScript), but I
-will be porting it to other languages, soon.
+will be porting it to other languages, soon.  If you have a specific language
+you would like to see it in, or package-management system you would like it
+deployed to, let me know.
 
 ### Basic Usage:
 
