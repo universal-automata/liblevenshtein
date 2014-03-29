@@ -2,7 +2,7 @@
 
 ### A library for generating Finite State Transducers based on Levenshtein Automata.
 
-|            |Build Status                                                                                                                                         |
+|Language    |Build Status                                                                                                                                         |
 |------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
 |CoffeeScript|[![Build Status](https://travis-ci.org/dylon/liblevenshtein-coffeescript.svg?branch=master)](https://travis-ci.org/dylon/liblevenshtein-coffeescript)|
 
