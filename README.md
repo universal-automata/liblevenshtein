@@ -2,9 +2,9 @@
 
 ### A library for generating Finite State Transducers based on Levenshtein Automata.
 
-CoffeeScript
-------------
-[![Build Status](https://travis-ci.org/dylon/liblevenshtein-coffeescript.svg?branch=master)](https://travis-ci.org/dylon/liblevenshtein-coffeescript)
+Build Status|CoffeeScript
+------------|------------
+|[![Build Status](https://travis-ci.org/dylon/liblevenshtein-coffeescript.svg?branch=master)](https://travis-ci.org/dylon/liblevenshtein-coffeescript)
 
 Levenshtein transducers accept a query term and return all terms in a
 dictionary that are within n spelling errors away from it. They constitute a
