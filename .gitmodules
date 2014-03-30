@@ -4,3 +4,6 @@
 [submodule "shared"]
 	path = shared
 	url = git@github.com:dylon/liblevenshtein-shared.git
+[submodule "java"]
+	path = java
+	url = git@github.com:dylon/liblevenshtein-java.git
