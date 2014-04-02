@@ -29,6 +29,11 @@
               </a>
             
               
+              <a class="source" href="index.html">
+                index.coffee
+              </a>
+            
+              
               <a class="source" href="builder.html">
                 builder.coffee
               </a>
@@ -131,7 +136,12 @@ following primitive operations: deletion, insertion, and substitution.</p>
             <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">when</span> <span class="hljs-string">'standard'</span> <span class="hljs-keyword">then</span> <span class="hljs-keyword">do</span> <span class="hljs-function"><span class="hljs-params">(; distance)</span> -&gt;</span>
       memoized_distance = {}
       <span class="hljs-function"><span class="hljs-title">distance</span> = <span class="hljs-params">(v, w)</span> -&gt;</span>
-        key = v + <span class="hljs-string">'\0'</span> + w
+        key =
+          <span class="hljs-keyword">if</span> v.localeCompare(w) &lt; <span class="hljs-number">0</span>
+            v + <span class="hljs-string">'\0'</span> + w
+          <span class="hljs-keyword">else</span>
+            w + <span class="hljs-string">'\0'</span> + v
+
         <span class="hljs-keyword">if</span> (value = memoized_distance[key]) <span class="hljs-keyword">isnt</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
           value
         <span class="hljs-keyword">else</span>
@@ -175,13 +185,16 @@ following primitive operations: deletion, insertion, and substitution.</p>
             
             <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> memoized_distance[key] = s.length || t.length <span class="hljs-keyword">if</span> a <span class="hljs-keyword">is</span> b
 
-            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> (p = distance(s,w)) <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+            p = distance(s,w)
+            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> p <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
             min = p
 
-            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> (p = distance(v,t)) <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+            p = distance(v,t)
+            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> p <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
             min = p <span class="hljs-keyword">if</span> p &lt; min
 
-            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> (p = distance(s,t)) <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+            p = distance(s,t)
+            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> p <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
             min = p <span class="hljs-keyword">if</span> p &lt; min
 
             <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> + min</pre></div></div>
@@ -204,7 +217,12 @@ transposition.</p>
             <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">when</span> <span class="hljs-string">'transposition'</span> <span class="hljs-keyword">then</span> <span class="hljs-keyword">do</span> <span class="hljs-function"><span class="hljs-params">(; distance)</span> -&gt;</span>
       memoized_distance = {}
       <span class="hljs-function"><span class="hljs-title">distance</span> = <span class="hljs-params">(v, w)</span> -&gt;</span>
-        key = v + <span class="hljs-string">'\0'</span> + w
+        key =
+          <span class="hljs-keyword">if</span> v.localeCompare(w) &lt; <span class="hljs-number">0</span>
+            v + <span class="hljs-string">'\0'</span> + w
+          <span class="hljs-keyword">else</span>
+            w + <span class="hljs-string">'\0'</span> + v
+
         <span class="hljs-keyword">if</span> (value = memoized_distance[key]) <span class="hljs-keyword">isnt</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
           value
         <span class="hljs-keyword">else</span>
@@ -248,19 +266,23 @@ transposition.</p>
             
             <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> memoized_distance[key] = x.length || y.length <span class="hljs-keyword">if</span> a <span class="hljs-keyword">is</span> b
 
-            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> (p = distance(x,w)) <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+            p = distance(x,w)
+            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> p <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
             min = p
 
-            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> (p = distance(v,y)) <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+            p = distance(v,y)
+            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> p <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
             min = p <span class="hljs-keyword">if</span> p &lt; min
 
-            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> (p = distance(x,y)) <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+            p = distance(x,y)
+            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> p <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
             min = p <span class="hljs-keyword">if</span> p &lt; min
 
             a1 = x[<span class="hljs-number">0</span>]  <span class="hljs-comment"># prefix character of x</span>
             b1 = y[<span class="hljs-number">0</span>]  <span class="hljs-comment"># prefix character of y</span>
             <span class="hljs-keyword">if</span> a <span class="hljs-keyword">is</span> b1 <span class="hljs-keyword">and</span> a1 <span class="hljs-keyword">is</span> b
-              <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> (p = distance(f(v,<span class="hljs-number">1</span>), f(w,<span class="hljs-number">1</span>))) <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+              p = distance(f(v,<span class="hljs-number">1</span>), f(w,<span class="hljs-number">1</span>))
+              <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> p <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
               min = p <span class="hljs-keyword">if</span> p &lt; min
 
             <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> + min</pre></div></div>
@@ -283,7 +305,12 @@ merge, and split.</p>
             <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">when</span> <span class="hljs-string">'merge_and_split'</span> <span class="hljs-keyword">then</span> <span class="hljs-keyword">do</span> <span class="hljs-function"><span class="hljs-params">(; distance)</span> -&gt;</span>
       memoized_distance = {}
       <span class="hljs-function"><span class="hljs-title">distance</span> = <span class="hljs-params">(v, w)</span> -&gt;</span>
-        key = v + <span class="hljs-string">'\0'</span> + w
+        key =
+          <span class="hljs-keyword">if</span> v.localeCompare(w) &lt; <span class="hljs-number">0</span>
+            v + <span class="hljs-string">'\0'</span> + w
+          <span class="hljs-keyword">else</span>
+            w + <span class="hljs-string">'\0'</span> + v
+
         <span class="hljs-keyword">if</span> (value = memoized_distance[key]) <span class="hljs-keyword">isnt</span> `<span class="javascript"><span class="hljs-literal">undefined</span></span>`
           value
         <span class="hljs-keyword">else</span>
@@ -327,20 +354,27 @@ merge, and split.</p>
             
             <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span> memoized_distance[key] = x.length || y.length <span class="hljs-keyword">if</span> a <span class="hljs-keyword">is</span> b
 
-            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> (p = distance(x,w)) <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+            p = distance(x,w)
+            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> p <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
             min = p
 
-            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> (p = distance(v,y)) <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+            p = distance(v,y)
+            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> p <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
             min = p <span class="hljs-keyword">if</span> p &lt; min
 
-            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> (p = distance(x,y)) <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+            p = distance(x,y)
+            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> p <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
             min = p <span class="hljs-keyword">if</span> p &lt; min
 
-            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> (p = <span class="hljs-keyword">if</span> w.length &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">then</span> distance(x, f(w,<span class="hljs-number">1</span>)) <span class="hljs-keyword">else</span> Infinity) <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
-            min = p <span class="hljs-keyword">if</span> p &lt; min
+            <span class="hljs-keyword">if</span> w.length &gt; <span class="hljs-number">1</span>
+              p = distance(x, f(w,<span class="hljs-number">1</span>))
+              <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> p <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+              min = p <span class="hljs-keyword">if</span> p &lt; min
 
-            <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> (p = <span class="hljs-keyword">if</span> v.length &gt; <span class="hljs-number">1</span> <span class="hljs-keyword">then</span> distance(f(v,<span class="hljs-number">1</span>), y) <span class="hljs-keyword">else</span> Infinity) <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
-            min = p <span class="hljs-keyword">if</span> p &lt; min
+            <span class="hljs-keyword">if</span> v.length &gt; <span class="hljs-number">1</span>
+              p = distance(f(v,<span class="hljs-number">1</span>), y)
+              <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> <span class="hljs-keyword">if</span> p <span class="hljs-keyword">is</span> <span class="hljs-number">0</span>
+              min = p <span class="hljs-keyword">if</span> p &lt; min
 
             <span class="hljs-keyword">return</span> memoized_distance[key] = <span class="hljs-number">1</span> + min
 

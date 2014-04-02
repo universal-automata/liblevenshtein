@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>truth-table.coffee</title>
+  <title>index.coffee</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -26,6 +26,11 @@
               
               <a class="source" href="max-heap.html">
                 max-heap.coffee
+              </a>
+            
+              
+              <a class="source" href="index.html">
+                index.coffee
               </a>
             
               
@@ -71,7 +76,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>truth-table.coffee</h1>
+                  <h1>index.coffee</h1>
               </div>
           </li>
         
@@ -86,25 +91,18 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-title">truth_table</span> = <span class="hljs-params">(n, i=<span class="hljs-number">0</span>, truths=[], buffer=[])</span> -&gt;</span>
-  <span class="hljs-keyword">if</span> i &lt; n
-    <span class="hljs-keyword">for</span> truth <span class="hljs-keyword">in</span> [<span class="hljs-literal">true</span>, <span class="hljs-literal">false</span>]
-      truths[i] = truth
-      truth_table(n, <span class="hljs-number">1</span> + i, truths, buffer)
-  <span class="hljs-keyword">else</span>
-    buffer.push truths
-  buffer
+            <div class="content"><div class='highlight'><pre>{<span class="hljs-attribute">levenshtein</span>: {Dawg}} = <span class="hljs-built_in">require</span> <span class="hljs-string">'./collection/dawg'</span>
+{<span class="hljs-attribute">levenshtein</span>: {MaxHeap}} = <span class="hljs-built_in">require</span> <span class="hljs-string">'./collection/max-heap'</span>
+{<span class="hljs-attribute">levenshtein</span>: {Transducer}} = <span class="hljs-built_in">require</span> <span class="hljs-string">'./levenshtein/transducer'</span>
+{<span class="hljs-attribute">levenshtein</span>: {Builder}} = <span class="hljs-built_in">require</span> <span class="hljs-string">'./levenshtein/builder'</span>
+{<span class="hljs-attribute">levenshtein</span>: {distance}} = <span class="hljs-built_in">require</span> <span class="hljs-string">'./levenshtein/distance'</span>
 
-<span class="hljs-built_in">global</span> =
-  <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> <span class="hljs-built_in">exports</span> <span class="hljs-keyword">is</span> <span class="hljs-string">'object'</span>
-    <span class="hljs-built_in">exports</span>
-  <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-keyword">typeof</span> <span class="hljs-built_in">window</span> <span class="hljs-keyword">is</span> <span class="hljs-string">'object'</span>
-    <span class="hljs-built_in">window</span>
-  <span class="hljs-keyword">else</span>
-    <span class="hljs-keyword">this</span>
-
-<span class="hljs-built_in">global</span>[<span class="hljs-string">'levenshtein'</span>] ||= {}
-<span class="hljs-built_in">global</span>[<span class="hljs-string">'levenshtein'</span>][<span class="hljs-string">'truth_table'</span>] = truth_table</pre></div></div>
+<span class="hljs-built_in">module</span>.<span class="hljs-built_in">exports</span> =
+  <span class="hljs-attribute">Dawg</span>: Dawg
+  <span class="hljs-attribute">MaxHeap</span>: MaxHeap
+  <span class="hljs-attribute">Transducer</span>: Transducer
+  <span class="hljs-attribute">Builder</span>: Builder
+  <span class="hljs-attribute">distance</span>: distance</pre></div></div>
             
         </li>
         
