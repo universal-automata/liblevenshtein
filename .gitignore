@@ -1,10 +1,7 @@
 *.sw?
 wiki
-coffeescript/.gradle/*
-coffeescript/node_modules/*
-coffeescript/build/*
-coffeescript/coverage/*
-java/build/*
-java/.gradle/*
+/coffeescript
+/java
+/shared
 .sass-cache/*
 npm-debug.log
