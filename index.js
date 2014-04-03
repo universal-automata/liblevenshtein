@@ -2,10 +2,9 @@
 (function() {
   $(function($) {
     'use strict';
-    var $algo, $dist, $filtered_results, $filtered_results_tbody, $progs, $term, $unfiltered_results, $unfiltered_results_body, algo, builder, dist, filter, reset_transducer, term, transducer;
+    var $algo, $dist, $filtered_results, $filtered_results_tbody, $term, $unfiltered_results, $unfiltered_results_body, algo, builder, dist, filter, reset_transducer, term, transducer;
     hljs.initHighlightingOnLoad();
     transducer = null;
-    $progs = $('textarea.programming-languages');
     $term = $('input.query-term');
     $dist = $('select.edit-distance');
     $algo = $('select.algorithm');

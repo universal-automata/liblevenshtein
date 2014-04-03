@@ -5,8 +5,6 @@ $ ($) ->
 
   transducer = null
 
-  $progs = $('textarea.programming-languages')
-
   $term = $('input.query-term')
   $dist = $('select.edit-distance')
   $algo = $('select.algorithm')
