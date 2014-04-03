@@ -5,11 +5,13 @@
     <meta content='chrome=1' http-equiv='X-UA-Compatible'>
     <meta content='libLevenshtein : Various utilities regarding Levenshtein transducers.' name='description'>
     <link href='stylesheets/stylesheet.css' media='screen' rel='stylesheet' type='text/css'>
-    <link href='index.css' media='screen' rel='stylesheet' type='text/css'>
+    <link href='index.css' rel='stylesheet' type='text/css'>
+    <link href='http://yandex.st/highlightjs/8.0/styles/default.min.css' rel='stylesheet' type='text/css'>
     <script src='http://code.jquery.com/jquery-2.1.0.min.js' type='text/javascript'></script>
     <script src='javascripts/2.0.1/levenshtein-transducer.min.js' type='text/javascript'></script>
     <script src='programming-languages.js' type='text/javascript'></script>
     <script src='index.js' type='text/javascript'></script>
+    <script src='http://yandex.st/highlightjs/8.0/highlight.min.js' type='text/javascript'></script>
     <title>libLevenshtein</title>
   </head>
   <body>
@@ -33,9 +35,24 @@
     <div class='outer' id='main_content_wrap'>
       <section class='inner' id='main_content'>
         <h2>Demonstration</h2>
-        Enter a query term below, and (optionally) change the maximum edit
-        distance and search algorithm.  Note that the search is case-sensitive,
-        so c++ and C++ are different terms.
+        <p>
+          Enter a query term below, and (optionally) change the maximum edit
+          distance and search algorithm.  Note that the search is
+          case-sensitive, so c++ and C++ are different terms.
+        </p>
+        <p>
+          Some examples to try include:
+          <ol>
+            <li>Query: Jvaa</li>
+            <li>Max Distance: 2</li>
+            <li>Algorithm: Toggle between "Standard" and "Transposition"</li>
+          </ol>
+          <ol>
+            <li>Query: dojure</li>
+            <li>Max Distance 2</li>
+            <li>Algorithm: Toggle between "Transposition" and "Merge and Split"</li>
+          </ol>
+        </p>
         <table class='query'>
           <tr>
             <td class='query-term'>
@@ -88,11 +105,27 @@
           </tr>
           <tr>
             <td colspan='3'>
-              <textarea class='programming-languages' readonly title='List of prgramming languages'></textarea>
+              <table class='languages unfiltered-results'>
+                <thead>
+                  <tr>
+                    <th class='language'>Programming Language</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+              <table class='languages filtered-results hidden'>
+                <thead>
+                  <tr>
+                    <th class='language'>Programming Language</th>
+                    <th class='distance'>Distance</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
             </td>
           </tr>
         </table>
-        <pre><code>'use strict'&#x000A;&#x000A;$ ($) -&gt;&#x000A;  transducer = null&#x000A;&#x000A;  $progs = $('textarea.programming-languages')&#x000A;  defaults = levenshtein.programming_languages.join('\n')&#x000A;&#x000A;  $term = $('input.query-term')&#x000A;  $dist = $('select.edit-distance')&#x000A;  $algo = $('select.algorithm')&#x000A;&#x000A;  term = ''&#x000A;  dist = 2&#x000A;  algo = 'transposition'&#x000A;&#x000A;  builder = new levenshtein.Builder()&#x000A;    .dictionary(levenshtein.programming_languages, true)&#x000A;    .maximum_candidates(10)&#x000A;    .include_distance(false)&#x000A;    .case_insensitive_sort(true)&#x000A;    .sort_candidates(true)&#x000A;&#x000A;  reset_transducer = () -&gt;&#x000A;    transducer = builder.algorithm(algo).transducer()&#x000A;&#x000A;  filter = () -&gt;&#x000A;    if term = $.trim $term.val()&#x000A;      candidates = transducer.transduce(term, dist)&#x000A;      $progs.val candidates.join('\n')&#x000A;    else&#x000A;      $progs.val(defaults)&#x000A;    null&#x000A;&#x000A;  $term.keyup (event) -&gt;&#x000A;    filter()&#x000A;    true&#x000A;&#x000A;  $dist.change (event) -&gt;&#x000A;    dist = +$dist.find('option:selected').val()&#x000A;    filter()&#x000A;    true&#x000A;&#x000A;  $algo.change (event) -&gt;&#x000A;    algo = $algo.find('option:selected').val()&#x000A;    reset_transducer()&#x000A;    filter()&#x000A;    true&#x000A;&#x000A;  $dist.val(dist) #-&gt; 0-indexed&#x000A;  $algo.find(&quot;option[value='#{algo}']&quot;).prop('selected', true)&#x000A;  reset_transducer()&#x000A;  filter()&#x000A;  $term.focus()&#x000A;  true</code></pre>
+        <pre class='code'><code class='coffeescript'>$ ($) -&gt;&#x000A;  'use strict'&#x000A;&#x000A;  transducer = null&#x000A;&#x000A;  $progs = $('textarea.programming-languages')&#x000A;&#x000A;  $term = $('input.query-term')&#x000A;  $dist = $('select.edit-distance')&#x000A;  $algo = $('select.algorithm')&#x000A;&#x000A;  term = ''&#x000A;  dist = 2&#x000A;  algo = 'transposition'&#x000A;&#x000A;  builder = new levenshtein.Builder()&#x000A;    .dictionary(levenshtein.programming_languages, true)&#x000A;    .include_distance(true)&#x000A;    .case_insensitive_sort(true)&#x000A;    .sort_candidates(true)&#x000A;&#x000A;  reset_transducer = () -&gt;&#x000A;    transducer = builder.algorithm(algo).transducer()&#x000A;&#x000A;  $unfiltered_results = $('table.unfiltered-results')&#x000A;  $unfiltered_results_body = $unfiltered_results.find('tbody:first')&#x000A;  $filtered_results = $('table.filtered-results')&#x000A;  $filtered_results_tbody = $filtered_results.find('tbody:first')&#x000A;&#x000A;  $.each levenshtein.programming_languages,&#x000A;    (index, language) -&gt;&#x000A;      $unfiltered_results_body.append $ \&#x000A;        '&lt;tr&gt;' +&#x000A;          &quot;&lt;td class='language'&gt;#{language}&lt;/td&gt;&quot; +&#x000A;        '&lt;/tr&gt;'&#x000A;&#x000A;  filter = () -&gt;&#x000A;    if term = $.trim $term.val()&#x000A;      $unfiltered_results.hide()&#x000A;      $filtered_results.hide()&#x000A;      $filtered_results_tbody.empty()&#x000A;      $.each transducer.transduce(term, dist),&#x000A;        (index, [candidate, distance]) -&gt;&#x000A;          $filtered_results_tbody.append $ \&#x000A;            '&lt;tr&gt;' +&#x000A;              &quot;&lt;td class='language'&gt;#{candidate}&lt;/td&gt;&quot; +&#x000A;              &quot;&lt;td class='distance'&gt;#{distance}&lt;/td&gt;&quot; +&#x000A;            '&lt;/tr&gt;'&#x000A;      $filtered_results.show()&#x000A;    else&#x000A;      $filtered_results.hide()&#x000A;      $unfiltered_results.show()&#x000A;    null&#x000A;&#x000A;  $term.keyup (event) -&gt;&#x000A;    filter()&#x000A;    true&#x000A;&#x000A;  $dist.change (event) -&gt;&#x000A;    dist = +$dist.find('option:selected').val()&#x000A;    filter()&#x000A;    true&#x000A;&#x000A;  $algo.change (event) -&gt;&#x000A;    algo = $algo.find('option:selected').val()&#x000A;    reset_transducer()&#x000A;    filter()&#x000A;    true&#x000A;&#x000A;  $dist.val(dist) #-&gt; 0-indexed&#x000A;  $algo.find(&quot;option[value='#{algo}']&quot;).prop('selected', true)&#x000A;  reset_transducer()&#x000A;  filter()&#x000A;  $term.focus()&#x000A;  true</code></pre>
       </section>
     </div>
     <!-- FOOTER -->

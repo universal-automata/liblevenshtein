@@ -2,27 +2,41 @@
 (function() {
   'use strict';
   $(function($) {
-    var $algo, $dist, $progs, $term, algo, builder, defaults, dist, filter, reset_transducer, term, transducer;
+    var $algo, $dist, $filtered_results, $filtered_results_tbody, $progs, $term, $unfiltered_results, $unfiltered_results_body, algo, builder, dist, filter, reset_transducer, term, transducer;
+    hljs.initHighlightingOnLoad();
     transducer = null;
     $progs = $('textarea.programming-languages');
-    defaults = levenshtein.programming_languages.join('\n');
     $term = $('input.query-term');
     $dist = $('select.edit-distance');
     $algo = $('select.algorithm');
     term = '';
     dist = 2;
     algo = 'transposition';
-    builder = new levenshtein.Builder().dictionary(levenshtein.programming_languages, true).maximum_candidates(10).include_distance(false).case_insensitive_sort(true).sort_candidates(true);
+    builder = new levenshtein.Builder().dictionary(levenshtein.programming_languages, true).include_distance(true).case_insensitive_sort(true).sort_candidates(true);
     reset_transducer = function() {
       return transducer = builder.algorithm(algo).transducer();
     };
+    $unfiltered_results = $('table.unfiltered-results');
+    $unfiltered_results_body = $unfiltered_results.find('tbody:first');
+    $filtered_results = $('table.filtered-results');
+    $filtered_results_tbody = $filtered_results.find('tbody:first');
+    $.each(levenshtein.programming_languages, function(index, language) {
+      return $unfiltered_results_body.append($('<tr>' + ("<td class='language'>" + language + "</td>") + '</tr>'));
+    });
     filter = function() {
-      var candidates;
       if (term = $.trim($term.val())) {
-        candidates = transducer.transduce(term, dist);
-        $progs.val(candidates.join('\n'));
+        $unfiltered_results.hide();
+        $filtered_results.hide();
+        $filtered_results_tbody.empty();
+        $.each(transducer.transduce(term, dist), function(index, _arg) {
+          var candidate, distance;
+          candidate = _arg[0], distance = _arg[1];
+          return $filtered_results_tbody.append($('<tr>' + ("<td class='language'>" + candidate + "</td>") + ("<td class='distance'>" + distance + "</td>") + '</tr>'));
+        });
+        $filtered_results.show();
       } else {
-        $progs.val(defaults);
+        $filtered_results.hide();
+        $unfiltered_results.show();
       }
       return null;
     };

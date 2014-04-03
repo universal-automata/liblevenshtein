@@ -11,8 +11,42 @@ table.query {
       padding-right: 0; }
   table.query input[type=text] {
     width: 100%; }
-  table.query textarea.programming-languages {
-    width: 100%;
-    height: 10em; }
   table.query select.algorithm {
+    width: 152px; }
+
+table.languages {
+  border: thin solid #373737;
+  width: 100%; }
+  table.languages tbody {
+    max-height: 10em;
+    overflow: auto;
     width: 100%; }
+  table.languages.unfiltered-results th, table.languages.unfiltered-results td {
+    text-align: left; }
+    table.languages.unfiltered-results th.language, table.languages.unfiltered-results td.language {
+      width: 640px; }
+  table.languages.filtered-results th.language, table.languages.filtered-results td.language {
+    text-align: left; }
+  table.languages.filtered-results th.distance, table.languages.filtered-results td.distance {
+    text-align: left;
+    border-left: thin solid #373737; }
+  table.languages.filtered-results th.language {
+    width: 370px; }
+  table.languages.filtered-results th.distance {
+    width: 225px; }
+  table.languages.filtered-results td.language {
+    width: 385px; }
+  table.languages.filtered-results td.distance {
+    width: 200px; }
+  table.languages thead > tr, table.languages tbody {
+    display: block; }
+
+pre.code {
+  width: 100%;
+  padding: 0; }
+  pre.code code {
+    padding: 0;
+    margin: 0; }
+
+.hidden {
+  display: none; }

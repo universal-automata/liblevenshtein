@@ -1,15 +1,17 @@
 !!!
 %html
   %head
-    %meta{:charset => 'utf-8'}/
-    %meta{:content => 'chrome=1', 'http-equiv' => 'X-UA-Compatible'}/
-    %meta{:content => 'libLevenshtein : Various utilities regarding Levenshtein transducers.', :name => 'description'}/
-    %link{:href => 'stylesheets/stylesheet.css', :media => 'screen', :rel => 'stylesheet', :type => 'text/css'}/
-    %link{:href => 'index.css', :media => 'screen', :rel => 'stylesheet', :type => 'text/css'}/
+    %meta{:charset => 'utf-8'}
+    %meta{:content => 'chrome=1', 'http-equiv' => 'X-UA-Compatible'}
+    %meta{:content => 'libLevenshtein : Various utilities regarding Levenshtein transducers.', :name => 'description'}
+    %link{:href => 'stylesheets/stylesheet.css', :media => 'screen', :rel => 'stylesheet', :type => 'text/css'}
+    %link{:href => 'index.css', :rel => 'stylesheet', :type => 'text/css'}
+    %link{:href => 'http://yandex.st/highlightjs/8.0/styles/default.min.css', :rel => 'stylesheet', :type => 'text/css'}
     %script{:type => 'text/javascript', :src => 'http://code.jquery.com/jquery-2.1.0.min.js'}
     %script{:type => 'text/javascript', :src => 'javascripts/2.0.1/levenshtein-transducer.min.js'}
     %script{:type => 'text/javascript', :src => 'programming-languages.js'}
     %script{:type => 'text/javascript', :src => 'index.js'}
+    %script{:type => 'text/javascript', :src => 'http://yandex.st/highlightjs/8.0/highlight.min.js'}
     %title libLevenshtein
   %body
     / HEADER
@@ -27,9 +29,23 @@
     #main_content_wrap.outer
       %section#main_content.inner
         %h2 Demonstration
-        Enter a query term below, and (optionally) change the maximum edit
-        distance and search algorithm.  Note that the search is case-sensitive,
-        so c++ and C++ are different terms.
+
+        %p
+          Enter a query term below, and (optionally) change the maximum edit
+          distance and search algorithm.  Note that the search is
+          case-sensitive, so c++ and C++ are different terms.
+
+        %p
+          Some examples to try include:
+          %ol
+            %li Query: Jvaa
+            %li Max Distance: 2
+            %li Algorithm: Toggle between "Standard" and "Transposition"
+          %ol
+            %li Query: dojure
+            %li Max Distance 2
+            %li Algorithm: Toggle between "Transposition" and "Merge and Split"
+
         %table.query
           %tr
             %td.query-term
@@ -46,18 +62,27 @@
                 %option{:value => 'merge_and_split'} Merge and Split
           %tr
             %td{:colspan => 3}
-              %textarea.programming-languages{:readonly => true, :title => 'List of prgramming languages'}
-        %pre
-          %code
+              %table.languages.unfiltered-results
+                %thead
+                  %tr
+                    %th.language Programming Language
+                %tbody
+              %table.languages.filtered-results.hidden
+                %thead
+                  %tr
+                    %th.language Programming Language
+                    %th.distance Distance
+                %tbody
+        %pre.code
+          %code.coffeescript
             = preserve do
               :escaped
-                'use strict'
-
                 $ ($) ->
+                  'use strict'
+
                   transducer = null
 
                   $progs = $('textarea.programming-languages')
-                  defaults = levenshtein.programming_languages.join('\n')
 
                   $term = $('input.query-term')
                   $dist = $('select.edit-distance')
@@ -69,20 +94,41 @@
 
                   builder = new levenshtein.Builder()
                     .dictionary(levenshtein.programming_languages, true)
-                    .maximum_candidates(10)
-                    .include_distance(false)
+                    .include_distance(true)
                     .case_insensitive_sort(true)
                     .sort_candidates(true)
 
                   reset_transducer = () ->
                     transducer = builder.algorithm(algo).transducer()
 
+                  $unfiltered_results = $('table.unfiltered-results')
+                  $unfiltered_results_body = $unfiltered_results.find('tbody:first')
+                  $filtered_results = $('table.filtered-results')
+                  $filtered_results_tbody = $filtered_results.find('tbody:first')
+
+                  $.each levenshtein.programming_languages,
+                    (index, language) ->
+                      $unfiltered_results_body.append $ \
+                        '<tr>' +
+                          "<td class='language'>\#{language}</td>" +
+                        '</tr>'
+
                   filter = () ->
                     if term = $.trim $term.val()
-                      candidates = transducer.transduce(term, dist)
-                      $progs.val candidates.join('\n')
+                      $unfiltered_results.hide()
+                      $filtered_results.hide()
+                      $filtered_results_tbody.empty()
+                      $.each transducer.transduce(term, dist),
+                        (index, [candidate, distance]) ->
+                          $filtered_results_tbody.append $ \
+                            '<tr>' +
+                              "<td class='language'>\#{candidate}</td>" +
+                              "<td class='distance'>\#{distance}</td>" +
+                            '</tr>'
+                      $filtered_results.show()
                     else
-                      $progs.val(defaults)
+                      $filtered_results.hide()
+                      $unfiltered_results.show()
                     null
 
                   $term.keyup (event) ->

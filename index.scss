@@ -20,12 +20,75 @@ table.query {
     width: 100%;
   }
 
-  textarea.programming-languages {
+  select.algorithm {
+    width: 152px;
+  }
+}
+
+table.languages {
+  border: thin solid #373737;
+  width: 100%;
+
+  tbody {
+    max-height: 10em;
+    overflow: auto;
     width: 100%;
-    height: 10em;
   }
 
-  select.algorithm {
-    width: 100%;
+  &.unfiltered-results {
+    th, td {
+      text-align: left;
+
+      &.language {
+        width: 640px;
+      }
+    }
   }
+
+  &.filtered-results {
+    th, td {
+      &.language {
+        text-align: left;
+      }
+      &.distance {
+        text-align: left;
+        border-left: thin solid #373737;
+      }
+    }
+
+    th {
+      &.language {
+        width: 370px;
+      }
+      &.distance {
+        width: 225px;
+      }
+    }
+
+    td {
+      &.language {
+        width: 385px;
+      }
+      &.distance {
+        width: 200px;
+      }
+    }
+  }
+
+  thead > tr, tbody {
+    display: block;
+  }
+}
+
+pre.code {
+  width: 100%;
+  padding: 0;
+  code {
+    padding: 0;
+    margin: 0;
+  }
+}
+
+.hidden {
+  display: none;
 }
