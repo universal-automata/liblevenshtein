@@ -55,6 +55,8 @@
                 - (0..10).each do |distance|
                   %option{:value => distance}
                     = distance
+                %option{:value => 'Infinity'}
+                  &infin;
             %td.algorithm
               %select.algorithm{:title => 'Which algorithm to use'}
                 %option{:value => 'standard'} Standard
