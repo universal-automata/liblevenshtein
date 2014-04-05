@@ -35,7 +35,7 @@ deployed to, let me know.
 
 This library is based largely on the work of [Stoyan
 Mihov](http://www.lml.bas.bg/~stoyan/), [Klaus
-Schulz](http://www.klaus-schulze.com/), and Petar Nikolaev Mitankin: "[Fast
+Schulz](http://www.cis.uni-muenchen.de/people/schulz.html), and Petar Nikolaev Mitankin: "[Fast
 String Correction with
 Levenshtein-Automata](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.16.652
 "Klaus Schulz and Stoyan Mihov (2002)")".  For more details, please see the
