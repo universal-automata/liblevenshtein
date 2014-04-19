@@ -4,8 +4,8 @@
 
 |     Language|                                                                      Build Status                                                                     |                     Repository                     |
 |------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------|
-| CoffeeScript|[![Build Status](https://travis-ci.org/dylon/liblevenshtein-coffeescript.svg?branch=master)](https://travis-ci.org/dylon/liblevenshtein-coffeescript)  |https://github.com/dylon/liblevenshtein-coffeescript|
-|         Java|[![Build Status](https://travis-ci.org/dylon/liblevenshtein-java.svg?branch=master)](https://travis-ci.org/dylon/liblevenshtein-java)                  |https://github.com/dylon/liblevenshtein-java        |
+| CoffeeScript|[![Build Status](https://travis-ci.org/universal-automata/liblevenshtein-coffeescript.svg?branch=master)](https://travis-ci.org/universal-automata/liblevenshtein-coffeescript)  |https://github.com/universal-automata/liblevenshtein-coffeescript|
+|         Java|[![Build Status](https://travis-ci.org/universal-automata/liblevenshtein-java.svg?branch=master)](https://travis-ci.org/universal-automata/liblevenshtein-java)                  |https://github.com/universal-automata/liblevenshtein-java        |
 
 Levenshtein transducers accept a query term and return all terms in a
 dictionary that are within n spelling errors away from it. They constitute a
