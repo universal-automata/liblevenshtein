@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>package com.github.dylon.liblevenshtein.levenshtein.factory;<a name="line.1"></a>
+<span class="sourceLineNo">002</span><a name="line.2"></a>
+<span class="sourceLineNo">003</span>import com.github.dylon.liblevenshtein.levenshtein.Intersection;<a name="line.3"></a>
+<span class="sourceLineNo">004</span>import com.github.dylon.liblevenshtein.levenshtein.IState;<a name="line.4"></a>
+<span class="sourceLineNo">005</span><a name="line.5"></a>
+<span class="sourceLineNo">006</span>/**<a name="line.6"></a>
+<span class="sourceLineNo">007</span> * Builds nodes that help intersect a dictionary automaton with a Levenshtein<a name="line.7"></a>
+<span class="sourceLineNo">008</span> * automaton.<a name="line.8"></a>
+<span class="sourceLineNo">009</span> * @param &lt;DictionaryNode&gt; Kind of the nodes in the dictionary automaton.<a name="line.9"></a>
+<span class="sourceLineNo">010</span> * @author Dylon Edwards<a name="line.10"></a>
+<span class="sourceLineNo">011</span> * @since 2.1.0<a name="line.11"></a>
+<span class="sourceLineNo">012</span> */<a name="line.12"></a>
+<span class="sourceLineNo">013</span>public interface IIntersectionFactory&lt;DictionaryNode&gt; {<a name="line.13"></a>
+<span class="sourceLineNo">014</span><a name="line.14"></a>
+<span class="sourceLineNo">015</span>  /**<a name="line.15"></a>
+<span class="sourceLineNo">016</span>   * Constructs a new Intersection between two states: one from the dictionary<a name="line.16"></a>
+<span class="sourceLineNo">017</span>   * and one from the Levenshtein automaton.<a name="line.17"></a>
+<span class="sourceLineNo">018</span>   * @param candidate Substring of the candidate term from the dictionary<a name="line.18"></a>
+<span class="sourceLineNo">019</span>   * (spelling candidate of the query term).<a name="line.19"></a>
+<span class="sourceLineNo">020</span>   * @param dictionaryNode Dictionary node representing the final character in<a name="line.20"></a>
+<span class="sourceLineNo">021</span>   * the candidate term.<a name="line.21"></a>
+<span class="sourceLineNo">022</span>   * @param levenshteinState Location within the Levenshtein automaton of this<a name="line.22"></a>
+<span class="sourceLineNo">023</span>   * intersection.<a name="line.23"></a>
+<span class="sourceLineNo">024</span>   * @return New intersection node between {@code dictionaryNode} and<a name="line.24"></a>
+<span class="sourceLineNo">025</span>   * {@code levenshteinState}, having the term-prefix, {@code candidate}.<a name="line.25"></a>
+<span class="sourceLineNo">026</span>   */<a name="line.26"></a>
+<span class="sourceLineNo">027</span>  Intersection&lt;DictionaryNode&gt; build(<a name="line.27"></a>
+<span class="sourceLineNo">028</span>      String candidate,<a name="line.28"></a>
+<span class="sourceLineNo">029</span>      DictionaryNode dictionaryNode,<a name="line.29"></a>
+<span class="sourceLineNo">030</span>      IState levenshteinState);<a name="line.30"></a>
+<span class="sourceLineNo">031</span><a name="line.31"></a>
+<span class="sourceLineNo">032</span>  /**<a name="line.32"></a>
+<span class="sourceLineNo">033</span>   * [Optional Operation] Instructs this factory that the intersection will no<a name="line.33"></a>
+<span class="sourceLineNo">034</span>   * longer be used and may be recycled for reuse.<a name="line.34"></a>
+<span class="sourceLineNo">035</span>   * @param intersection Value to recycle.<a name="line.35"></a>
+<span class="sourceLineNo">036</span>   */<a name="line.36"></a>
+<span class="sourceLineNo">037</span>  void recycle(Intersection&lt;DictionaryNode&gt; intersection);<a name="line.37"></a>
+<span class="sourceLineNo">038</span>}<a name="line.38"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>
