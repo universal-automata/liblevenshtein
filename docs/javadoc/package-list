@@ -1,0 +1,6 @@
+com.github.dylon.liblevenshtein.collection
+com.github.dylon.liblevenshtein.collection.dawg
+com.github.dylon.liblevenshtein.collection.dawg.factory
+com.github.dylon.liblevenshtein.levenshtein
+com.github.dylon.liblevenshtein.levenshtein.distance
+com.github.dylon.liblevenshtein.levenshtein.factory
