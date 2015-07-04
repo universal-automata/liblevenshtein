@@ -833,13 +833,23 @@ it in _unsubsume for why I am not checking (e &lt; f) below.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
-              <p>(e &lt; f) &amp;&amp; Math.abs(j - (i - 1)) &lt;= (f - e)</p>
-<p>NOTE: This is how I derived what follows:
-  Math.abs(j - (i - 1)) = Math.abs(j - i + 1) = Math.abs(j - i) + 1</p>
+              <p>We have two cases:</p>
+<p>Case 1: (j &lt; i) =&gt; (j - i) = - (i - j)
+                =&gt; |j - (i - 1)| = |j - i + 1|
+                                 = |-(i - j) + 1|
+                                 = |-(i - j - 1)|
+                                 = i - j - 1</p>
+<p>Case 1 holds, because i and j are integers, and j &lt; i implies i is at
+least 1 unit greater than j, further implying that i - j - 1 is
+non-negative.</p>
+<p>Case 2: (j &gt;= i) =&gt; |j - (i - 1)| = |j - i + 1| = j - i + 1</p>
+<p>Case 2 holds for the same reason case 1 does, in that j - i &gt;= 0, and
+adding 1 to the difference will only strengthen its non-negativity.</p>
+<p>Math.abs(j - (i - 1)) &lt;= (f - e);</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>            ((i &lt; j) &amp;&amp; (j - i) || (i - j)) + <span class="hljs-number">1</span> &lt;= (f - e)
+            <div class="content"><div class='highlight'><pre>            (<span class="hljs-keyword">if</span> (j &lt; i) <span class="hljs-keyword">then</span> (i - j - <span class="hljs-number">1</span>) <span class="hljs-keyword">else</span> (j - i + <span class="hljs-number">1</span>)) &lt;= (f - e)
           <span class="hljs-keyword">else</span></pre></div></div>
             
         </li>
