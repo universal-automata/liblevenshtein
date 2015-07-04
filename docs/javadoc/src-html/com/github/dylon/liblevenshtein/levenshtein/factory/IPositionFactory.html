@@ -21,26 +21,32 @@
 <span class="sourceLineNo">013</span>   * @param e Number of accumulated errors at index {@code i}.<a name="line.13"></a>
 <span class="sourceLineNo">014</span>   * @return New position vector having index {@code i} and error {@code e}.<a name="line.14"></a>
 <span class="sourceLineNo">015</span>   */<a name="line.15"></a>
-<span class="sourceLineNo">016</span>  int[] build(int i, int e);<a name="line.16"></a>
-<span class="sourceLineNo">017</span><a name="line.17"></a>
-<span class="sourceLineNo">018</span>  /**<a name="line.18"></a>
-<span class="sourceLineNo">019</span>   * Builds a position vector for the transposition and merge-and-split,<a name="line.19"></a>
-<span class="sourceLineNo">020</span>   * Levenshtein algorihtms.<a name="line.20"></a>
-<span class="sourceLineNo">021</span>   * @param i Current index of the spelling candidate.<a name="line.21"></a>
-<span class="sourceLineNo">022</span>   * @param e Number of accumulated errors at index {@code i}.<a name="line.22"></a>
-<span class="sourceLineNo">023</span>   * @param x Either {@code 1} or {@code 0}, depending on whether the position<a name="line.23"></a>
-<span class="sourceLineNo">024</span>   * is a special case (e.g. a transposition position).<a name="line.24"></a>
-<span class="sourceLineNo">025</span>   * @return New position vector having index {@code i}, error {@code e}, and<a name="line.25"></a>
-<span class="sourceLineNo">026</span>   * special marker {@code x}.<a name="line.26"></a>
-<span class="sourceLineNo">027</span>   */<a name="line.27"></a>
-<span class="sourceLineNo">028</span>  int[] build(int i, int e, int x);<a name="line.28"></a>
-<span class="sourceLineNo">029</span><a name="line.29"></a>
-<span class="sourceLineNo">030</span>  /**<a name="line.30"></a>
-<span class="sourceLineNo">031</span>   * Recycles a position vector for re-use.<a name="line.31"></a>
-<span class="sourceLineNo">032</span>   * @param position Position vector to recycle.<a name="line.32"></a>
-<span class="sourceLineNo">033</span>   */<a name="line.33"></a>
-<span class="sourceLineNo">034</span>  void recycle(int[] position);<a name="line.34"></a>
-<span class="sourceLineNo">035</span>}<a name="line.35"></a>
+<span class="sourceLineNo">016</span>  default int[] build(int i, int e) {<a name="line.16"></a>
+<span class="sourceLineNo">017</span>    throw new UnsupportedOperationException("build(i,e) is not implemented");<a name="line.17"></a>
+<span class="sourceLineNo">018</span>  }<a name="line.18"></a>
+<span class="sourceLineNo">019</span><a name="line.19"></a>
+<span class="sourceLineNo">020</span>  /**<a name="line.20"></a>
+<span class="sourceLineNo">021</span>   * Builds a position vector for the transposition and merge-and-split,<a name="line.21"></a>
+<span class="sourceLineNo">022</span>   * Levenshtein algorihtms.<a name="line.22"></a>
+<span class="sourceLineNo">023</span>   * @param i Current index of the spelling candidate.<a name="line.23"></a>
+<span class="sourceLineNo">024</span>   * @param e Number of accumulated errors at index {@code i}.<a name="line.24"></a>
+<span class="sourceLineNo">025</span>   * @param x Either {@code 1} or {@code 0}, depending on whether the position<a name="line.25"></a>
+<span class="sourceLineNo">026</span>   * is a special case (e.g. a transposition position).<a name="line.26"></a>
+<span class="sourceLineNo">027</span>   * @return New position vector having index {@code i}, error {@code e}, and<a name="line.27"></a>
+<span class="sourceLineNo">028</span>   * special marker {@code x}.<a name="line.28"></a>
+<span class="sourceLineNo">029</span>   */<a name="line.29"></a>
+<span class="sourceLineNo">030</span>  default int[] build(int i, int e, int x) {<a name="line.30"></a>
+<span class="sourceLineNo">031</span>    throw new UnsupportedOperationException("build(i,e,x) is not implemented");<a name="line.31"></a>
+<span class="sourceLineNo">032</span>  }<a name="line.32"></a>
+<span class="sourceLineNo">033</span><a name="line.33"></a>
+<span class="sourceLineNo">034</span>  /**<a name="line.34"></a>
+<span class="sourceLineNo">035</span>   * Recycles a position vector for re-use.<a name="line.35"></a>
+<span class="sourceLineNo">036</span>   * @param position Position vector to recycle.<a name="line.36"></a>
+<span class="sourceLineNo">037</span>   */<a name="line.37"></a>
+<span class="sourceLineNo">038</span>  default void recycle(int[] position) {<a name="line.38"></a>
+<span class="sourceLineNo">039</span>        // default behavior is to do nothing<a name="line.39"></a>
+<span class="sourceLineNo">040</span>  }<a name="line.40"></a>
+<span class="sourceLineNo">041</span>}<a name="line.41"></a>
 
 
 
