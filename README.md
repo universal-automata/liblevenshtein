@@ -26,9 +26,9 @@ as by selecting the sequence of terms that have the greatest probability of
 appearing together).
 
 For a quick demonstration, please visit the [Github Page,
-here](http://dylon.github.io/liblevenshtein/).
+here](http://universal-automata.github.io/liblevenshtein/).
 
-The library is currently only written in CoffeeScript (and JavaScript), but I
+The library is currently written in Java, CoffeeScript, and JavaScript, but I
 will be porting it to other languages, soon.  If you have a specific language
 you would like to see it in, or package-management system you would like it
 deployed to, let me know.
@@ -39,4 +39,4 @@ Schulz](http://www.cis.uni-muenchen.de/people/schulz.html), and Petar Nikolaev M
 String Correction with
 Levenshtein-Automata](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.16.652
 "Klaus Schulz and Stoyan Mihov (2002)")".  For more details, please see the
-[wiki](https://github.com/dylon/liblevenshtein/wiki).
+[wiki](https://github.com/universal-automata/liblevenshtein/wiki).
