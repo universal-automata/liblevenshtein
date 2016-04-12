@@ -1,9 +1,9 @@
 [submodule "coffeescript"]
 	path = coffeescript
-	url = git@github.com:dylon/liblevenshtein-coffeescript.git
+	url = git@github.com:universal-automata/liblevenshtein-coffeescript.git
 [submodule "shared"]
 	path = shared
-	url = git@github.com:dylon/liblevenshtein-shared.git
+	url = git@github.com:universal-automata/liblevenshtein-shared.git
 [submodule "java"]
 	path = java
-	url = git@github.com:dylon/liblevenshtein-java.git
+	url = git@github.com:universal-automata/liblevenshtein-java.git
