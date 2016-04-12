@@ -2,10 +2,10 @@
 
 ### A library for generating Finite State Transducers based on Levenshtein Automata.
 
-|     Language |                     Build Status                  |                    Release                   |                            Repository                         |
-|-------------:|:-------------------------------------------------:|:--------------------------------------------:|:------------------------------------------------------------- |
-|         Java | [![Build Status][java-build-status]][java-ci]     | [![Maven Central][java-release]][java-maven] | [universal-automata/liblevenshtein-java][java-repo]           |
-| CoffeeScript | [![Build Status][coffee-build-status]][coffee-ci] | [![npm version][coffee-release]][coffee-npm] | [universal-automata/liblevenshtein-coffeescript][coffee-repo] |
+|     Language |                     Build Status                  |                    Release                   |                 Repository                 |
+|-------------:|:-------------------------------------------------:|:--------------------------------------------:|:------------------------------------------ |
+|         Java | [![Build Status][java-build-status]][java-ci]     | [![Maven Central][java-release]][java-maven] | [liblevenshtein-java][java-repo]           |
+| CoffeeScript | [![Build Status][coffee-build-status]][coffee-ci] | [![npm version][coffee-release]][coffee-npm] | [liblevenshtein-coffeescript][coffee-repo] |
 
 Levenshtein transducers accept a query term and return all terms in a
 dictionary that are within n spelling errors away from it. They constitute a
