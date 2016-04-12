@@ -2,10 +2,10 @@
 
 ### A library for generating Finite State Transducers based on Levenshtein Automata.
 
-|     Language|                                                                      Build Status                                                                     |                     Repository                     |
-|------------:|:-----------------------------------------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------|
-| CoffeeScript|[![Build Status](https://travis-ci.org/universal-automata/liblevenshtein-coffeescript.svg?branch=master)](https://travis-ci.org/universal-automata/liblevenshtein-coffeescript)  |https://github.com/universal-automata/liblevenshtein-coffeescript|
-|         Java|[![Build Status](https://travis-ci.org/universal-automata/liblevenshtein-java.svg?branch=master)](https://travis-ci.org/universal-automata/liblevenshtein-java)                  |https://github.com/universal-automata/liblevenshtein-java        |
+|     Language |                     Build Status                  |                    Release                   |                            Repository                         |
+|-------------:|:-------------------------------------------------:|:--------------------------------------------:|:------------------------------------------------------------- |
+|         Java | [![Build Status][java-build-status]][java-ci]     | [![Maven Central][java-release]][java-maven] | [universal-automata/liblevenshtein-java][java-repo]           |
+| CoffeeScript | [![Build Status][coffee-build-status]][coffee-ci] | [![npm version][coffee-release]][coffee-npm] | [universal-automata/liblevenshtein-coffeescript][coffee-repo] |
 
 Levenshtein transducers accept a query term and return all terms in a
 dictionary that are within n spelling errors away from it. They constitute a
@@ -40,3 +40,15 @@ String Correction with
 Levenshtein-Automata](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.16.652
 "Klaus Schulz and Stoyan Mihov (2002)")".  For more details, please see the
 [wiki](https://github.com/universal-automata/liblevenshtein/wiki).
+
+[java-repo]: https://github.com/universal-automata/liblevenshtein-java
+[java-build-status]: https://travis-ci.org/universal-automata/liblevenshtein-java.svg?branch=master
+[java-ci]: https://travis-ci.org/universal-automata/liblevenshtein-java
+[java-maven]: https://maven-badges.herokuapp.com/maven-central/com.github.dylon/liblevenshtein
+[java-release]: https://maven-badges.herokuapp.com/maven-central/com.github.dylon/liblevenshtein/badge.svg
+
+[coffee-repo]: https://github.com/universal-automata/liblevenshtein-coffeescript
+[coffee-build-status]: https://travis-ci.org/universal-automata/liblevenshtein-coffeescript.svg?branch=master
+[coffee-ci]: https://travis-ci.org/universal-automata/liblevenshtein-coffeescript
+[coffee-npm]: https://www.npmjs.com/package/liblevenshtein
+[coffee-release]: https://badge.fury.io/js/liblevenshtein.svg
