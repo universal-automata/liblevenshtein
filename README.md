@@ -1,5 +1,7 @@
 # liblevenshtein
 
+[![Join the chat at https://gitter.im/universal-automata/liblevenshtein](https://badges.gitter.im/universal-automata/liblevenshtein.svg)](https://gitter.im/universal-automata/liblevenshtein?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ### A library for generating Finite State Transducers based on Levenshtein Automata.
 
 |     Language |                     Build Status                  |                    Release                   |                 Repository                 |
