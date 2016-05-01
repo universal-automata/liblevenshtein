@@ -27,8 +27,9 @@ starting place, and plug them into whatever model you're using for context (such
 as by selecting the sequence of terms that have the greatest probability of
 appearing together).
 
-For a quick demonstration, please visit the [Github Page,
-here](http://universal-automata.github.io/liblevenshtein/).
+For a quick demonstration, please visit the [Github Page, here][live-demo].
+There's also a command-line interface, [liblevenshtein-java-cli][java-cli].
+Please see its [README.md][java-cli-readme] for acquisition and usage information.
 
 The library is currently written in Java, CoffeeScript, and JavaScript, but I
 will be porting it to other languages, soon.  If you have a specific language
@@ -54,3 +55,8 @@ Levenshtein-Automata](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.16
 [coffee-ci]: https://travis-ci.org/universal-automata/liblevenshtein-coffeescript
 [coffee-npm]: https://www.npmjs.com/package/liblevenshtein
 [coffee-release]: https://badge.fury.io/js/liblevenshtein.svg
+
+[live-demo]: http://universal-automata.github.io/liblevenshtein/
+
+[java-cli]: https://github.com/universal-automata/liblevenshtein-java-cli "liblevenshtein-java-cli"
+[java-cli-readme]: https://github.com/universal-automata/liblevenshtein-java-cli/blob/master/README.md "liblevenshtein-java-cli, README.md"
