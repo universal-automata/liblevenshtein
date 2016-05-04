@@ -47,8 +47,8 @@ Levenshtein-Automata](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.16
 [java-repo]: https://github.com/universal-automata/liblevenshtein-java
 [java-build-status]: https://travis-ci.org/universal-automata/liblevenshtein-java.svg?branch=master
 [java-ci]: https://travis-ci.org/universal-automata/liblevenshtein-java
-[java-maven]: https://maven-badges.herokuapp.com/maven-central/com.github.dylon/liblevenshtein
-[java-release]: https://maven-badges.herokuapp.com/maven-central/com.github.dylon/liblevenshtein/badge.svg
+[java-maven]: https://maven-badges.herokuapp.com/maven-central/com.github.universal-automata/liblevenshtein
+[java-release]: https://maven-badges.herokuapp.com/maven-central/com.github.universal-automata/liblevenshtein/badge.svg
 
 [coffee-repo]: https://github.com/universal-automata/liblevenshtein-coffeescript
 [coffee-build-status]: https://travis-ci.org/universal-automata/liblevenshtein-coffeescript.svg?branch=master
