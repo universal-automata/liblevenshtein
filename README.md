@@ -8,6 +8,7 @@
 |-------------:|:-------------------------------------------------:|:--------------------------------------------:|:------------------------------------------ |
 |         Java | [![Build Status][java-build-status]][java-ci]     | [![Maven Central][java-release]][java-maven] | [liblevenshtein-java][java-repo]           |
 | CoffeeScript | [![Build Status][coffee-build-status]][coffee-ci] | [![npm version][coffee-release]][coffee-npm] | [liblevenshtein-coffeescript][coffee-repo] |
+|          C++ | Work-in-progress                                  | Work-in-progress                             | [liblevenshtein-cpp][cpp-repo]             |
 
 Levenshtein transducers accept a query term and return all terms in a
 dictionary that are within n spelling errors away from it. They constitute a
@@ -31,10 +32,10 @@ For a quick demonstration, please visit the [Github Page, here][live-demo].
 There's also a command-line interface, [liblevenshtein-java-cli][java-cli].
 Please see its [README.md][java-cli-readme] for acquisition and usage information.
 
-The library is currently written in Java, CoffeeScript, and JavaScript, but I
-will be porting it to other languages, soon.  If you have a specific language
-you would like to see it in, or package-management system you would like it
-deployed to, let me know.
+The library is currently written in Java, CoffeeScript, JavaScript, and C++. I
+will be porting it to other languages, soon. If you have a specific language you
+would like to see it in, or package-management system you would like it deployed
+to, let me know.
 
 This library is based largely on the work of [Stoyan
 Mihov](http://www.lml.bas.bg/~stoyan/), [Klaus
@@ -55,6 +56,8 @@ Levenshtein-Automata](http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.16
 [coffee-ci]: https://travis-ci.org/universal-automata/liblevenshtein-coffeescript
 [coffee-npm]: https://www.npmjs.com/package/liblevenshtein
 [coffee-release]: https://badge.fury.io/js/liblevenshtein.svg
+
+[cpp-repo]: https://github.com/universal-automata/liblevenshtein-cpp
 
 [live-demo]: http://universal-automata.github.io/liblevenshtein/
 

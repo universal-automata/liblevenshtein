@@ -7,3 +7,6 @@
 [submodule "java"]
 	path = java
 	url = git@github.com:universal-automata/liblevenshtein-java.git
+[submodule "cpp"]
+	path = cpp
+	url = git@github.com:universal-automata/liblevenshtein-cpp.git
